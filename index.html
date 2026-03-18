@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#EDEAE4"/>
+<title>Lokalz</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Dancing+Script:wght@600;700&family=Barlow:wght@600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Barlow',sans-serif;background:#111;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;}
+#root{width:100%;max-width:430px;height:100dvh;max-height:932px;position:relative;overflow:hidden;background:#EDEAE4;}
+@media(max-width:430px){#root{max-height:100dvh;}}
+
+/* TOKENS */
+:root{
+  --bg: #EDEAE4;
+  --blue: #1B4FD8;
+  --blue-dark: #1640B0;
+  --black: #111111;
+  --white: #FFFFFF;
+  --script: 'Dancing Script', cursive;
+  --display: 'Barlow Condensed', sans-serif;
+  --body: 'Barlow', sans-serif;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideInLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes slideInUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:fadeUp .28s ease both;}
+
+/* LOGO — large on auth screens, medium on inner screens */
+.logo{font-family:var(--display);font-weight:900;font-size:96px;color:var(--blue);line-height:.88;letter-spacing:-2px;user-select:none;}
+.logo-md{font-family:var(--display);font-weight:900;font-size:56px;color:var(--blue);line-height:.9;letter-spacing:-1px;user-select:none;}
+.logo-white{color:var(--white);}
+
+/* TAGLINE */
+.tagline{font-family:var(--body);font-weight:700;font-size:17px;color:var(--black);margin-top:6px;line-height:1.3;}
+
+/* SCRIPT TEXT */
+.script{font-family:var(--script);font-size:30px;color:var(--black);}
+.script-white{color:var(--white);}
+.script-sm{font-size:22px;}
+
+/* INPUTS — blue background, white bold uppercase, pill shape */
+.input-field{
+  background:var(--blue);
+  border-radius:50px;
+  padding:22px 26px;
+  font-family:var(--display);
+  font-weight:800;
+  font-size:17px;
+  color:var(--white);
+  letter-spacing:.1em;
+  width:100%;
+  border:none;
+  outline:none;
+  cursor:text;
+  display:block;
+}
+.input-field::placeholder{color:rgba(255,255,255,.85);font-weight:800;}
+
+/* BUTTONS */
+.btn-black{
+  background:var(--black);
+  color:var(--white);
+  border:none;
+  border-radius:50px;
+  padding:20px 28px;
+  font-family:var(--display);
+  font-weight:800;
+  font-size:17px;
+  letter-spacing:.1em;
+  cursor:pointer;
+  width:100%;
+  text-align:center;
+  transition:transform .12s,opacity .12s;
+  display:block;
+}
+.btn-black:active{transform:scale(.97);}
+
+.btn-black-half{
+  background:var(--black);
+  color:var(--white);
+  border:none;
+  border-radius:50px;
+  padding:22px 20px;
+  font-family:var(--display);
+  font-weight:800;
+  font-size:17px;
+  letter-spacing:.1em;
+  cursor:pointer;
+  flex:1;
+  text-align:center;
+  transition:transform .12s;
+}
+.btn-black-half:active{transform:scale(.97);}
+
+.btn-blue{
+  background:var(--blue);
+  color:var(--white);
+  border:none;
+  border-radius:50px;
+  padding:20px 28px;
+  font-family:var(--display);
+  font-weight:800;
+  font-size:17px;
+  letter-spacing:.1em;
+  cursor:pointer;
+  width:100%;
+  text-align:center;
+  transition:transform .12s;
+  display:block;
+}
+.btn-blue:active{transform:scale(.97);}
+
+/* OCCASION CARDS — horizontal scroll */
+.cards-row{
+  display:flex;
+  gap:14px;
+  padding:0 24px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x mandatory;
+  padding-bottom:8px;
+  flex-shrink:0;
+}
+.cards-row::-webkit-scrollbar{display:none;}
+
+.occ-card{
+  flex-shrink:0;
+  width:210px;
+  height:260px;
+  background:var(--blue);
+  border-radius:24px;
+  padding:20px 18px;
+  cursor:pointer;
+  scroll-snap-align:center;
+  transition:transform .15s,opacity .15s,outline .1s;
+  position:relative;
+  overflow:hidden;
+}
+.occ-card:active{transform:scale(.97);}
+.occ-card.sel{outline:3px solid var(--black);background:var(--blue-dark);}
+.occ-card-label{font-family:var(--script);font-size:24px;color:var(--white);line-height:1.25;position:relative;z-index:1;}
+
+/* SOMETHING ELSE EXPANDED */
+.else-card{
+  width:210px;
+  min-height:260px;
+  background:var(--blue);
+  border-radius:24px;
+  padding:20px 18px;
+  cursor:pointer;
+  flex-shrink:0;
+  scroll-snap-align:center;
+}
+.else-item{
+  font-family:var(--script);
+  font-size:20px;
+  color:var(--white);
+  padding:10px 6px;
+  border-bottom:1px solid rgba(255,255,255,.15);
+  cursor:pointer;
+  transition:opacity .15s;
+  border-radius:8px;
+}
+.else-item:last-child{border-bottom:none;}
+.else-item:active{opacity:.7;}
+
+/* MENU */
+.menu-panel{
+  position:absolute;inset:0;
+  background:var(--blue);
+  z-index:101;
+  animation:fadeIn .22s ease;
+  display:flex;flex-direction:column;
+  padding:56px 36px 44px;
+}
+.menu-close{position:absolute;top:24px;right:28px;background:none;border:none;color:rgba(255,255,255,.7);font-size:32px;cursor:pointer;font-weight:200;line-height:1;}
+.menu-item{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:44px;
+  color:var(--white);
+  padding:12px 0;
+  cursor:pointer;
+  transition:opacity .15s;
+  line-height:1;
+  letter-spacing:-.5px;
+}
+.menu-item:active{opacity:.6;}
+.menu-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+.menu-bottom-item{font-family:var(--body);font-weight:700;font-size:14px;color:rgba(255,255,255,.55);cursor:pointer;transition:color .15s;}
+.menu-bottom-item:active{color:var(--white);}
+
+/* HAMBURGER */
+.hamburger{background:none;border:none;cursor:pointer;padding:4px;display:flex;flex-direction:column;gap:6px;}
+.hamburger span{display:block;width:28px;height:2.5px;background:var(--blue);border-radius:2px;}
+
+/* OPTION BUTTONS (location, budget, etc) */
+.opt-btn{
+  background:var(--blue);
+  border:none;
+  border-radius:16px;
+  padding:19px 22px;
+  font-family:var(--display);
+  font-weight:800;
+  font-size:18px;
+  color:var(--white);
+  letter-spacing:.05em;
+  cursor:pointer;
+  width:100%;
+  text-align:left;
+  transition:all .15s;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.opt-btn.sel{background:var(--black);}
+.opt-btn:active{transform:scale(.98);}
+.opt-check{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.opt-check.on{background:var(--white);border-color:var(--white);}
+.opt-check.on::after{content:'✓';font-size:12px;color:var(--blue);font-weight:900;}
+
+/* VENUE CARDS */
+.venue-card{
+  background:var(--white);
+  border-radius:20px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform .15s;
+  margin-bottom:14px;
+}
+.venue-card:active{transform:scale(.98);}
+.venue-img{width:100%;height:170px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:60px;position:relative;}
+.venue-body{padding:16px 18px;}
+.venue-name{font-family:var(--display);font-weight:800;font-size:22px;color:var(--black);margin-bottom:5px;letter-spacing:.01em;}
+.venue-meta{font-family:var(--body);font-size:13px;color:#888;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.venue-tag{display:inline-block;background:#F0F0F0;color:#555;font-size:11px;font-weight:700;padding:3px 10px;border-radius:8px;}
+
+/* TABS */
+.tabs{display:flex;background:var(--bg);border-bottom:2px solid #ddd;flex-shrink:0;}
+.tab{flex:1;padding:14px 6px;font-family:var(--display);font-size:13px;font-weight:800;color:#aaa;background:none;border:none;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;letter-spacing:.05em;text-transform:uppercase;transition:all .15s;}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue);}
+
+/* MISC */
+.scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
+.scroll::-webkit-scrollbar{display:none;}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
+.back-btn{background:none;border:none;font-size:32px;color:var(--blue);cursor:pointer;padding:0;line-height:1;font-weight:300;}
+.text-link{font-family:var(--body);font-size:14px;font-weight:700;color:var(--black);text-decoration:underline;cursor:pointer;}
+.text-link-blue{color:var(--blue);}
+.divider{height:1px;background:#ddd;margin:4px 0;}
+.empty{text-align:center;padding:48px 20px;color:#aaa;}
+.empty-icon{font-size:44px;margin-bottom:12px;}
+.toast{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--white);padding:13px 26px;border-radius:50px;font-family:var(--display);font-size:14px;font-weight:800;letter-spacing:.06em;animation:popIn .25s ease both;white-space:nowrap;z-index:300;}
+.status-pill{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.04em;font-family:var(--body);}
+.pill-pending{background:#FFF3CD;color:#856404;}
+.pill-active{background:#D1E7DD;color:#0A3622;}
+.pill-rejected{background:#F8D7DA;color:#58151C;}
+.pill-needs_edit{background:#CFF4FC;color:#055160;}
+.admin-card{background:var(--white);border-radius:16px;padding:18px;margin-bottom:12px;}
+.input-wrap-light{background:var(--white);border:2px solid #ddd;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:10px;width:100%;}
+.input-wrap-light input{border:none;outline:none;background:transparent;font-family:var(--body);font-size:15px;font-weight:600;color:var(--black);flex:1;}
+.input-wrap-light input::placeholder{color:#bbb;}
+.prog-dots{display:flex;gap:7px;justify-content:center;padding:10px 0 4px;}
+.prog-dot{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.13);transition:all .2s;}
+.prog-dot.on{background:var(--blue);width:24px;border-radius:5px;}
+
+/* DARK MODE */
+body.dark #root { background: #111; }
+body.dark { background: #000; }
+.dark-mode {
+  --bg: #1A1A1A;
+  --black: #FFFFFF;
+  --white: #2A2A2A;
+}
+.dark-mode .screen { background: var(--bg); }
+.dark-mode .venue-card { background: #2A2A2A; }
+.dark-mode .venue-name { color: #FFFFFF; }
+.dark-mode .venue-meta { color: #aaa; }
+.dark-mode .venue-tag { background: #333; color: #ccc; }
+.dark-mode .admin-card { background: #2A2A2A; }
+.dark-mode .input-wrap-light { background: #2A2A2A; border-color: #444; }
+.dark-mode .input-wrap-light input { color: #fff; }
+.dark-mode .opt-btn { background: #1B4FD8; }
+.dark-mode .hdr { background: transparent; }
+.dark-mode .tabs { background: #1A1A1A; border-color: #333; }
+.dark-mode .tab { color: #666; }
+.dark-mode .tab.on { color: var(--blue); }
+.dark-mode .hamburger span { background: var(--blue); }
+.dark-mode .script { color: #eee; }
+.dark-mode .logo-md { color: var(--blue); }
+.dark-mode .tagline { color: #ccc; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+// ── SUPABASE CLIENT ───────────────────────────
+const SUPABASE_URL = "https://fljuckkagktvopquvqjs.supabase.co";
+const SUPABASE_KEY = "sb_publishable_IzCTiaNEH3RXKq9GJrTmEA_7cLYV_VI";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── MOCK DATA ────────────────────────────────
+const VENUES = [
+  {id:1,name:"Érlelt Bistro",address:"V., Váci u. 12.",district:"V",cuisine:"Wine bar",price:"$$$",terrace:true,emoji:"🍷",why:"Candlelit inner courtyard with a natural wine list. Locals keep it secret.",scout_alias:"The Sommelier",occasions:["Date night","Dinner with friends"],status:"active"},
+  {id:2,name:"Kollázs Brasserie",address:"V., Roosevelt tér 2.",district:"V",cuisine:"Hungarian",price:"$$$",terrace:false,emoji:"🥂",why:"Grand Art Deco dining room. Locals come for the Sunday brunch.",scout_alias:"The Chef",occasions:["Date night","Dinner with friends"],status:"active"},
+  {id:3,name:"Szeráj",address:"VI., Király u. 30.",district:"VI",cuisine:"Street food",price:"$",terrace:false,emoji:"☕",why:"Best burek in Budapest. Open until 5am. Every local knows it.",scout_alias:"The Night Owl",occasions:["Late night","Coffee"],status:"active"},
+  {id:4,name:"Telep",address:"VIII., Homok u. 2.",district:"VIII",cuisine:"Bar",price:"$$",terrace:true,emoji:"🍸",why:"Hidden garden bar in an old factory yard. No sign on the door.",scout_alias:"The Vibe Curator",occasions:["Drinks","Late night"],status:"active"},
+  {id:5,name:"Borkonyha",address:"V., Sas u. 3.",district:"V",cuisine:"Wine bar",price:"$$$",terrace:false,emoji:"⭐",why:"Michelin-starred but unfussy. Best value fine dining in the city.",scout_alias:"The Sommelier",occasions:["Dinner with friends","Date night"],status:"active"},
+  {id:6,name:"Gerbeaud",address:"V., Vörösmarty tér 7.",district:"V",cuisine:"Coffee",price:"$$",terrace:true,emoji:"☕",why:"Tourists sit outside. Locals go to the hidden upstairs salon.",scout_alias:"The Coffee Expert",occasions:["Coffee","Brunch"],status:"active"},
+  {id:7,name:"Dürer Kert",address:"XIV., Ajtósi Dürer sor 19.",district:"XIV",cuisine:"Bar",price:"$$",terrace:true,emoji:"🎵",why:"Budapest's best live music venue. Garden is magical in summer.",scout_alias:"The Night Owl",occasions:["Drinks","Dinner with friends"],status:"active"},
+  {id:8,name:"Spinoza",address:"VII., Dob u. 15.",district:"VII",cuisine:"Hungarian",price:"$$",terrace:false,emoji:"🎶",why:"Jewish Quarter institution. Cherry soup is legendary. Live jazz weekends.",scout_alias:"The Chef",occasions:["Dinner with friends","Coffee"],status:"active"},
+  {id:9,name:"Onyx",address:"V., Vörösmarty tér 7.",district:"V",cuisine:"Fine dining",price:"$$$$",terrace:false,emoji:"💎",why:"Two Michelin stars. The tasting menu changes with seasons.",scout_alias:"The Chef",occasions:["Date night","Birthday"],status:"active"},
+  {id:10,name:"Kiosk",address:"V., március 15. tér 4.",district:"V",cuisine:"Brunch",price:"$$",terrace:true,emoji:"🥗",why:"Riverfront terrace with Danube views. Brunch queue is worth it.",scout_alias:"The Vibe Curator",occasions:["Brunch","Coffee"],status:"active"},
+  {id:11,name:"New Scout Place",address:"XI., Bartók u. 55.",district:"XI",cuisine:"Italian",price:"$$",terrace:true,emoji:"🍝",why:"Homemade pasta, tiny terrace, no tourists yet.",scout_alias:"New Scout",occasions:["Dinner with friends"],status:"pending"},
+];
+
+const OCCASIONS = [
+  {id:"Date night", label:"Date night", illus:"date"},
+  {id:"Dinner with friends", label:"Dinner with friends", illus:"dinner"},
+  {id:"Brunch", label:"Brunch", illus:"brunch"},
+  {id:"Coffee", label:"Coffee", illus:"coffee"},
+  {id:"Drinks", label:"Drinks", illus:"drinks"},
+  {id:"Birthday", label:"Birthday", illus:"birthday"},
+  {id:"Something else...", label:"Something else...", illus:"else"},
+];
+const ELSE_OPTIONS = ["Matcha","Lunch","Sweet treat","Cocktails","Quick bite"];
+const DISTRICTS_MAIN = ["Near me","District V.","District VI.","District VII."];
+const ALL_DISTRICTS = ["District I.","District II.","District III.","District IV.","District V.","District VI.","District VII.","District VIII.","District IX.","District X.","District XI.","District XII.","District XIII.","District XIV.","District XV.","District XVI.","District XVII.","District XVIII.","District XIX.","District XX.","District XXI.","District XXII.","District XXIII."];
+const BUDGETS = ["$","$$","$$$","$$$$"];
+const CUISINES = ["Japanese","Chinese","Italian","Mexican","American","Hungarian","Indian","Vietnamese","Surprise me..."];
+const CUISINES_FILTER = ["Japanese","Chinese","Italian","Mexican","American","Hungarian","Indian","Vietnamese"];
+const GROUP_SIZES = ["2","Up to 6","Up to 8","8+"];
+const CITIES = ["Budapest","Vienna","Prague"];
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+// ── SVG ILLUSTRATIONS ────────────────────────
+const IllusDate = () => (
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+    <ellipse cx="40" cy="90" rx="16" ry="4" fill="white" fillOpacity=".15"/>
+    <ellipse cx="80" cy="90" rx="16" ry="4" fill="white" fillOpacity=".15"/>
+    <circle cx="35" cy="55" r="12" stroke="white" strokeWidth="2"/>
+    <circle cx="85" cy="55" r="12" stroke="white" strokeWidth="2"/>
+    <path d="M23 85 Q35 65 47 85" stroke="white" strokeWidth="2" fill="none"/>
+    <path d="M73 85 Q85 65 97 85" stroke="white" strokeWidth="2" fill="none"/>
+    <line x1="60" y1="30" x2="60" y2="50" stroke="white" strokeWidth="1.5" strokeDasharray="3,3"/>
+    <ellipse cx="60" cy="26" rx="4" ry="6" stroke="white" strokeWidth="1.5"/>
+    <rect x="35" y="70" width="50" height="2" rx="1" fill="white" fillOpacity=".3"/>
+  </svg>
+);
+
+const IllusCoffee = () => (
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+    <ellipse cx="55" cy="95" rx="30" ry="6" fill="white" fillOpacity=".15"/>
+    <path d="M25 50 Q25 90 55 90 Q85 90 85 50 Z" stroke="white" strokeWidth="2" fill="none"/>
+    <path d="M85 60 Q105 60 105 72 Q105 84 85 80" stroke="white" strokeWidth="2" fill="none"/>
+    <path d="M40 35 Q42 25 40 18" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <path d="M55 32 Q57 22 55 15" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <path d="M70 35 Q72 25 70 18" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <circle cx="90" cy="50" r="4" fill="white" fillOpacity=".3"/>
+    <circle cx="15" cy="65" r="5" fill="white" fillOpacity=".2"/>
+    <path d="M30 90 Q55 96 80 90" stroke="white" strokeWidth="2" fill="none"/>
+  </svg>
+);
+
+const IllusDrinks = () => (
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+    <path d="M35 20 L25 90 M35 20 L45 90" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+    <line x1="25" y1="90" x2="45" y2="90" stroke="white" strokeWidth="2"/>
+    <line x1="27" y1="55" x2="43" y2="55" stroke="white" strokeWidth="1.5" strokeDasharray="2,2"/>
+    <path d="M75 20 L65 90 M75 20 L85 90" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+    <line x1="65" y1="90" x2="85" y2="90" stroke="white" strokeWidth="2"/>
+    <line x1="67" y1="55" x2="83" y2="55" stroke="white" strokeWidth="1.5" strokeDasharray="2,2"/>
+    <path d="M40 25 Q60 10 80 25" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/>
+    <circle cx="20" cy="30" r="3" fill="white" fillOpacity=".3"/>
+    <circle cx="100" cy="45" r="4" fill="white" fillOpacity=".2"/>
+  </svg>
+);
+
+const IllusDinner = () => (
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+    <circle cx="60" cy="65" r="32" stroke="white" strokeWidth="2"/>
+    <circle cx="60" cy="65" r="22" stroke="white" strokeWidth="1.5" strokeDasharray="3,3"/>
+    <path d="M30 35 L30 50 Q30 58 38 58" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+    <path d="M38 35 L38 58" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+    <path d="M90 35 Q90 50 85 55 Q90 55 90 65 L90 90" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none"/>
+    <circle cx="60" cy="65" r="4" fill="white" fillOpacity=".4"/>
+  </svg>
+);
+
+const IllusBrunch = () => (
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+    <path d="M20 75 Q30 40 60 35 Q90 40 100 75 Z" stroke="white" strokeWidth="2" fill="none"/>
+    <path d="M30 75 Q35 55 60 50 Q85 55 90 75" stroke="white" strokeWidth="1.5" strokeDasharray="3,2" fill="none"/>
+    <path d="M50 35 Q52 20 58 15 Q62 20 65 35" stroke="white" strokeWidth="1.5" fill="none"/>
+    <line x1="58" y1="15" x2="58" y2="8" stroke="white" strokeWidth="1.5"/>
+    <line x1="15" y1="80" x2="105" y2="80" stroke="white" strokeWidth="2"/>
+    <circle cx="25" cy="90" r="3" fill="white" fillOpacity=".3"/>
+    <circle cx="95" cy="90" r="3" fill="white" fillOpacity=".3"/>
+  </svg>
+);
+
+const IllusElse = () => (
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+    <circle cx="60" cy="45" r="28" stroke="white" strokeWidth="2"/>
+    <path d="M51 38 Q60 28 69 38 Q72 48 60 52 L60 58" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+    <circle cx="60" cy="65" r="3" fill="white"/>
+    <path d="M35 85 Q60 95 85 85" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+  </svg>
+);
+
+function Illus({type}) {
+  const map = {date:<IllusDate/>,coffee:<IllusCoffee/>,drinks:<IllusDrinks/>,dinner:<IllusDinner/>,brunch:<IllusBrunch/>,else:<IllusElse/>,late:<IllusDrinks/>,birthday:<IllusDinner/>};
+  return map[type]||<IllusElse/>;
+}
+
+// ── COMPONENTS ───────────────────────────────
+function Hamburger({onClick}) {
+  return (
+    <button className="hamburger" onClick={onClick}>
+      <span/><span/><span/>
+    </button>
+  );
+}
+
+function StatusPill({status}) {
+  const map={pending:"pill-pending",active:"pill-active",rejected:"pill-rejected",needs_edit:"pill-needs_edit"};
+  const labels={pending:"Pending",active:"Active",rejected:"Rejected",needs_edit:"Needs Edit"};
+  return <span className={`status-pill ${map[status]||""}`}>{labels[status]||status}</span>;
+}
+
+function VenueCard({venue, onClick}) {
+  const [imgUrl, setImgUrl] = useState(null);
+  const grads={
+    "Wine bar":"linear-gradient(135deg,#2C1654,#1B4FD8)",
+    "Hungarian":"linear-gradient(135deg,#8B0000,#1B4FD8)",
+    "Bar":"linear-gradient(135deg,#1B4FD8,#0a2d8a)",
+    "Coffee":"linear-gradient(135deg,#3B2010,#1B4FD8)",
+    "Street food":"linear-gradient(135deg,#1B4FD8,#0d2f7a)",
+    "Brunch":"linear-gradient(135deg,#1a3a5c,#1B4FD8)",
+    "Fine dining":"linear-gradient(135deg,#111,#1B4FD8)",
+    "Italian":"linear-gradient(135deg,#1a4a1a,#1B4FD8)",
+    default:"linear-gradient(135deg,#111,#1B4FD8)",
+  };
+
+  useEffect(()=>{
+    supabase.from("venue_images").select("url").eq("venue_id",venue.id).eq("is_primary",true).limit(1).then(({data})=>{
+      if(data&&data.length>0) setImgUrl(data[0].url);
+    });
+  },[venue.id]);
+
+  return (
+    <div className="venue-card" onClick={onClick}>
+      <div className="venue-img" style={{background:imgUrl?"#111":grads[venue.cuisine]||grads.default,padding:0}}>
+        {imgUrl
+          ?<img src={imgUrl} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+          :<span style={{fontSize:52}}>🍽</span>
+        }
+      </div>
+      <div className="venue-body">
+        <div className="venue-name">{venue.name}</div>
+        <div className="venue-meta">
+          <span>{venue.cuisine}</span><span>·</span>
+          <span>Dist. {venue.district}</span><span>·</span>
+          <span>{venue.price_level||venue.price}</span>
+          {venue.terrace&&<><span>·</span><span>🌿</span></>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Menu({onClose, navigate, role, onSignOut}) {
+  return (
+    <div className="menu-panel">
+      <button className="menu-close" onClick={onClose}>✕</button>
+      <div className="menu-item" onClick={()=>{navigate("home");onClose();}}>Home</div>
+      {["Profile","Saved","All venues"].map(item=>(
+        <div key={item} className="menu-item" onClick={()=>{navigate(item.toLowerCase().replace(" ","_"));onClose();}}>{item}</div>
+      ))}
+      {(role==="scout"||role==="city_lead")&&(
+        <div className="menu-item" onClick={()=>{navigate("scout");onClose();}}>Scout mode</div>
+      )}
+      {role==="city_lead"&&(
+        <div className="menu-item" onClick={()=>{navigate("city_lead");onClose();}}>City lead</div>
+      )}
+      <div className="menu-bottom">
+        <div className="menu-bottom-item">About Lokalz</div>
+        <div className="menu-bottom-item">Contact us</div>
+        <div className="menu-bottom-item">Privacy policy</div>
+        <div className="menu-bottom-item" style={{color:"rgba(255,255,255,.35)",marginTop:4}} onClick={()=>{onSignOut();onClose();}}>Sign out</div>
+      </div>
+    </div>
+  );
+}
+
+// ── SCREENS ──────────────────────────────────
+
+function SignInScreen({navigate, onLogin}) {
+  const [email, setEmail] = useState("");
+  const [pw, setPw] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function go() {
+    if(!email||!pw) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const {data, error} = await supabase.auth.signInWithPassword({email, password:pw});
+      if(error) throw error;
+      const {data: profile} = await supabase.from("users").select("*").eq("id", data.user.id).single();
+      const u = {
+        id: data.user.id,
+        name: profile?.name || email.split("@")[0],
+        email: data.user.email,
+        role: profile?.role?.toLowerCase() || "user",
+        city_id: profile?.city_id || null
+      };
+      onLogin(u);
+      navigate(u.city_id ? "home" : "onboarding");
+    } catch(e) {
+      setError(e.message || "Sign in failed. Check your email and password.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="screen" style={{padding:"28px 28px 36px",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+      <div>
+        <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:"128px",color:"var(--blue)",lineHeight:.84,letterSpacing:"-3px",userSelect:"none",marginLeft:"-4px"}}>LOKALZ</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:8,lineHeight:1.3}}>Skip the tourist traps. Discover the real city.</div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        <div style={{fontFamily:"var(--script)",fontSize:28,color:"var(--black)",marginBottom:4}}>Sign in</div>
+        <input className="input-field" placeholder="E-MAIL" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
+        <input className="input-field" placeholder="PASSWORD" type="password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&go()}/>
+        {error&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"#c00",fontWeight:600,background:"rgba(255,0,0,.08)",padding:"10px 14px",borderRadius:10}}>{error}</div>}
+        <div style={{marginTop:4}}>
+          <div style={{fontFamily:"var(--script)",fontSize:24,color:"var(--black)",marginBottom:12}}>Or continue with...</div>
+          <div style={{display:"flex",gap:12}}>
+            <button className="btn-black-half" onClick={async()=>{
+              await supabase.auth.signInWithOAuth({
+                provider:"google",
+                options:{redirectTo: "https://lokalz.vercel.app"}
+              });
+            }}>GOOGLE</button>
+          </div>
+        </div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        <button className="btn-black" onClick={go} style={{opacity:loading?.6:1}}>
+          {loading ? "SIGNING IN..." : "SIGN IN"}
+        </button>
+        <div style={{textAlign:"center",display:"flex",flexDirection:"column",gap:8}}>
+          <span className="text-link" style={{fontSize:15}}>Forgot Password?</span>
+          <span style={{fontFamily:"var(--body)",fontSize:15,color:"var(--black)",fontWeight:600}}>
+            Don't have account?{" "}
+            <span className="text-link text-link-blue" onClick={()=>navigate("signup")}>Sign Up</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SignUpScreen({navigate, onLogin}) {
+  const [name,setName]=useState("");
+  const [email,setEmail]=useState("");
+  const [pw,setPw]=useState("");
+  const [pw2,setPw2]=useState("");
+  const [dob,setDob]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState(null);
+  const [success,setSuccess]=useState(false);
+
+  async function go() {
+    if(!name||!email||!pw) return setError("Please fill in all required fields.");
+    if(pw!==pw2) return setError("Passwords don't match.");
+    if(pw.length<6) return setError("Password must be at least 6 characters.");
+    setLoading(true);
+    setError(null);
+    try {
+      const {data, error} = await supabase.auth.signUp({email, password:pw});
+      if(error) throw error;
+      // Create user profile
+      await supabase.from("users").insert({
+        id: data.user.id,
+        name,
+        email,
+        role: "USER"
+      });
+      setSuccess(true);
+    } catch(e) {
+      setError(e.message || "Sign up failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if(success) return (
+    <div className="screen" style={{padding:"36px 28px",display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",gap:20,textAlign:"center"}}>
+      <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:"80px",color:"var(--blue)",lineHeight:.9}}>LOKALZ</div>
+      <div style={{fontFamily:"var(--script)",fontSize:32,color:"var(--black)",marginTop:20}}>Check your email!</div>
+      <div style={{fontFamily:"var(--body)",fontSize:16,fontWeight:600,color:"#555",lineHeight:1.6}}>
+        We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.
+      </div>
+      <button className="btn-black" style={{marginTop:20}} onClick={()=>navigate("signin")}>BACK TO SIGN IN</button>
+    </div>
+  );
+
+  return (
+    <div className="screen" style={{padding:"36px 28px 32px",justifyContent:"space-between"}}>
+      <div>
+        <div className="logo">LOKALZ</div>
+        <div className="tagline">Skip the tourist traps. Discover the real city.</div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        <div className="script" style={{marginBottom:4}}>Sign up</div>
+        <input className="input-field" placeholder="NAME" value={name} onChange={e=>setName(e.target.value)}/>
+        <input className="input-field" placeholder="E-MAIL" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
+        <input className="input-field" placeholder="PASSWORD" type="password" value={pw} onChange={e=>setPw(e.target.value)}/>
+        <input className="input-field" placeholder="PASSWORD AGAIN" type="password" value={pw2} onChange={e=>setPw2(e.target.value)}/>
+        <input className="input-field" placeholder="DATE OF BIRTH (DD/MM/YYYY)" value={dob} onChange={e=>setDob(e.target.value)} maxLength={10}/>
+        {error&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"#c00",fontWeight:600,background:"rgba(255,0,0,.08)",padding:"10px 14px",borderRadius:10}}>{error}</div>}
+      </div>
+      <div>
+        <button className="btn-black" onClick={go} style={{marginBottom:16,opacity:loading?.6:1}}>
+          {loading ? "SIGNING UP..." : "SIGN UP"}
+        </button>
+        <div style={{textAlign:"center",fontFamily:"var(--body)",fontSize:14,color:"#777",fontWeight:600}}>
+          Already have an account?{" "}
+          <span className="text-link text-link-blue" onClick={()=>navigate("signin")}>Sign In</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OnboardingScreen({navigate, user}) {
+  const [city, setCity] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  async function goNext(){
+    if(!city) return;
+    setSaving(true);
+    // Get city_id from cities table
+    const {data} = await supabase.from("cities").select("id").eq("name",city).single();
+    if(data && user?.id){
+      await supabase.from("users").update({city_id: data.id}).eq("id", user.id);
+    }
+    setSaving(false);
+    navigate("home");
+  }
+
+  return (
+    <div className="screen" style={{padding:"48px 28px 48px",justifyContent:"space-between"}}>
+      <div>
+        <div className="logo">LOKALZ</div>
+        <div style={{marginTop:32}}>
+          <div className="script" style={{marginBottom:4}}>Welcome!</div>
+          <div style={{fontFamily:"var(--body)",fontSize:16,fontWeight:600,color:"#555",lineHeight:1.5}}>
+            Pick your city to get started.
+          </div>
+        </div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {CITIES.map(c=>(
+          <button key={c} className={`opt-btn${city===c?" sel":""}`} onClick={()=>setCity(c)}>
+            {c}
+            <div className={`opt-check${city===c?" on":""}`}/>
+          </button>
+        ))}
+      </div>
+      <button className="btn-black" onClick={goNext} style={{opacity:city?1:.4}}>
+        {saving?"SAVING...":"LET'S GO →"}
+      </button>
+    </div>
+  );
+}
+
+function HomeScreen({navigate, onMenu, setAnswers}) {
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  function mockAIParse(q) {
+    const t = q.toLowerCase();
+    const result = {};
+
+    // OCCASION
+    if(/birthday/.test(t)) result.occasion = "Birthday";
+    else if(/date night|romantic|just the two|couple/.test(t)) result.occasion = "Date night";
+    else if(/brunch/.test(t)) result.occasion = "Brunch";
+    else if(/coffee|matcha|cafe/.test(t)) result.occasion = "Coffee";
+    else if(/drink|cocktail|bar|wine/.test(t)) result.occasion = "Drinks";
+    else if(/late night|after midnight|2am|3am/.test(t)) result.occasion = "Late night";
+    else if(/lunch/.test(t)) result.occasion = "Lunch";
+    else if(/dinner|dinner with|eating out/.test(t)) result.occasion = "Dinner with friends";
+
+    // GROUP SIZE
+    if(/\b(20|30|40|50)\b|large group|big group/.test(t)) result.group = "8+";
+    else if(/\b(9|10|11|12|13|14|15)\b/.test(t)) result.group = "8+";
+    else if(/\b(5|6|7|8)\b/.test(t)) result.group = "5–8";
+    else if(/\b(3|4)\b|few friends|couple of friends/.test(t)) result.group = "3–4";
+    else if(/\b2\b|just us|just the two|for two/.test(t)) result.group = "2";
+
+    // BUDGET
+    if(/cheap|budget|affordable|inexpensive/.test(t)) result.budget = "$";
+    else if(/mid|moderate|not too expensive/.test(t)) result.budget = "$$";
+    else if(/fancy|fine dining|upscale|splurge|special/.test(t)) result.budget = "$$$";
+    else if(/michelin|luxury|most expensive/.test(t)) result.budget = "$$$$";
+
+    // CUISINES
+    const cuisines = [];
+    if(/italian|pasta|pizza/.test(t)) cuisines.push("Italian");
+    if(/japanese|sushi|ramen/.test(t)) cuisines.push("Japanese");
+    if(/asian|thai|chinese|vietnamese/.test(t)) cuisines.push("Asian");
+    if(/hungarian|goulash|traditional/.test(t)) cuisines.push("Hungarian");
+    if(/wine bar|bistro|natural wine/.test(t)) cuisines.push("Wine bar");
+    if(/burger|street food|fast/.test(t)) cuisines.push("Burgers");
+    if(/dessert|cake|pastry|sweet/.test(t)) cuisines.push("Dessert");
+    if(/steak|grill|bbq/.test(t)) cuisines.push("Steak");
+    if(cuisines.length > 0) result.cuisines = cuisines;
+
+    return result;
+  }
+
+  function handleAISearch() {
+    if(!query.trim()) return;
+    setLoading(true);
+    setError(null);
+    setTimeout(()=>{
+      const parsed = mockAIParse(query);
+      setAnswers(a=>({...a, ...parsed, aiQuery: query}));
+      setLoading(false);
+      navigate("results");
+    }, 600);
+  }
+
+  return (
+    <div className="screen" style={{paddingTop:20}}>
+      <div className="hdr" style={{paddingBottom:0}}>
+        <div className="logo-md">LOKALZ</div>
+        <Hamburger onClick={onMenu}/>
+      </div>
+      <div style={{padding:"24px 24px 0"}}>
+        <div className="script" style={{marginBottom:20}}>What do you fancy?</div>
+        <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:13,color:"var(--black)",letterSpacing:".08em",marginBottom:10}}>
+          ASK OUR AI ASSISTANT
+        </div>
+        <div style={{position:"relative"}}>
+          <textarea
+            value={query}
+            onChange={e=>setQuery(e.target.value)}
+            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleAISearch();}}}
+            placeholder={"e.g. Birthday dinner for 20 in the city centre"}
+            rows={4}
+            style={{
+              width:"100%",background:"var(--white)",
+              border:"2px solid var(--black)",borderRadius:16,
+              padding:"16px 16px 52px",fontFamily:"var(--body)",
+              fontSize:15,fontWeight:600,color:"var(--black)",
+              resize:"none",outline:"none",lineHeight:1.5,
+            }}
+          />
+          <button onClick={handleAISearch} disabled={!query.trim()||loading}
+            style={{
+              position:"absolute",bottom:12,right:12,
+              background:query.trim()&&!loading?"var(--blue)":"#bbb",
+              color:"white",border:"none",borderRadius:10,
+              padding:"8px 16px",fontFamily:"var(--display)",
+              fontWeight:700,fontSize:13,letterSpacing:".06em",
+              cursor:query.trim()&&!loading?"pointer":"default",transition:"background .15s"
+            }}>
+            {loading?"..." : "SEARCH →"}
+          </button>
+        </div>
+        {error&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"#c00",fontWeight:600,marginTop:8}}>{error}</div>}
+        <div style={{display:"flex",alignItems:"center",gap:12,margin:"24px 0 16px"}}>
+          <div style={{flex:1,height:1,background:"#ccc"}}/>
+        </div>
+        <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:13,color:"var(--black)",letterSpacing:".08em",marginBottom:10}}>
+          NOT SURE YET? LET US HELP
+        </div>
+        <button className="btn-black" onClick={()=>{setAnswers({});navigate("q1");}}>
+          DISCOVER
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Q1Screen({navigate, onMenu, answers, setAnswers}) {
+  const [sel, setSel] = useState(answers.occasions||[]);
+  const [showElse, setShowElse] = useState(false);
+
+  function toggle(id) {
+    if(id==="Something else..."){setShowElse(v=>!v);return;}
+    setSel(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id]);
+  }
+  function toggleElse(val) {
+    setSel(prev=>prev.includes(val)?prev.filter(x=>x!==val):[...prev,val]);
+  }
+  function next(){setAnswers(a=>({...a,occasions:sel}));navigate("q2");}
+
+  return (
+    <div className="screen" style={{paddingTop:20,display:"flex",flexDirection:"column"}}>
+      <div className="hdr" style={{paddingBottom:0}}>
+        <button className="back-btn" onClick={()=>navigate("home")}>&#8249;</button>
+        <Hamburger onClick={onMenu}/>
+      </div>
+      <div style={{padding:"16px 24px 20px"}}>
+        <div className="logo-md">LOKALZ</div>
+        <div className="script" style={{marginTop:8}}>What do you fancy?</div>
+      </div>
+      <div className="cards-row" style={{flexShrink:0}}>
+        {OCCASIONS.map((o,i)=>(
+          <div key={o.id}
+            className={`occ-card${sel.includes(o.id)?" sel":""}`}
+            onClick={()=>toggle(o.id)}
+            style={{animationDelay:`${i*.04}s`,animation:"fadeUp .3s ease both"}}
+          >
+            <div className="occ-card-label">{o.label}</div>
+            <div className="illus" style={{position:"absolute",bottom:0,right:0}}>
+              <Illus type={o.illus}/>
+            </div>
+          </div>
+        ))}
+        {showElse&&(
+          <div className="else-card" style={{animation:"popIn .2s ease both"}}>
+            <div className="occ-card-label" style={{marginBottom:12}}>Something else...</div>
+            {ELSE_OPTIONS.map(e=>(
+              <div key={e} className="else-item"
+                style={{fontWeight:sel.includes(e)?800:400,background:sel.includes(e)?"rgba(255,255,255,.15)":"transparent",borderRadius:8,padding:"8px 6px"}}
+                onClick={()=>toggleElse(e)}>{e}</div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div style={{flex:1}}/>
+      <div style={{padding:"8px 24px 16px"}}>
+        <div className="prog-dots" style={{marginBottom:10}}>
+          {[1,2,3,4,5].map(i=><div key={i} className={`prog-dot${i===1?" on":""}`}/>)}
+        </div>
+        <button className="btn-black" onClick={next} style={{opacity:sel.length>0?1:.4}}>CONTINUE &#8594;</button>
+      </div>
+    </div>
+  );
+}
+
+function Q2Screen({navigate, onMenu, answers, setAnswers}) {
+  const [sel, setSel] = useState(answers.locations||[]);
+  const [showMore, setShowMore] = useState(false);
+  function toggle(d){setSel(prev=>prev.includes(d)?prev.filter(x=>x!==d):[...prev,d]);}
+  function next(){setAnswers(a=>({...a,locations:sel}));navigate("q3");}
+  return (
+    <div className="screen" style={{padding:"20px 24px 24px"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+        <button className="back-btn" onClick={()=>navigate("q1")}>&#8249;</button>
+        <div style={{width:26}}/>
+      </div>
+      <div className="logo-md" style={{marginBottom:8}}>LOKALZ</div>
+      <div className="script" style={{marginBottom:20}}>Where in the city?</div>
+      <div className="scroll" style={{display:"flex",flexDirection:"column",gap:9,marginBottom:12}}>
+        {DISTRICTS_MAIN.map(d=>(
+          <button key={d} className={`opt-btn${sel.includes(d)?" sel":""}`} onClick={()=>toggle(d)}>
+            {d}<div className={`opt-check${sel.includes(d)?" on":""}`}/>
+          </button>
+        ))}
+        <button className={`opt-btn${showMore?" sel":""}`} onClick={()=>setShowMore(v=>!v)}>
+          More districts...
+          <span style={{fontSize:16,lineHeight:1}}>{showMore?"▲":"▼"}</span>
+        </button>
+        {showMore&&(
+          <div style={{display:"flex",flexDirection:"column",gap:9,paddingLeft:12,animation:"fadeUp .2s ease both"}}>
+            {ALL_DISTRICTS.filter(d=>!DISTRICTS_MAIN.includes(d)).map(d=>(
+              <button key={d} className={`opt-btn${sel.includes(d)?" sel":""}`} onClick={()=>toggle(d)} style={{fontSize:16}}>
+                {d}<div className={`opt-check${sel.includes(d)?" on":""}`}/>
+              </button>
+            ))}
+          </div>
+        )}
+        <button className={`opt-btn${sel.includes("Anywhere in Budapest")?" sel":""}`} onClick={()=>toggle("Anywhere in Budapest")}>
+          Anywhere in Budapest<div className={`opt-check${sel.includes("Anywhere in Budapest")?" on":""}`}/>
+        </button>
+      </div>
+      <div className="prog-dots" style={{marginBottom:10}}>
+        {[1,2,3,4,5].map(i=><div key={i} className={`prog-dot${i===2?" on":""}`}/>)}
+      </div>
+      <button className="btn-black" onClick={next}>CONTINUE &#8594;</button>
+    </div>
+  );
+}
+
+const FOOD_OCCASIONS = ["Date night","Dinner with friends","Birthday","Brunch","Lunch"];
+
+function Q3Screen({navigate, answers, setAnswers}) {
+  const isFoodOccasion = (answers.occasions||[]).some(o => FOOD_OCCASIONS.includes(o));
+  function select(b){
+    setAnswers(a=>({...a,budget:b}));
+    setTimeout(()=>navigate(isFoodOccasion ? "q4" : "q5"),300);
+  }
+  return (
+    <div className="screen" style={{padding:"20px 24px 24px"}}>
+      <div style={{marginBottom:16}}>
+        <button className="back-btn" onClick={()=>navigate("q2")}>‹</button>
+      </div>
+      <div className="logo-md" style={{marginBottom:8}}>LOKALZ</div>
+      <div className="script" style={{marginBottom:20}}>What's your budget?</div>
+      <div style={{display:"flex",flexDirection:"column",gap:9,flex:1}}>
+        {BUDGETS.map(b=>(
+          <button key={b} className={`opt-btn${answers.budget===b?" sel":""}`} onClick={()=>select(b)}>
+            {b}
+          </button>
+        ))}
+      </div>
+      <div className="prog-dots" style={{marginTop:12}}>
+        {[1,2,3,4,5].map(i=><div key={i} className={`prog-dot${i===3?" on":""}`}/>)}
+      </div>
+    </div>
+  );
+}
+
+function Q4Screen({navigate, answers, setAnswers}) {
+  const [sel,setSel]=useState(answers.cuisines||[]);
+  function toggle(c){setSel(prev=>prev.includes(c)?prev.filter(x=>x!==c):[...prev,c]);}
+  function next(){setAnswers(a=>({...a,cuisines:sel}));navigate("q5");}
+  return (
+    <div className="screen" style={{padding:"20px 24px 24px"}}>
+      <div style={{marginBottom:16}}>
+        <button className="back-btn" onClick={()=>navigate("q3")}>&#8249;</button>
+      </div>
+      <div className="logo-md" style={{marginBottom:8}}>LOKALZ</div>
+      <div className="script" style={{marginBottom:16}}>What are you in the mood for?</div>
+      <div className="scroll" style={{display:"flex",flexDirection:"column",gap:9,marginBottom:12}}>
+        {CUISINES.map(c=>(
+          <button key={c} className={`opt-btn${sel.includes(c)?" sel":""}`} onClick={()=>toggle(c)}>
+            {c}<div className={`opt-check${sel.includes(c)?" on":""}`}/>
+          </button>
+        ))}
+      </div>
+      <div className="prog-dots" style={{marginBottom:10}}>
+        {[1,2,3,4,5].map(i=><div key={i} className={`prog-dot${i===4?" on":""}`}/>)}
+      </div>
+      <button className="btn-black" onClick={next}>CONTINUE &#8594;</button>
+    </div>
+  );
+}
+
+function Q5Screen({navigate, answers, setAnswers}) {
+  const isFoodOccasion = (answers.occasions||[]).some(o => FOOD_OCCASIONS.includes(o));
+  function select(g){setAnswers(a=>({...a,group:g}));setTimeout(()=>navigate("results"),350);}
+  return (
+    <div className="screen" style={{padding:"20px 24px 24px"}}>
+      <div style={{marginBottom:16}}>
+        <button className="back-btn" onClick={()=>navigate(isFoodOccasion?"q4":"q3")}>‹</button>
+      </div>
+      <div className="logo-md" style={{marginBottom:8}}>LOKALZ</div>
+      <div className="script" style={{marginBottom:20}}>How many people?</div>
+      <div style={{display:"flex",flexDirection:"column",gap:9,flex:1}}>
+        {GROUP_SIZES.map(g=>(
+          <button key={g} className={`opt-btn${answers.group===g?" sel":""}`} onClick={()=>select(g)}>
+            {g}
+          </button>
+        ))}
+      </div>
+      <div className="prog-dots" style={{marginTop:12}}>
+        {[1,2,3,4,5].map(i=><div key={i} className={`prog-dot${i===5?" on":""}`}/>)}
+      </div>
+    </div>
+  );
+}
+
+// Capacity matching — "2 főre keresek" → Up to 6, Up to 8, 8+ is megfelelő
+function capacityMatches(venueCapacity, searchGroup) {
+  if(!venueCapacity || !searchGroup) return true;
+  const order = ["2", "Up to 6", "Up to 8", "8+"];
+  const vIdx = order.indexOf(venueCapacity);
+  const sIdx = order.indexOf(searchGroup);
+  if(vIdx === -1 || sIdx === -1) return true;
+  return vIdx >= sIdx; // venue kapacitása >= keresett csoport
+}
+
+function ResultsScreen({navigate, onMenu, answers, allVenues}) {
+  const BATCH=5;
+  const active = allVenues.filter(v=>v.status==="active");
+  const filtered = active.filter(v=>{
+    if(answers.occasions?.length>0 && !answers.occasions.some(o=>(v.occasions||[]).includes(o))) return false;
+    if(answers.budget && (v.price_level||v.price)!==answers.budget) return false;
+    if(answers.cuisines?.length>0 && v.cuisine && !answers.cuisines.some(c=>v.cuisine.toLowerCase().includes(c.toLowerCase()))) return false;
+    if(answers.group && !capacityMatches(v.capacity, answers.group)) return false;
+    return true;
+  });
+  const pool = shuffle(filtered.length>0?filtered:active);
+  const [shown,setShown]=useState(pool.slice(0,BATCH));
+  const [page,setPage]=useState(1);
+  const noMore=page*BATCH>=pool.length;
+
+  function showMore(){
+    const next=pool.slice(page*BATCH,(page+1)*BATCH);
+    setShown(p=>[...p,...next]);
+    setPage(p=>p+1);
+  }
+
+  return (
+    <div className="screen" style={{padding:"20px 0 0"}}>
+      <div className="hdr" style={{paddingBottom:0}}>
+        <Hamburger onClick={onMenu}/>
+        <div style={{width:26}}/>
+      </div>
+      <div style={{padding:"12px 24px 16px"}}>
+        <div className="logo-md">LOKALZ</div>
+        <div className="script" style={{marginTop:6}}>Our picks for you:</div>
+      </div>
+      <div className="scroll" style={{padding:"0 20px"}}>
+        {shown.length===0&&(
+          <div className="empty">
+            <div className="empty-icon">😕</div>
+            <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:600,color:"#777",lineHeight:1.6}}>
+              No venues matched your filters.<br/>Try different options!
+            </div>
+            <button className="btn-blue" style={{marginTop:20,width:"auto",padding:"14px 28px"}} onClick={()=>navigate("q1")}>
+              START OVER
+            </button>
+          </div>
+        )}
+        {shown.map((v,i)=>(
+          <div key={v.id} style={{animation:`fadeUp .3s ${Math.min(i,.4)*0.07}s ease both`,opacity:0,animationFillMode:"forwards"}}>
+            <VenueCard venue={v} onClick={()=>navigate("venue",v)}/>
+          </div>
+        ))}
+        {shown.length>0&&!noMore&&(
+          <button className="btn-blue" style={{marginBottom:16,borderRadius:14}} onClick={showMore}>
+            SHOW ME MORE ↻
+          </button>
+        )}
+        {noMore&&shown.length>0&&(
+          <div style={{textAlign:"center",color:"#aaa",fontFamily:"var(--body)",fontSize:13,fontWeight:600,marginBottom:16}}>
+            That's all! <span className="text-link text-link-blue" onClick={()=>navigate("q1")}>Start over</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ScoutFeedbackSection({venue, user, showToast}) {
+  const [existing, setExisting] = useState(null);
+  const [counts, setCounts] = useState({still_recommended:0, needs_review:0, report_closed:0});
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(()=>{
+    // Load own feedback
+    if(user?.id){
+      supabase.from("venue_feedback")
+        .select("*")
+        .eq("venue_id", venue.id)
+        .eq("scout_id", user.id)
+        .single()
+        .then(({data})=>{ if(data) setExisting(data); });
+    }
+    // Load counts
+    supabase.from("venue_feedback")
+      .select("feedback_type")
+      .eq("venue_id", venue.id)
+      .then(({data})=>{
+        if(data){
+          const c={still_recommended:0,needs_review:0,report_closed:0};
+          data.forEach(r=>{ if(c[r.feedback_type]!==undefined) c[r.feedback_type]++; });
+          setCounts(c);
+        }
+      });
+  },[venue.id, user?.id]);
+
+  async function submitFeedback(type){
+    if(!user?.id) return;
+    setSubmitting(true);
+    const prevType = existing?.feedback_type;
+    if(existing){
+      const {error} = await supabase.from("venue_feedback").update({feedback_type:type}).eq("id",existing.id);
+      if(!error){
+        setExisting(e=>({...e,feedback_type:type}));
+        setCounts(c=>({...c,[prevType]:c[prevType]-1,[type]:c[type]+1}));
+      }
+    } else {
+      const {data,error} = await supabase.from("venue_feedback").insert({
+        venue_id: venue.id,
+        scout_id: user.id,
+        feedback_type: type
+      }).select().single();
+      if(!error){
+        setExisting(data);
+        setCounts(c=>({...c,[type]:c[type]+1}));
+      }
+    }
+    setSubmitting(false);
+    showToast("Feedback submitted ✓");
+  }
+
+  const options = [
+    {type:"still_recommended", label:"Still recommended", icon:"✅"},
+    {type:"needs_review", label:"Needs review", icon:"⚠️"},
+    {type:"report_closed", label:"Report closed", icon:"🚫"},
+  ];
+
+  return (
+    <div style={{background:"#F5F5F5",borderRadius:16,padding:16,marginTop:4}}>
+      <div style={{fontFamily:"var(--display)",fontSize:13,fontWeight:800,color:"var(--blue)",letterSpacing:".06em",marginBottom:10}}>SCOUT FEEDBACK</div>
+      {options.map(o=>(
+        <button key={o.type} onClick={()=>!submitting&&submitFeedback(o.type)}
+          style={{display:"flex",width:"100%",alignItems:"center",justifyContent:"space-between",
+            background:existing?.feedback_type===o.type?"var(--blue)":"none",
+            color:existing?.feedback_type===o.type?"white":"var(--black)",
+            border:"1.5px solid",
+            borderColor:existing?.feedback_type===o.type?"var(--blue)":"#ddd",
+            borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:700,cursor:"pointer",marginBottom:8,transition:"all .15s"}}>
+          <span>{o.icon} {o.label}</span>
+          <span style={{background:existing?.feedback_type===o.type?"rgba(255,255,255,.25)":"#e0e0e0",borderRadius:20,padding:"2px 10px",fontSize:13,fontWeight:800,color:existing?.feedback_type===o.type?"white":"#555"}}>
+            {counts[o.type]}
+          </span>
+        </button>
+      ))}
+      {existing&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600,marginTop:4}}>Last updated: {new Date(existing.created_at).toLocaleDateString()}</div>}
+    </div>
+  );
+}
+
+function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, isScout, user}) {
+  const [imgIdx,setImgIdx]=useState(0);
+  const [images,setImages]=useState([]);
+  const [showReport,setShowReport]=useState(false);
+  const [reportType,setReportType]=useState("");
+  const [reportSubmitting,setReportSubmitting]=useState(false);
+  const saved=savedIds.has(venue.id);
+
+  async function submitReport(){
+    if(!reportType) return;
+    setReportSubmitting(true);
+    const {error} = await supabase.from("venue_reports").insert({
+      venue_id: venue.id,
+      user_id: user?.id||null,
+      report_type: reportType
+    });
+    setReportSubmitting(false);
+    if(error){showToast("Error sending report");return;}
+    setShowReport(false);
+    setReportType("");
+    showToast("Report sent ✓ Thank you!");
+  }
+
+  useEffect(()=>{
+    supabase.from("venue_images").select("url").eq("venue_id",venue.id).order("sort_order").then(({data})=>{
+      if(data&&data.length>0) setImages(data.map(d=>d.url));
+    });
+  },[venue.id]);
+
+  const grads={
+    "Wine bar":"linear-gradient(160deg,#2C1654,#1B4FD8)",
+    "Hungarian":"linear-gradient(160deg,#8B0000,#1B4FD8)",
+    "Bar":"linear-gradient(160deg,#111,#1B4FD8)",
+    "Coffee":"linear-gradient(160deg,#3B2010,#1B4FD8)",
+    "Fine dining":"linear-gradient(160deg,#111,#1B4FD8)",
+    default:"linear-gradient(160deg,#111,#1B4FD8)",
+  };
+
+  return (
+    <div className="screen">
+      <div style={{width:"100%",height:220,background:images.length>0?"#111":grads[venue.cuisine]||grads.default,flexShrink:0,position:"relative",display:"flex",alignItems:"center",justifyContent:"center",fontSize:72,overflow:"hidden"}}>
+        {images.length>0
+          ?<img src={images[imgIdx]} style={{width:"100%",height:"100%",objectFit:"cover"}}
+              onClick={()=>setImgIdx(i=>(i+1)%images.length)}/>
+          :<span>🍽</span>
+        }
+        {images.length>1&&(
+          <div style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",display:"flex",gap:5}}>
+            {images.map((_,i)=>(
+              <div key={i} onClick={()=>setImgIdx(i)} style={{width:6,height:6,borderRadius:"50%",background:i===imgIdx?"white":"rgba(255,255,255,.5)",cursor:"pointer"}}/>
+            ))}
+          </div>
+        )}
+        <button className="back-btn" style={{position:"absolute",top:16,left:16,background:"rgba(0,0,0,.4)",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:22}} onClick={()=>navigate("results")}>‹</button>
+        <button onClick={()=>{toggleSave(venue.id);showToast(saved?"Removed":"Saved ♥");}}
+          style={{position:"absolute",top:16,right:16,background:"rgba(0,0,0,.4)",border:"none",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,color:saved?"#F97B30":"white"}}>
+          {saved?"♥":"♡"}
+        </button>
+      </div>
+      <div className="scroll" style={{padding:"20px 24px"}}>
+        <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:28,color:"var(--black)",marginBottom:6,letterSpacing:".02em"}}>{venue.name}</div>
+        <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
+          <span className="venue-tag">{venue.cuisine}</span>
+          <span className="venue-tag">Dist. {venue.district}</span>
+          <span className="venue-tag">{venue.price}</span>
+          {venue.terrace&&<span className="venue-tag">🌿 Terrace</span>}
+        </div>
+        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",marginBottom:2}}>ADDRESS</div>
+        <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#444",marginBottom:16}}>{venue.address}</div>
+        <div style={{fontFamily:"var(--display)",fontSize:18,fontWeight:800,color:"var(--black)",marginBottom:6,letterSpacing:".02em"}}>WHY LOCALS GO HERE:</div>
+        <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#444",lineHeight:1.7,marginBottom:4}}>{venue.why}</div>
+        <div style={{fontFamily:"var(--body)",fontSize:12,color:"#aaa",fontWeight:600,marginBottom:20}}>— {venue.scout_alias}{venue.scout_role ? ` · ${venue.scout_role}` : ""}</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9,marginBottom:14}}>
+          {[
+            ["📍","Google Maps", venue.google_maps_url],
+            ["🗺","Apple Maps", venue.apple_maps_url||venue.google_maps_url],
+            ["📸","Instagram", venue.instagram_url],
+            ["🍽","Reservation", venue.reservation_url]
+          ].map(([ico,label,url])=>(
+            <button key={label}
+              onClick={()=>url&&window.open(url,"_blank")}
+              style={{background:"var(--white)",border:"2px solid #ddd",borderRadius:12,padding:"12px 8px",fontFamily:"var(--display)",fontWeight:700,fontSize:13,color:url?"var(--black)":"#ccc",cursor:url?"pointer":"default",letterSpacing:".03em",transition:"all .15s",opacity:url?1:.5}}
+              onMouseEnter={e=>{if(url)e.currentTarget.style.borderColor="var(--blue)"}}
+              onMouseLeave={e=>e.currentTarget.style.borderColor="#ddd"}>
+              {ico} {label}
+            </button>
+          ))}
+        </div>
+        <button style={{background:"var(--blue)",color:"white",border:"none",borderRadius:12,padding:"13px",width:"100%",fontFamily:"var(--display)",fontWeight:700,fontSize:14,letterSpacing:".06em",cursor:"pointer",marginBottom:10}}
+          onClick={()=>{navigator.clipboard?.writeText(`https://lokalz.app/venue/${venue.id}`);showToast("Link copied!");}}>
+          🔗 SHARE THIS PLACE
+        </button>
+        <button style={{background:"transparent",color:"#aaa",border:"1.5px solid #ddd",borderRadius:12,padding:"11px",width:"100%",fontFamily:"var(--display)",fontWeight:700,fontSize:13,letterSpacing:".04em",cursor:"pointer",marginBottom:8}}
+          onClick={()=>setShowReport(true)}>
+          ⚑ Report venue
+        </button>
+        {showReport&&(
+          <div style={{background:"#FFF8F8",border:"1.5px solid #F8D7DA",borderRadius:16,padding:16,marginBottom:12,animation:"fadeUp .2s ease both"}}>
+            <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:14,color:"#58151C",marginBottom:10}}>REPORT THIS VENUE</div>
+            {[["closed","This place is closed"],["wrong_address","Wrong address"],["photos_outdated","Photos are outdated"],["other","Other issue"]].map(([val,label])=>(
+              <button key={val} onClick={()=>setReportType(val)}
+                style={{display:"block",width:"100%",textAlign:"left",background:reportType===val?"#F8D7DA":"none",border:"1.5px solid",borderColor:reportType===val?"#dc3545":"#ddd",borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:700,color:"var(--black)",cursor:"pointer",marginBottom:8}}>
+                {label}
+              </button>
+            ))}
+            <div style={{display:"flex",gap:8,marginTop:4}}>
+              <button onClick={submitReport} disabled={!reportType||reportSubmitting}
+                style={{flex:1,background:"#58151C",color:"white",border:"none",borderRadius:10,padding:"11px",fontFamily:"var(--display)",fontWeight:700,fontSize:13,cursor:reportType?"pointer":"default",opacity:reportType?1:.5}}>
+                {reportSubmitting?"SENDING...":"SEND REPORT"}
+              </button>
+              <button onClick={()=>{setShowReport(false);setReportType("");}}
+                style={{background:"#eee",border:"none",borderRadius:10,padding:"11px 16px",fontFamily:"var(--display)",fontWeight:700,fontSize:13,cursor:"pointer"}}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+        {isScout&&(
+          <ScoutFeedbackSection venue={venue} user={user} showToast={showToast}/>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SavedScreen({navigate, savedIds, allVenues, onMenu}) {
+  const saved=[...allVenues].filter(v=>savedIds.has(v.id));
+  return (
+    <div className="screen">
+      <div className="hdr"><Hamburger onClick={onMenu}/><div/></div>
+      <div style={{padding:"12px 24px 16px"}}>
+        <div className="logo-md">LOKALZ</div>
+        <div className="script" style={{marginTop:6}}>Saved places</div>
+      </div>
+      <div className="scroll" style={{padding:"0 20px"}}>
+        {saved.length===0
+          ?<div className="empty"><div className="empty-icon">🔖</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No saved places yet.<br/>Tap ♡ on any venue.</div></div>
+          :saved.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)
+        }
+      </div>
+    </div>
+  );
+}
+
+function AllVenuesScreen({navigate, allVenues, onMenu}) {
+  const [search,setSearch]=useState("");
+  const [category,setCategory]=useState("");
+  const [occasion,setOccasion]=useState("");
+  const [cuisine,setCuisine]=useState("");
+  const [budget,setBudget]=useState("");
+  const [district,setDistrict]=useState("");
+
+  const CATEGORIES = ["Restaurant","Café","Bar","Brunch","Street food"];
+  const isFoodOccasion = FOOD_OCCASIONS.includes(occasion);
+  const allOccasions = [...OCCASIONS.filter(o=>o.id!=="Something else...").map(o=>o.id), ...ELSE_OPTIONS];
+
+  const active=allVenues.filter(v=>v.status==="active");
+  const filtered=active.filter(v=>{
+    if(search&&!v.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if(category&&v.category!==category) return false;
+    if(occasion&&!(v.occasions||[]).includes(occasion)) return false;
+    if(cuisine&&isFoodOccasion&&v.cuisine!==cuisine) return false;
+    if(budget&&(v.price_level||v.price)!==budget) return false;
+    if(district&&v.district!==district.replace("District ","").replace(".","")) return false;
+    return true;
+  });
+  const sorted=[...filtered].sort((a,b)=>a.name.localeCompare(b.name));
+  const selectStyle={background:"var(--white)",border:"1.5px solid #ddd",borderRadius:12,padding:"11px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:14,cursor:"pointer",outline:"none",width:"100%"};
+
+  return (
+    <div className="screen">
+      <div className="hdr"><Hamburger onClick={onMenu}/><div/></div>
+      <div style={{padding:"12px 24px 16px"}}>
+        <div className="logo-md">LOKALZ</div>
+        <div className="script" style={{marginTop:6}}>All venues</div>
+      </div>
+      <div style={{padding:"0 20px 12px",display:"flex",flexDirection:"column",gap:10}}>
+        <div className="input-wrap-light">
+          <span style={{color:"#aaa"}}>🔍</span>
+          <input placeholder="Search venue..." value={search} onChange={e=>setSearch(e.target.value)}/>
+        </div>
+        <div style={{display:"flex",gap:10}}>
+          <select value={category} onChange={e=>{setCategory(e.target.value);setCuisine("");}} style={{...selectStyle,color:category?"var(--blue)":"#888"}}>
+            <option value="">All categories</option>
+            {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
+          </select>
+          <select value={occasion} onChange={e=>{setOccasion(e.target.value);setCuisine("");}} style={{...selectStyle,color:occasion?"var(--blue)":"#888"}}>
+            <option value="">All occasions</option>
+            {allOccasions.map(o=><option key={o} value={o}>{o}</option>)}
+          </select>
+        </div>
+        {isFoodOccasion&&(
+          <select value={cuisine} onChange={e=>setCuisine(e.target.value)} style={{...selectStyle,color:cuisine?"var(--blue)":"#888",animation:"fadeUp .2s ease both"}}>
+            <option value="">All cuisines</option>
+            {CUISINES_FILTER.map(c=><option key={c} value={c}>{c}</option>)}
+          </select>
+        )}
+        <div style={{display:"flex",gap:10}}>
+          <select value={budget} onChange={e=>setBudget(e.target.value)} style={{...selectStyle,color:budget?"var(--blue)":"#888"}}>
+            <option value="">All prices</option>
+            {BUDGETS.map(b=><option key={b} value={b}>{b}</option>)}
+          </select>
+          <select value={district} onChange={e=>setDistrict(e.target.value)} style={{...selectStyle,color:district?"var(--blue)":"#888"}}>
+            <option value="">All districts</option>
+            {ALL_DISTRICTS.map(d=><option key={d} value={d}>{d}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="scroll" style={{padding:"0 20px"}}>
+        {sorted.length===0
+          ?<div className="empty"><div className="empty-icon">🍽</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No venues found</div></div>
+          :sorted.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)
+        }
+      </div>
+    </div>
+  );
+}
+
+function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user}) {
+  const [tab,setTab]=useState("all");
+  const [search,setSearch]=useState("");
+  const myVenues=allVenues.filter(v=>v.scout_alias===user?.name);
+  const filtered=allVenues.filter(v=>!search||v.name.toLowerCase().includes(search.toLowerCase()));
+
+  // Add Venue form state
+  const CATEGORIES = ["Restaurant","Café","Bar","Brunch","Street food"];
+  const CAPACITIES = ["2","Up to 6","Up to 8","8+"];
+  const [form,setForm]=useState({name:"",address:"",district:"",category:"",cuisine:"",price_level:"",capacity:"",terrace:"",instagram_url:"",reservation_url:"",google_maps_url:"",why:""});
+  const [selOccasions,setSelOccasions]=useState([]);
+  const [submitting,setSubmitting]=useState(false);
+  const [formError,setFormError]=useState(null);
+
+  function setF(k,v){setForm(f=>({...f,[k]:v}));}
+  function toggleOcc(o){setSelOccasions(prev=>prev.includes(o)?prev.filter(x=>x!==o):[...prev,o]);}
+
+  const [imgFiles, setImgFiles] = useState([]);
+  const [imgPreviews, setImgPreviews] = useState([]);
+
+  function handleImgSelect(e){
+    const files = Array.from(e.target.files);
+    const remaining = 5 - imgFiles.length;
+    const newFiles = files.slice(0, remaining);
+    setImgFiles(prev=>[...prev, ...newFiles]);
+    setImgPreviews(prev=>[...prev, ...newFiles.map(f=>URL.createObjectURL(f))]);
+  }
+
+  function removeImg(idx){
+    setImgFiles(prev=>prev.filter((_,i)=>i!==idx));
+    setImgPreviews(prev=>prev.filter((_,i)=>i!==idx));
+  }
+
+  async function submitVenue(){
+    if(!form.name||!form.address||!form.district||!form.category||!form.price_level||!form.why||!form.google_maps_url){
+      setFormError("Please fill in all required fields (*).");
+      return;
+    }
+    setSubmitting(true);
+    setFormError(null);
+    try {
+      const {data, error} = await supabase.from("venues").insert({
+        city_id: "62aeda29-9994-4c45-8d41-d1bd68ce1fa1",
+        name: form.name,
+        address: form.address,
+        district: form.district,
+        category: form.category,
+        cuisine: form.cuisine||null,
+        price_level: form.price_level,
+        capacity: form.capacity||null,
+        terrace: form.terrace==="yes",
+        google_maps_url: form.google_maps_url,
+        instagram_url: form.instagram_url||null,
+        reservation_url: form.reservation_url||null,
+        why: form.why,
+        scout_alias: user?.name||"Scout",
+        scout_role: user?.role==="city_lead"?"The Founder":"Scout",
+        submitted_by: user?.id||null,
+        status: "pending",
+        occasions: selOccasions
+      }).select().single();
+      if(error) throw error;
+      // Upload images if selected
+      if(imgFiles.length>0 && data?.id){
+        for(let i=0;i<imgFiles.length;i++){
+          const file = imgFiles[i];
+          const ext = file.name.split(".").pop();
+          const path = `${data.id}/${Date.now()}_${i}.${ext}`;
+          const {error: uploadErr} = await supabase.storage.from("venue-images").upload(path, file);
+          if(!uploadErr){
+            const {data: urlData} = supabase.storage.from("venue-images").getPublicUrl(path);
+            await supabase.from("venue_images").insert({venue_id:data.id, url:urlData.publicUrl, is_primary:i===0, sort_order:i});
+          }
+        }
+      }
+      setAllVenues(v=>[...v, {...data, price: data.price_level, emoji:"🍽"}]);
+      setForm({name:"",address:"",district:"",category:"",cuisine:"",price_level:"",capacity:"",terrace:"",instagram_url:"",reservation_url:"",google_maps_url:"",why:""});
+      setSelOccasions([]);
+      setImgFiles([]);
+      setImgPreviews([]);
+      showToast("Submitted for review ✓");
+      setTab("activity");
+    } catch(e){
+      setFormError(e.message||"Submit failed. Try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const selectStyle={width:"100%",background:"var(--white)",border:"1.5px solid #ddd",borderRadius:12,padding:"13px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:14,color:"#888",marginBottom:10,outline:"none"};
+
+  return (
+    <div className="screen">
+      <div className="hdr"><Hamburger onClick={onMenu}/><div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:16,color:"var(--blue)",letterSpacing:".04em"}}>SCOUT MODE</div><div/></div>
+      <div className="tabs">
+        {[["all","All Venues"],["add","Add Venue"],["activity","My Activity"]].map(([k,l])=>(
+          <button key={k} className={`tab${tab===k?" on":""}`} onClick={()=>setTab(k)}>{l}</button>
+        ))}
+      </div>
+      {tab==="all"&&(
+        <div className="scroll" style={{padding:"14px 20px"}}>
+          <div className="input-wrap-light" style={{marginBottom:12}}>
+            <span style={{color:"#aaa"}}>🔍</span>
+            <input placeholder="Search venue..." value={search} onChange={e=>setSearch(e.target.value)}/>
+          </div>
+          {filtered.map(v=>(
+            <div key={v.id} className="admin-card" onClick={()=>navigate("venue",v)} style={{cursor:"pointer"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:3}}>
+                <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:16}}>{v.name}</div>
+                <StatusPill status={v.status}/>
+              </div>
+              <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600}}>{v.cuisine} · Dist. {v.district} · {v.price_level||v.price}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      {tab==="add"&&(
+        <div className="scroll" style={{padding:"14px 20px"}}>
+          <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",marginBottom:14}}>Submit a new venue for review</div>
+          {[["name","Venue name *"],["address","Address *"],["district","District * (e.g. V)"]].map(([k,p])=>(
+            <div key={k} className="input-wrap-light" style={{marginBottom:10}}>
+              <input placeholder={p} value={form[k]} onChange={e=>setF(k,e.target.value)}/>
+            </div>
+          ))}
+          <select style={selectStyle} value={form.category} onChange={e=>setF("category",e.target.value)}>
+            <option value="">Category *</option>
+            {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
+          </select>
+          <select style={selectStyle} value={form.cuisine} onChange={e=>setF("cuisine",e.target.value)}>
+            <option value="">Cuisine</option>
+            {CUISINES_FILTER.map(c=><option key={c} value={c}>{c}</option>)}
+          </select>
+          <select style={selectStyle} value={form.price_level} onChange={e=>setF("price_level",e.target.value)}>
+            <option value="">Price level *</option>
+            {BUDGETS.map(b=><option key={b} value={b}>{b}</option>)}
+          </select>
+          <select style={selectStyle} value={form.capacity} onChange={e=>setF("capacity",e.target.value)}>
+            <option value="">Capacity</option>
+            {CAPACITIES.map(c=><option key={c} value={c}>{c}</option>)}
+          </select>
+          <select style={selectStyle} value={form.terrace} onChange={e=>setF("terrace",e.target.value)}>
+            <option value="">Terrace?</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+          <div style={{marginBottom:10}}>
+            <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:13,color:"#888",letterSpacing:".05em",marginBottom:8}}>OCCASIONS</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+              {[...OCCASIONS.filter(o=>o.id!=="Something else...").map(o=>o.id),...ELSE_OPTIONS].map(o=>(
+                <button key={o} onClick={()=>toggleOcc(o)}
+                  style={{background:selOccasions.includes(o)?"var(--blue)":"var(--white)",color:selOccasions.includes(o)?"white":"#555",border:"1.5px solid",borderColor:selOccasions.includes(o)?"var(--blue)":"#ddd",borderRadius:20,padding:"7px 14px",fontFamily:"var(--body)",fontWeight:700,fontSize:12,cursor:"pointer"}}>
+                  {o}
+                </button>
+              ))}
+            </div>
+          </div>
+          {[["google_maps_url","Google Maps URL *"],["instagram_url","Instagram URL"],["reservation_url","Reservation URL"]].map(([k,p])=>(
+            <div key={k} className="input-wrap-light" style={{marginBottom:10}}>
+              <input placeholder={p} value={form[k]} onChange={e=>setF(k,e.target.value)}/>
+            </div>
+          ))}
+          <div className="input-wrap-light" style={{marginBottom:10,alignItems:"flex-start"}}>
+            <textarea placeholder="Why locals go here * (max 280 chars)" maxLength={280} rows={4} value={form.why} onChange={e=>setF("why",e.target.value)} style={{border:"none",outline:"none",background:"transparent",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",flex:1,resize:"none"}}/>
+          </div>
+          {formError&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"#c00",fontWeight:600,background:"rgba(255,0,0,.08)",padding:"10px 14px",borderRadius:10,marginBottom:10}}>{formError}</div>}
+          <div style={{marginBottom:14}}>
+            <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:13,color:"#888",letterSpacing:".05em",marginBottom:8}}>PHOTOS ({imgPreviews.length}/5)</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:8}}>
+              {imgPreviews.map((src,i)=>(
+                <div key={i} style={{position:"relative",aspectRatio:"1",borderRadius:10,overflow:"hidden"}}>
+                  <img src={src} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                  <button onClick={()=>removeImg(i)} style={{position:"absolute",top:4,right:4,background:"rgba(0,0,0,.6)",border:"none",borderRadius:"50%",width:22,height:22,color:"white",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+                  {i===0&&<div style={{position:"absolute",bottom:4,left:4,background:"rgba(0,0,0,.6)",borderRadius:6,padding:"2px 6px",fontFamily:"var(--display)",fontWeight:700,fontSize:10,color:"white"}}>MAIN</div>}
+                </div>
+              ))}
+              {imgPreviews.length<5&&(
+                <label style={{aspectRatio:"1",borderRadius:10,border:"2px dashed #ddd",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexDirection:"column",gap:4}}>
+                  <input type="file" accept="image/*" multiple style={{display:"none"}} onChange={handleImgSelect}/>
+                  <span style={{fontSize:24}}>📷</span>
+                  <span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa"}}>Add</span>
+                </label>
+              )}
+            </div>
+          </div>
+          <button className="btn-blue" style={{borderRadius:14,opacity:submitting?.6:1}} onClick={submitVenue}>
+            {submitting?"SUBMITTING...":"SUBMIT FOR REVIEW"}
+          </button>
+        </div>
+      )}
+      {tab==="activity"&&(
+        <div className="scroll" style={{padding:"14px 20px"}}>
+          <div style={{display:"flex",gap:12,marginBottom:20}}>
+            {[["✅","Approved",myVenues.filter(v=>v.status==="active").length],["⏳","Pending",myVenues.filter(v=>v.status==="pending").length]].map(([ico,label,count])=>(
+              <div key={label} style={{flex:1,background:"var(--white)",borderRadius:16,padding:"16px",textAlign:"center"}}>
+                <div style={{fontSize:28}}>{ico}</div>
+                <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:28,color:"var(--blue)"}}>{count}</div>
+                <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:700,color:"#888"}}>{label}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:16,color:"var(--black)",marginBottom:10,letterSpacing:".04em"}}>MY SUBMISSIONS</div>
+          {myVenues.length===0
+            ?<div className="empty"><div className="empty-icon">📍</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No submissions yet.</div></div>
+            :myVenues.map(v=>(
+              <div key={v.id} className="admin-card">
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:15}}>{v.name}</div>
+                  <StatusPill status={v.status}/>
+                </div>
+                {v.edit_comment&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"#e67e00",fontWeight:600,marginTop:6,background:"#FFF3CD",padding:"8px 10px",borderRadius:8}}>✏ {v.edit_comment}</div>}
+              </div>
+            ))
+          }
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast}) {
+  const [tab,setTab]=useState("pending");
+  const [editComment,setEditComment]=useState({});
+  const [showEditFor,setShowEditFor]=useState(null);
+  const [editingVenue,setEditingVenue]=useState(null);
+  const [editForm,setEditForm]=useState({});
+  const [uploadingImg,setUploadingImg]=useState(false);
+  const [saving,setSaving]=useState(false);
+  const [reports,setReports]=useState([]);
+
+  const CATEGORIES = ["Restaurant","Café","Bar","Brunch","Street food"];
+  const CAPACITIES = ["2","Up to 6","Up to 8","8+"];
+
+  const pending=allVenues.filter(v=>v.status==="pending"||v.status==="needs_edit"||v.status==="rejected");
+  const active=[...allVenues.filter(v=>v.status==="active")].reverse();
+
+  useEffect(()=>{
+    supabase.from("venue_reports")
+      .select("*, venues(name)")
+      .order("created_at",{ascending:false})
+      .then(({data})=>{ if(data) setReports(data); });
+  },[]);
+
+  async function sendEmailNotification(type, venueId, editComment=""){
+    try {
+      const {data: venue} = await supabase.from("venues").select("name, submitted_by").eq("id", venueId).single();
+      if(!venue?.submitted_by) return;
+      const {data: scout} = await supabase.from("users").select("email").eq("id", venue.submitted_by).single();
+      if(!scout?.email) return;
+      await supabase.functions.invoke("send-email", {
+        body: { type, to: scout.email, venue_name: venue.name, edit_comment: editComment }
+      });
+    } catch(e) { console.log("Email error:", e); }
+  }
+
+  async function updateStatus(id, status){
+    const {error} = await supabase.from("venues").update({status}).eq("id", id);
+    if(error){showToast("Error: "+error.message);return;}
+    setAllVenues(p=>p.map(v=>v.id===id?{...v,status}:v));
+    showToast("Updated: "+status);
+    if(status==="active") sendEmailNotification("approved", id);
+    if(status==="rejected") sendEmailNotification("rejected", id);
+  }
+
+  async function deleteVenue(id){
+    const {error} = await supabase.from("venues").delete().eq("id",id);
+    if(error){showToast("Error: "+error.message);return;}
+    setAllVenues(p=>p.filter(v=>v.id!==id));
+    showToast("Venue deleted ✓");
+  }
+
+  async function sendEdit(id){
+    const comment=editComment[id]||"";
+    const {error} = await supabase.from("venues").update({status:"needs_edit", edit_comment:comment}).eq("id", id);
+    if(error){showToast("Error: "+error.message);return;}
+    setAllVenues(p=>p.map(v=>v.id===id?{...v,status:"needs_edit",edit_comment:comment}:v));
+    setShowEditFor(null);
+    setEditComment(e=>({...e,[id]:""}));
+    showToast("Edit request sent ✓");
+    sendEmailNotification("needs_edit", id, comment);
+  }
+
+  const [editImgFiles, setEditImgFiles] = useState([]);
+  const [editImgPreviews, setEditImgPreviews] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
+
+  async function loadExistingImages(venueId){
+    const {data} = await supabase.from("venue_images").select("id,url").eq("venue_id",venueId).order("sort_order");
+    if(data) setExistingImages(data);
+  }
+
+  function handleEditImgSelect(e){
+    const files = Array.from(e.target.files);
+    const remaining = 5 - existingImages.length - editImgFiles.length;
+    const newFiles = files.slice(0, remaining);
+    setEditImgFiles(prev=>[...prev,...newFiles]);
+    setEditImgPreviews(prev=>[...prev,...newFiles.map(f=>URL.createObjectURL(f))]);
+  }
+
+  function removeEditImg(idx){
+    setEditImgFiles(prev=>prev.filter((_,i)=>i!==idx));
+    setEditImgPreviews(prev=>prev.filter((_,i)=>i!==idx));
+  }
+
+  async function removeExistingImg(img){
+    await supabase.from("venue_images").delete().eq("id",img.id);
+    setExistingImages(prev=>prev.filter(i=>i.id!==img.id));
+  }
+
+  function startEdit(v){
+    setEditImgFiles([]);
+    setEditImgPreviews([]);
+    setExistingImages([]);
+    loadExistingImages(v.id);
+    setEditForm({
+      name: v.name||"",
+      address: v.address||"",
+      district: v.district||"",
+      category: v.category||"",
+      cuisine: v.cuisine||"",
+      price_level: v.price_level||v.price||"",
+      capacity: v.capacity||"",
+      terrace: v.terrace?"yes":"no",
+      google_maps_url: v.google_maps_url||"",
+      instagram_url: v.instagram_url||"",
+      reservation_url: v.reservation_url||"",
+      why: v.why||"",
+      scout_alias: v.scout_alias||"",
+    });
+    setEditingVenue(v);
+  }
+
+  async function uploadImage(file, venueId){
+    setUploadingImg(true);
+    const ext = file.name.split(".").pop();
+    const path = `${venueId}/${Date.now()}.${ext}`;
+    const {error} = await supabase.storage.from("venue-images").upload(path, file);
+    if(error){showToast("Upload error: "+error.message);setUploadingImg(false);return;}
+    const {data} = supabase.storage.from("venue-images").getPublicUrl(path);
+    await supabase.from("venue_images").insert({venue_id:venueId, url:data.publicUrl, is_primary:true});
+    showToast("Image uploaded ✓");
+    setUploadingImg(false);
+  }
+
+  async function saveEdit(){
+    setSaving(true);
+    const {error} = await supabase.from("venues").update({
+      name: editForm.name,
+      address: editForm.address,
+      district: editForm.district,
+      category: editForm.category||null,
+      cuisine: editForm.cuisine||null,
+      price_level: editForm.price_level,
+      capacity: editForm.capacity||null,
+      terrace: editForm.terrace==="yes",
+      google_maps_url: editForm.google_maps_url||null,
+      instagram_url: editForm.instagram_url||null,
+      reservation_url: editForm.reservation_url||null,
+      why: editForm.why,
+      scout_alias: editForm.scout_alias||null,
+    }).eq("id", editingVenue.id);
+    if(error){showToast("Error: "+error.message);setSaving(false);return;}
+    // Upload new images
+    for(let i=0;i<editImgFiles.length;i++){
+      const file = editImgFiles[i];
+      const ext = file.name.split(".").pop();
+      const path = `${editingVenue.id}/${Date.now()}_${i}.${ext}`;
+      const {error: uploadErr} = await supabase.storage.from("venue-images").upload(path, file);
+      if(!uploadErr){
+        const {data: urlData} = supabase.storage.from("venue-images").getPublicUrl(path);
+        await supabase.from("venue_images").insert({venue_id:editingVenue.id, url:urlData.publicUrl, is_primary:existingImages.length===0&&i===0, sort_order:existingImages.length+i});
+      }
+    }
+    setAllVenues(p=>p.map(v=>v.id===editingVenue.id?{...v,...editForm,price:editForm.price_level}:v));
+    showToast("Venue updated ✓");
+    setSaving(false);
+    setEditingVenue(null);
+  }
+
+  const inputStyle={width:"100%",background:"var(--white)",border:"1.5px solid #ddd",borderRadius:12,padding:"12px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",marginBottom:10,outline:"none"};
+  const selectStyle={...inputStyle,cursor:"pointer"};
+
+  // Edit venue screen
+  if(editingVenue) return (
+    <div className="screen">
+      <div className="hdr">
+        <button className="back-btn" onClick={()=>setEditingVenue(null)}>&#8249;</button>
+        <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:16,color:"var(--blue)"}}>EDIT VENUE</div>
+        <div style={{width:26}}/>
+      </div>
+      <div className="scroll" style={{padding:"14px 20px"}}>
+        {[["name","Name *"],["address","Address *"],["district","District *"],["scout_alias","Scout alias"],["google_maps_url","Google Maps URL"],["instagram_url","Instagram URL"],["reservation_url","Reservation URL"]].map(([k,p])=>(
+          <input key={k} style={inputStyle} placeholder={p} value={editForm[k]} onChange={e=>setEditForm(f=>({...f,[k]:e.target.value}))}/>
+        ))}
+        <select style={selectStyle} value={editForm.category} onChange={e=>setEditForm(f=>({...f,category:e.target.value}))}>
+          <option value="">Category</option>
+          {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
+        </select>
+        <select style={selectStyle} value={editForm.cuisine} onChange={e=>setEditForm(f=>({...f,cuisine:e.target.value}))}>
+          <option value="">Cuisine</option>
+          {CUISINES_FILTER.map(c=><option key={c} value={c}>{c}</option>)}
+        </select>
+        <select style={selectStyle} value={editForm.price_level} onChange={e=>setEditForm(f=>({...f,price_level:e.target.value}))}>
+          <option value="">Price level *</option>
+          {BUDGETS.map(b=><option key={b} value={b}>{b}</option>)}
+        </select>
+        <select style={selectStyle} value={editForm.capacity} onChange={e=>setEditForm(f=>({...f,capacity:e.target.value}))}>
+          <option value="">Capacity</option>
+          {CAPACITIES.map(c=><option key={c} value={c}>{c}</option>)}
+        </select>
+        <select style={selectStyle} value={editForm.terrace} onChange={e=>setEditForm(f=>({...f,terrace:e.target.value}))}>
+          <option value="">Terrace?</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+        <textarea style={{...inputStyle,resize:"none",minHeight:100}} placeholder="Why locals go here *" maxLength={280} value={editForm.why} onChange={e=>setEditForm(f=>({...f,why:e.target.value}))}/>
+        
+        {/* Image upload */}
+        <div style={{marginBottom:10}}>
+          <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:13,color:"#888",letterSpacing:".05em",marginBottom:8}}>PHOTOS ({existingImages.length + editImgPreviews.length}/5)</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:8}}>
+            {existingImages.map((img,i)=>(
+              <div key={img.id} style={{position:"relative",aspectRatio:"1",borderRadius:10,overflow:"hidden"}}>
+                <img src={img.url} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                <button onClick={()=>removeExistingImg(img)} style={{position:"absolute",top:4,right:4,background:"rgba(0,0,0,.6)",border:"none",borderRadius:"50%",width:22,height:22,color:"white",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+                {i===0&&<div style={{position:"absolute",bottom:4,left:4,background:"rgba(0,0,0,.6)",borderRadius:6,padding:"2px 6px",fontFamily:"var(--display)",fontWeight:700,fontSize:10,color:"white"}}>MAIN</div>}
+              </div>
+            ))}
+            {editImgPreviews.map((src,i)=>(
+              <div key={`new_${i}`} style={{position:"relative",aspectRatio:"1",borderRadius:10,overflow:"hidden"}}>
+                <img src={src} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                <button onClick={()=>removeEditImg(i)} style={{position:"absolute",top:4,right:4,background:"rgba(0,0,0,.6)",border:"none",borderRadius:"50%",width:22,height:22,color:"white",fontSize:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+              </div>
+            ))}
+            {existingImages.length+editImgPreviews.length<5&&(
+              <label style={{aspectRatio:"1",borderRadius:10,border:"2px dashed #ddd",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexDirection:"column",gap:4}}>
+                <input type="file" accept="image/*" multiple style={{display:"none"}} onChange={handleEditImgSelect}/>
+                <span style={{fontSize:24}}>📷</span>
+                <span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa"}}>Add</span>
+              </label>
+            )}
+          </div>
+        </div>
+
+        <button className="btn-blue" style={{borderRadius:14,opacity:saving?.6:1}} onClick={saveEdit}>
+          {saving?"SAVING...":"SAVE CHANGES"}
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="screen">
+      <div className="hdr"><Hamburger onClick={onMenu}/><div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:16,color:"var(--blue)",letterSpacing:".04em"}}>CITY LEAD</div><div/></div>
+      <div style={{display:"flex",gap:0,background:"var(--blue)",padding:"10px 20px 12px",flexShrink:0}}>
+        {[["pending","📥 Pending",pending.length],["all","📋 All",active.length],["reports","🚩 Reports",reports.length]].map(([k,l,c])=>(
+          <button key={k} style={{flex:1,background:"none",border:"none",cursor:"pointer",color:tab===k?"white":"rgba(255,255,255,.5)",fontFamily:"var(--display)",fontWeight:800,fontSize:14,letterSpacing:".04em",paddingBottom:4,borderBottom:tab===k?"2.5px solid white":"2.5px solid transparent"}} onClick={()=>setTab(k)}>
+            {l} <span style={{background:"rgba(255,255,255,.2)",borderRadius:10,padding:"1px 6px",fontSize:11}}>{c}</span>
+          </button>
+        ))}
+      </div>
+      {tab==="pending"&&(
+        <div className="scroll" style={{padding:"14px 20px"}}>
+          {pending.length===0
+            ?<div className="empty"><div className="empty-icon">✅</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No pending venues!</div></div>
+            :pending.map(v=>(
+              <div key={v.id} className="admin-card" style={{marginBottom:12}}>
+                <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:6}}>
+                  <div style={{flex:1,marginRight:8}}>
+                    <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:16}}>{v.name}</div>
+                    <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600,marginTop:2}}>{v.address} · {v.cuisine}</div>
+                    <div style={{fontFamily:"var(--body)",fontSize:13,color:"#555",marginTop:6,lineHeight:1.5}}>{v.why}</div>
+                  </div>
+                  <StatusPill status={v.status}/>
+                </div>
+                {showEditFor===v.id&&(
+                  <div style={{marginBottom:10,animation:"fadeUp .2s ease both"}}>
+                    <textarea
+                      value={editComment[v.id]||""}
+                      onChange={e=>setEditComment(prev=>({...prev,[v.id]:e.target.value}))}
+                      placeholder="Describe what needs to be changed..."
+                      rows={3}
+                      style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"10px 12px",fontFamily:"var(--body)",fontSize:13,fontWeight:600,resize:"none",outline:"none",marginBottom:6}}
+                    />
+                    <div style={{display:"flex",gap:8}}>
+                      <button style={{flex:1,background:"#FFF3CD",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"#664D03",cursor:"pointer"}} onClick={()=>sendEdit(v.id)}>Send to scout</button>
+                      <button style={{background:"#eee",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"#666",cursor:"pointer"}} onClick={()=>setShowEditFor(null)}>Cancel</button>
+                    </div>
+                  </div>
+                )}
+                <div style={{display:"flex",gap:8,marginTop:showEditFor===v.id?0:10,flexWrap:"wrap"}}>
+                  {v.status!=="rejected"&&<button style={{background:"#D1E7DD",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"#0A3622",cursor:"pointer"}} onClick={()=>updateStatus(v.id,"active")}>✓ Approve</button>}
+                  {showEditFor!==v.id&&v.status!=="rejected"&&<button style={{background:"#FFF3CD",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"#664D03",cursor:"pointer"}} onClick={()=>setShowEditFor(v.id)}>✏ Request edit</button>}
+                  {v.status!=="rejected"&&<button style={{background:"#F8D7DA",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"#58151C",cursor:"pointer"}} onClick={()=>updateStatus(v.id,"rejected")}>✕ Reject</button>}
+                  {v.status==="rejected"&&<button style={{background:"#58151C",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"white",cursor:"pointer"}} onClick={()=>deleteVenue(v.id)}>🗑 Delete permanently</button>}
+                  {v.status==="rejected"&&<button style={{background:"#D1E7DD",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"#0A3622",cursor:"pointer"}} onClick={()=>updateStatus(v.id,"pending")}>↩ Restore</button>}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      )}
+      {tab==="all"&&(
+        <div className="scroll" style={{padding:"14px 20px"}}>
+          {active.map(v=>(
+            <div key={v.id} className="admin-card" style={{marginBottom:10}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+                <div>
+                  <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:15}}>{v.name}</div>
+                  <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600,marginTop:2}}>{v.cuisine} · Dist. {v.district} · {v.price_level||v.price}</div>
+                </div>
+                <StatusPill status={v.status}/>
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                <button style={{background:"var(--blue)",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"white",cursor:"pointer"}} onClick={()=>startEdit(v)}>✏ Edit</button>
+                <button style={{background:"#F8D7DA",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"#58151C",cursor:"pointer"}} onClick={()=>updateStatus(v.id,"closed")}>✕ Close</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {tab==="reports"&&(
+        <div className="scroll" style={{padding:"14px 20px"}}>
+          {reports.length===0
+            ?<div className="empty"><div className="empty-icon">🚩</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No reports yet.</div></div>
+            :Object.entries(
+                reports.reduce((acc,r)=>{
+                  const key = r.venue_id;
+                  if(!acc[key]) acc[key]={name:r.venues?.name||"Unknown venue", reports:[]};
+                  acc[key].reports.push(r);
+                  return acc;
+                },{})
+              ).map(([venueId,group])=>(
+              <div key={venueId} className="admin-card" style={{marginBottom:12}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                  <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:15}}>{group.name}</div>
+                  <button onClick={async()=>{
+                    await Promise.all(group.reports.map(r=>supabase.from("venue_reports").delete().eq("id",r.id)));
+                    setReports(prev=>prev.filter(r=>r.venue_id!==venueId));
+                  }} style={{background:"#D1E7DD",border:"none",borderRadius:8,padding:"6px 12px",fontFamily:"var(--display)",fontWeight:700,fontSize:12,color:"#0A3622",cursor:"pointer"}}>
+                    ✓ Resolved
+                  </button>
+                </div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                  {group.reports.map(r=>(
+                    <div key={r.id} style={{background:"#F8D7DA",color:"#58151C",borderRadius:8,padding:"3px 10px",fontFamily:"var(--display)",fontWeight:700,fontSize:12}}>
+                      {r.report_type==="closed"?"Closed"
+                       :r.report_type==="wrong_address"?"Wrong address"
+                       :r.report_type==="photos_outdated"?"Photos outdated"
+                       :"Other"}
+                    </div>
+                  ))}
+                </div>
+                <div style={{fontFamily:"var(--body)",fontSize:11,color:"#aaa",fontWeight:600,marginTop:6}}>
+                  {group.reports.length} report{group.reports.length>1?"s":""} · Latest: {new Date(group.reports[0].created_at).toLocaleDateString()}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProfileScreen({navigate, user, onMenu, onSignOut, darkMode, setDarkMode}) {
+  const [editing, setEditing] = useState(null); // 'password' | 'city'
+  const [newPassword, setNewPassword] = useState("");
+  const [newPassword2, setNewPassword2] = useState("");
+  const [newCity, setNewCity] = useState(user?.city||"Budapest");
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState(null);
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+
+  function showMsg(text, isErr=false){setMsg({text,isErr});setTimeout(()=>setMsg(null),3000);}
+
+  async function savePassword(){
+    if(newPassword.length<6) return showMsg("Password must be at least 6 characters.",true);
+    if(newPassword!==newPassword2) return showMsg("Passwords don't match.",true);
+    setSaving(true);
+    const {error} = await supabase.auth.updateUser({password: newPassword});
+    setSaving(false);
+    if(error) return showMsg(error.message,true);
+    setNewPassword("");setNewPassword2("");setEditing(null);
+    showMsg("Password updated ✓");
+  }
+
+  async function saveCity(){
+    setSaving(true);
+    const {error} = await supabase.from("users").update({city_id: null}).eq("id",user.id);
+    setSaving(false);
+    if(error) return showMsg(error.message,true);
+    setEditing(null);
+    showMsg("City updated ✓");
+  }
+
+  async function deleteAccount(){
+    if(deleteConfirm!=="DELETE") return showMsg("Type DELETE to confirm.",true);
+    const {error} = await supabase.rpc("delete_user");
+    if(error){
+      // fallback: just sign out
+      await supabase.auth.signOut();
+      onSignOut();
+      return;
+    }
+    await supabase.auth.signOut();
+    onSignOut();
+  }
+
+  const rowStyle={background:"var(--white)",borderRadius:14,padding:"16px",marginBottom:10,cursor:"pointer"};
+
+  return (
+    <div className="screen">
+      <div className="hdr"><Hamburger onClick={onMenu}/><div/></div>
+      <div style={{padding:"12px 24px 24px"}}>
+        <div className="logo-md">LOKALZ</div>
+        <div className="script" style={{marginTop:6}}>Profile</div>
+      </div>
+      <div className="scroll" style={{padding:"0 20px"}}>
+
+        {/* Name — read only */}
+        <div style={rowStyle}>
+          <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:13,color:"#888",letterSpacing:".06em"}}>NAME</div>
+          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",marginTop:2}}>{user?.name||"User"}</div>
+        </div>
+
+        {/* Password */}
+        <div style={rowStyle} onClick={()=>setEditing(editing==="password"?null:"password")}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div>
+              <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:13,color:"#888",letterSpacing:".06em"}}>PASSWORD</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",marginTop:2}}>••••••••</div>
+            </div>
+            <span style={{color:"var(--blue)",fontSize:20}}>{editing==="password"?"∨":"›"}</span>
+          </div>
+          {editing==="password"&&(
+            <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
+              <input type="password" placeholder="New password" value={newPassword} onChange={e=>setNewPassword(e.target.value)}
+                style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:8,outline:"none"}}/>
+              <input type="password" placeholder="Confirm password" value={newPassword2} onChange={e=>setNewPassword2(e.target.value)}
+                style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
+              <button onClick={savePassword} style={{background:"var(--blue)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--display)",fontWeight:700,fontSize:14,cursor:"pointer",opacity:saving?.6:1}}>
+                {saving?"SAVING...":"SAVE PASSWORD"}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* City */}
+        <div style={rowStyle} onClick={()=>setEditing(editing==="city"?null:"city")}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div>
+              <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:13,color:"#888",letterSpacing:".06em"}}>CITY</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",marginTop:2}}>{newCity}</div>
+            </div>
+            <span style={{color:"var(--blue)",fontSize:20}}>{editing==="city"?"∨":"›"}</span>
+          </div>
+          {editing==="city"&&(
+            <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
+              <select value={newCity} onChange={e=>setNewCity(e.target.value)}
+                style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none",background:"white"}}>
+                {CITIES.map(c=><option key={c} value={c}>{c}</option>)}
+              </select>
+              <button onClick={saveCity} style={{background:"var(--blue)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--display)",fontWeight:700,fontSize:14,cursor:"pointer",opacity:saving?.6:1}}>
+                {saving?"SAVING...":"SAVE CITY"}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Dark mode */}
+        <div style={{...rowStyle,cursor:"default",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:13,color:"#888",letterSpacing:".06em"}}>DARK MODE</div>
+          <div onClick={()=>setDarkMode(!darkMode)} style={{width:48,height:26,borderRadius:13,background:darkMode?"var(--blue)":"#ddd",cursor:"pointer",position:"relative",transition:"background .2s"}}>
+            <div style={{position:"absolute",top:3,left:darkMode?22:2,width:20,height:20,borderRadius:"50%",background:"white",transition:"left .2s",boxShadow:"0 1px 4px rgba(0,0,0,.2)"}}/>
+          </div>
+        </div>
+
+        {msg&&<div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:msg.isErr?"#c00":"#0a3622",background:msg.isErr?"rgba(255,0,0,.08)":"#D1E7DD",padding:"10px 14px",borderRadius:10,marginBottom:10,textAlign:"center"}}>{msg.text}</div>}
+
+        <div style={{height:20}}/>
+
+        {/* Delete account */}
+        {!showDelete
+          ?<button onClick={()=>setShowDelete(true)} style={{background:"transparent",border:"1.5px solid #F8D7DA",borderRadius:12,padding:"14px",width:"100%",fontFamily:"var(--display)",fontWeight:700,fontSize:14,letterSpacing:".04em",color:"#58151C",cursor:"pointer"}}>
+            DELETE ACCOUNT
+          </button>
+          :<div style={{background:"#FFF8F8",border:"1.5px solid #F8D7DA",borderRadius:14,padding:16}}>
+            <div style={{fontFamily:"var(--display)",fontWeight:800,fontSize:14,color:"#58151C",marginBottom:8}}>Are you sure?</div>
+            <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"#888",marginBottom:12}}>Type DELETE to confirm. This cannot be undone.</div>
+            <input placeholder="Type DELETE" value={deleteConfirm} onChange={e=>setDeleteConfirm(e.target.value)}
+              style={{width:"100%",border:"1.5px solid #F8D7DA",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={deleteAccount} style={{flex:1,background:"#58151C",color:"white",border:"none",borderRadius:10,padding:"11px",fontFamily:"var(--display)",fontWeight:700,fontSize:13,cursor:"pointer",opacity:deleteConfirm==="DELETE"?1:.5}}>
+                DELETE
+              </button>
+              <button onClick={()=>{setShowDelete(false);setDeleteConfirm("");}} style={{background:"#eee",border:"none",borderRadius:10,padding:"11px 16px",fontFamily:"var(--display)",fontWeight:700,fontSize:13,cursor:"pointer"}}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        }
+        <div style={{height:32}}/>
+      </div>
+    </div>
+  );
+}
+
+// ── MAIN APP ─────────────────────────────────
+function App() {
+  const [screen, setScreen] = useState("signin");
+  const [prevScreen, setPrevScreen] = useState(null);
+  const [selectedVenue, setSelectedVenue] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [user, setUser] = useState(null);
+  const [savedIds, setSavedIds] = useState(new Set());
+  const [allVenues, setAllVenues] = useState([]);
+  const [venuesLoading, setVenuesLoading] = useState(true);
+  const [answers, setAnswers] = useState({});
+
+  // Load venues from Supabase
+  useEffect(()=>{
+    async function loadVenues(){
+      setVenuesLoading(true);
+      const {data, error} = await supabase
+        .from("venues")
+        .select("*")
+        .in("status",["active","pending","needs_edit","watchlist"]);
+      if(!error && data) setAllVenues(data.map(v=>({
+        ...v,
+        price: v.price_level,
+        why: v.why,
+        emoji: "🍽",
+        occasions: v.occasions || []
+      })));
+      setVenuesLoading(false);
+    }
+    loadVenues();
+  },[]);
+
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(()=>{
+    const root = document.getElementById("root");
+    if(darkMode) root.classList.add("dark-mode");
+    else root.classList.remove("dark-mode");
+  },[darkMode]);
+  useEffect(()=>{
+    supabase.auth.getSession().then(({data:{session}})=>{
+      if(session){
+        supabase.from("users").select("*").eq("id",session.user.id).single().then(({data:profile})=>{
+          const u = {
+            id: session.user.id,
+            name: profile?.name || session.user.email.split("@")[0],
+            email: session.user.email,
+            role: profile?.role?.toLowerCase() || "user",
+            city_id: profile?.city_id || null
+          };
+          setUser(u);
+          loadSavedIds(u.id);
+          // Show onboarding if no city selected yet
+          setScreen(u.city_id ? "home" : "onboarding");
+        });
+      }
+    });
+    supabase.auth.onAuthStateChange(async (event, session)=>{
+      if(event==="SIGNED_OUT"){setUser(null);setScreen("signin");setSavedIds(new Set());}
+      if(event==="SIGNED_IN" && session){
+        const {data:profile} = await supabase.from("users").select("*").eq("id",session.user.id).single();
+        const u = {
+          id: session.user.id,
+          name: profile?.name || session.user.user_metadata?.full_name || session.user.email.split("@")[0],
+          email: session.user.email,
+          role: profile?.role?.toLowerCase() || "user",
+          city_id: profile?.city_id || null
+        };
+        setUser(u);
+        loadSavedIds(u.id);
+        setScreen(u.city_id ? "home" : "onboarding");
+      }
+    });
+  },[]);
+
+  function navigate(target, data) {
+    if(target==="venue"&&data){setSelectedVenue(data);setPrevScreen(screen);}
+    setScreen(target);
+    setShowMenu(false);
+  }
+  function showToastMsg(msg){setToast(msg);setTimeout(()=>setToast(null),2000);}
+
+  async function loadSavedIds(userId){
+    const {data, error} = await supabase
+      .from("saved_venues")
+      .select("venue_id")
+      .eq("user_id", userId);
+    console.log("loadSavedIds", userId, data, error);
+    if(data) setSavedIds(new Set(data.map(r=>r.venue_id)));
+  }
+
+  async function toggleSave(id){
+    if(!user) return;
+    const isSaved = savedIds.has(id);
+    if(isSaved){
+      setSavedIds(prev=>{const n=new Set(prev);n.delete(id);return n;});
+      await supabase.from("saved_venues").delete().eq("user_id",user.id).eq("venue_id",id);
+    } else {
+      setSavedIds(prev=>new Set(prev).add(id));
+      await supabase.from("saved_venues").insert({user_id:user.id, venue_id:id});
+    }
+  }
+
+  function onLogin(u){
+    setUser(u);
+    if(u?.id) loadSavedIds(u.id);
+  }
+  async function signOut(){
+    await supabase.auth.signOut();
+    setUser(null);
+    navigate("signin");
+  }
+
+  const isScout = user?.role==="scout"||user?.role==="city_lead";
+
+  const screens = {
+    signin: <SignInScreen navigate={navigate} onLogin={onLogin}/>,
+    signup: <SignUpScreen navigate={navigate} onLogin={onLogin}/>,
+    onboarding: <OnboardingScreen navigate={navigate} user={user}/>,
+    home: <HomeScreen navigate={navigate} onMenu={()=>setShowMenu(true)} setAnswers={setAnswers}/>,
+    q1: <Q1Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
+    q2: <Q2Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
+    q3: <Q3Screen navigate={navigate} answers={answers} setAnswers={setAnswers}/>,
+    q4: <Q4Screen navigate={navigate} answers={answers} setAnswers={setAnswers}/>,
+    q5: <Q5Screen navigate={navigate} answers={answers} setAnswers={setAnswers}/>,
+    results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} allVenues={allVenues}/>,
+    venue: selectedVenue&&<VenueDetailScreen venue={selectedVenue} navigate={navigate} savedIds={savedIds} toggleSave={toggleSave} showToast={showToastMsg} isScout={isScout} user={user}/>,
+    saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)}/>,
+    all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)}/>,
+    scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user}/>,
+    city_lead: <CityLeadScreen navigate={navigate} allVenues={allVenues} setAllVenues={setAllVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg}/>,
+    profile: <ProfileScreen navigate={navigate} user={user} onMenu={()=>setShowMenu(true)} onSignOut={signOut} darkMode={darkMode} setDarkMode={setDarkMode}/>,
+  };
+
+  return (
+    <div style={{width:"100%",height:"100%",position:"relative"}}>
+      {screens[screen]||screens.signin}
+      {showMenu&&<Menu onClose={()=>setShowMenu(false)} navigate={navigate} role={user?.role||"user"} onSignOut={signOut}/>}
+      {toast&&<div className="toast">{toast}</div>}
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
