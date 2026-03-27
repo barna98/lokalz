@@ -1256,7 +1256,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
     }
     setSel(prev=>prev.includes(d)?prev.filter(x=>x!==d):[...prev,d]);
   }
-  function next(){setAnswers(a=>({...a,locations:sel}));navigate("q4");}
+  function next(){setAnswers(a=>({...a,locations:selRef.current}));navigate("q4");}
   const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
@@ -1273,9 +1273,17 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>Where in the city?</div>
       </div>
       <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
-        {DISTRICTS_MAIN.map(d=>(
+        <button style={{...PILL,
+          background:sel.includes("near me")?"var(--red)":"white",
+          color:sel.includes("near me")?"white":"var(--red)",
+          border:"1.5px solid var(--red)",fontWeight:700}}
+          onClick={()=>toggle("near me")}>
+          <span>{locLoading?"📍 locating...":"📍 detect my location"}</span>
+          {sel.includes("near me")&&<span>✓</span>}
+        </button>
+        {DISTRICTS_MAIN.filter(d=>d!=="near me").map(d=>(
           <button key={d} style={{...PILL,background:sel.includes(d)?"var(--black)":"white",color:sel.includes(d)?"white":"var(--black)"}} onClick={()=>toggle(d)}>
-            <span>{d==="near me"&&locLoading?"📍 Locating...":districtLabel(d)}</span>{sel.includes(d)&&<span>✓</span>}
+            <span>{districtLabel(d)}</span>{sel.includes(d)&&<span>✓</span>}
           </button>
         ))}
         <button style={{...PILL,background:showMore?"var(--black)":"white",color:showMore?"white":"var(--black)"}} onClick={()=>setShowMore(v=>!v)}>
@@ -1291,7 +1299,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
         </button>
       </div>
       <div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
-        <button onClick={()=>sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel.length>0?"pointer":"default",opacity:sel.length>0?1:.4,whiteSpace:"nowrap"}}>next</button>
+        <button onClick={()=>!locLoading&&selRef.current.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:(!locLoading&&sel.length>0)?"pointer":"default",opacity:(!locLoading&&sel.length>0)?1:.4,whiteSpace:"nowrap"}}>{locLoading?"locating...":"next"}</button>
       </div>
     </div>
   );
