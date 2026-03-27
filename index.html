@@ -555,6 +555,7 @@ function SignInScreen({navigate, onLogin}) {
         role: (()=>{ const r=(profile?.role||"explorer").toLowerCase(); return r==="user"?"explorer":r; })(),
         city_id: profile?.city_id || null,
         badge: profile?.badge || null,
+        profile_image: profile?.profile_image || null,
       };
       onLogin(u);
       // navigation handled by onLogin
@@ -1202,7 +1203,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
     setSel(prev=>prev.includes(d)?prev.filter(x=>x!==d):[...prev,d]);
   }
 
-  function next(){setAnswers(a=>({...a,locations:selRef.current}));navigate("q4");}
+  function next(){setAnswers(a=>({...a,locations:sel}));navigate("q4");}
   const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
@@ -5441,6 +5442,7 @@ function App() {
             role: (()=>{ const r=(profile?.role||"explorer").toLowerCase(); return r==="user"?"explorer":r; })(),
             city_id: profile?.city_id || null,
             badge: profile?.badge || null,
+            profile_image: profile?.profile_image || null,
             partner_id: profile?.partner_id || null,
             partner_access_expires_at: profile?.partner_access_expires_at || null,
           };
@@ -5497,6 +5499,7 @@ function App() {
           role: (()=>{ const r=(profile?.role||"explorer").toLowerCase(); return r==="user"?"explorer":r; })(),
           city_id: profile?.city_id || null,
           badge: profile?.badge || null,
+          profile_image: profile?.profile_image || null,
           partner_id: profile?.partner_id || null,
           partner_access_expires_at: profile?.partner_access_expires_at || null,
         };
