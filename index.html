@@ -1189,11 +1189,37 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
   const [showMore, setShowMore] = useState(false);
   const [locLoading, setLocLoading] = useState(false);
 
+  function postalToDistrict(postal){
+    const code = parseInt(postal);
+    if(code>=1011&&code<=1239){
+      const districtNum = Math.floor((code-1000)/10);
+      const ROMAN=["","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"];
+      return ROMAN[districtNum]||null;
+    }
+    return null;
+  }
+
   function toggle(d){
     if(d==="near me" && !sel.includes("near me")){
       setLocLoading(true);
       navigator.geolocation?.getCurrentPosition(
-        ()=>{ setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]); setLocLoading(false); },
+        async (pos)=>{
+          const {latitude:lat, longitude:lng} = pos.coords;
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=en`);
+            const data = await res.json();
+            const postal = data.address?.postcode?.replace(/\s/g,"");
+            const district = postal ? postalToDistrict(postal) : null;
+            if(district){
+              setSel(prev=>[...prev.filter(x=>x!=="near me"&&x!==district), district]);
+            } else {
+              setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
+            }
+          } catch(e){
+            setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
+          }
+          setLocLoading(false);
+        },
         ()=>{ setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]); setLocLoading(false); }
       );
       return;
