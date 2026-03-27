@@ -1199,23 +1199,43 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
     return null;
   }
 
+  function districtFromAddress(address){
+    if(!address) return null;
+    const match = address.match(/(1[0-2]\d{2})/);
+    return match ? postalToDistrict(match[1]) : null;
+  }
+
   function toggle(d){
     if(d==="near me" && !sel.includes("near me")){
       setLocLoading(true);
       navigator.geolocation?.getCurrentPosition(
-        async (pos)=>{
-          const {latitude:lat, longitude:lng} = pos.coords;
-          try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=en`);
-            const data = await res.json();
-            const postal = data.address?.postcode?.replace(/\s/g,"");
-            const district = postal ? postalToDistrict(postal) : null;
-            if(district){
-              setSel(prev=>[...prev.filter(x=>x!=="near me"&&x!==district), district]);
-            } else {
-              setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
-            }
-          } catch(e){
+        (pos)=>{
+          const {latitude:userLat, longitude:userLng} = pos.coords;
+          // Find closest venue using haversine, get its district
+          function haversine(lat1,lon1,lat2,lon2){
+            const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+            const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+            return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+          }
+          // Budapest center coords per district (postal code midpoints)
+          const DISTRICT_COORDS = {
+            "I":[47.4979,18.9913],"II":[47.5347,18.9675],"III":[47.5665,19.0385],
+            "IV":[47.5590,19.0894],"V":[47.5018,19.0533],"VI":[47.5100,19.0700],
+            "VII":[47.5017,19.0736],"VIII":[47.4924,19.0771],"IX":[47.4778,19.0644],
+            "X":[47.4798,19.1234],"XI":[47.4767,19.0264],"XII":[47.4970,18.9770],
+            "XIII":[47.5314,19.0698],"XIV":[47.5149,19.1197],"XV":[47.5710,19.1007],
+            "XVI":[47.5052,19.1618],"XVII":[47.4762,19.1756],"XVIII":[47.4536,19.1433],
+            "XIX":[47.4393,19.1250],"XX":[47.4318,19.0989],"XXI":[47.4200,19.0620],
+            "XXII":[47.4201,18.9990],"XXIII":[47.3894,19.0824]
+          };
+          let closest = null, minDist = Infinity;
+          Object.entries(DISTRICT_COORDS).forEach(([dist,[lat,lng]])=>{
+            const d = haversine(userLat,userLng,lat,lng);
+            if(d<minDist){ minDist=d; closest=dist; }
+          });
+          if(closest){
+            setSel(prev=>[...prev.filter(x=>x!=="near me"&&x!==closest), closest]);
+          } else {
             setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
           }
           setLocLoading(false);
