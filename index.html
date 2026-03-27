@@ -897,20 +897,23 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading}
       });
       if(result.error) throw result.error;
       const parsed = result.data||{};
+      const VALID_CAT = ["Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"];
       const VALID_OCC = ["Casual dining","Fine dining","Dinner with friends","Date night","Lunch","Breakfast and brunch","Quick bite","Coffee","Quiet work spot","Pre-drinks / drinks","Late night","Celebration","Family outing"];
+      const VALID_TAGS = ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Cocktails","Wine bar","Speakeasy","Live music","Good music","Good for groups","Romantic","Lively","Upscale","Scenic","Underrated","Aesthetic"];
       const VALID_CUI = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","Italian","French","Spanish","Greek","Mexican","American","Hungarian","Middle Eastern","Mediterranean"];
       const VALID_DIS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","Anywhere in Budapest"];
       const VALID_DIE = ["Gluten-free","Vegan","Vegetarian","Halal","Kosher","Dairy-free","Nut-free","Pescatarian"];
       const VALID_BUD = ["$","$$","$$$","$$$$"];
-      const VALID_GRP = ["Just me","2 people","3\u20134 people","5+ people"];
+      const VALID_GRP = ["solo","2","3-6","6-8","9+"];
       const aiData = {
+        category:  VALID_CAT.includes(parsed.category)?parsed.category:null,
         occasions: Array.isArray(parsed.occasions)?parsed.occasions.filter(o=>VALID_OCC.includes(o)):[],
-        cuisines:  Array.isArray(parsed.cuisines) ?parsed.cuisines.filter(c=>VALID_CUI.includes(c)) :[],
+        tags:      Array.isArray(parsed.tags)?parsed.tags.filter(t=>VALID_TAGS.includes(t)):[],
+        cuisines:  Array.isArray(parsed.cuisines)?parsed.cuisines.filter(c=>VALID_CUI.includes(c)):[],
         budget:    VALID_BUD.includes(parsed.budget)?parsed.budget:null,
         group:     VALID_GRP.includes(parsed.group)?parsed.group:null,
-        terrace:   parsed.terrace===true?true:parsed.terrace===false?false:null,
         locations: Array.isArray(parsed.locations)?parsed.locations.filter(l=>VALID_DIS.includes(l)):[],
-        dietary:   Array.isArray(parsed.dietary)  ?parsed.dietary.filter(d=>VALID_DIE.includes(d))  :[],
+        dietary:   Array.isArray(parsed.dietary)?parsed.dietary.filter(d=>VALID_DIE.includes(d)):[],
         whySearch: typeof parsed.whySearch==="string"&&parsed.whySearch.trim()?parsed.whySearch.trim():null,
       };
       setAnswers(a=>({...a, ...aiData, aiQuery:query}));
