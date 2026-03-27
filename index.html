@@ -1188,6 +1188,8 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
   const [sel, setSel] = useState(answers.locations||(partnerDistrict?[partnerDistrict]:[]));
   const [showMore, setShowMore] = useState(false);
   const [locLoading, setLocLoading] = useState(false);
+  const selRef = React.useRef(sel);
+  React.useEffect(()=>{ selRef.current = sel; }, [sel]);
 
   function postalToDistrict(postal){
     const code = parseInt(postal);
@@ -1246,7 +1248,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
     }
     setSel(prev=>prev.includes(d)?prev.filter(x=>x!==d):[...prev,d]);
   }
-  function next(){setAnswers(a=>({...a,locations:sel}));navigate("q4");}
+  function next(){setAnswers(a=>({...a,locations:selRef.current}));navigate("q4");}
   const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
@@ -1281,7 +1283,9 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
         </button>
       </div>
       <div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
-        <button onClick={()=>sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel.length>0?"pointer":"default",opacity:sel.length>0?1:.4,whiteSpace:"nowrap"}}>next</button>
+        <button onClick={()=>!locLoading&&sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:(!locLoading&&sel.length>0)?"pointer":"default",opacity:(!locLoading&&sel.length>0)?1:.4,whiteSpace:"nowrap"}}>
+          {locLoading?"locating...":"next"}
+        </button>
       </div>
     </div>
   );
