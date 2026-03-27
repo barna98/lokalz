@@ -1208,49 +1208,9 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
   }
 
   function toggle(d){
-    if(d==="near me" && !sel.includes("near me")){
-      setLocLoading(true);
-      navigator.geolocation?.getCurrentPosition(
-        (pos)=>{
-          const {latitude:userLat, longitude:userLng} = pos.coords;
-          // Find closest venue from allVenues and use its district
-          // allVenues have latitude/longitude if available, otherwise use address postal code
-          let detectedDistrict = null;
-
-          // Method: find closest venue by lat/lng if available
-          let minDist = Infinity;
-          (allVenues||[]).filter(v=>v.status==="active"&&v.latitude&&v.longitude).forEach(v=>{
-            const dLat = (v.latitude-userLat)*Math.PI/180;
-            const dLon = (v.longitude-userLng)*Math.PI/180;
-            const a = Math.sin(dLat/2)**2+Math.cos(userLat*Math.PI/180)*Math.cos(v.latitude*Math.PI/180)*Math.sin(dLon/2)**2;
-            const dist = 6371*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-            if(dist<minDist){ minDist=dist; detectedDistrict=v.district; }
-          });
-
-          // Fallback: extract postal from address of nearest venue without coords
-          if(!detectedDistrict){
-            const nearest = (allVenues||[]).filter(v=>v.status==="active"&&v.address).slice(0,20);
-            detectedDistrict = nearest.map(v=>districtFromAddress(v.address)).find(Boolean)||null;
-          }
-
-          if(detectedDistrict){
-            setSel(prev=>[...prev.filter(x=>x!=="near me"&&x!==detectedDistrict), detectedDistrict]);
-            if(!["near me","V","VI","VII"].includes(detectedDistrict)) setShowMore(true);
-          } else {
-            setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
-          }
-          setLocLoading(false);
-        },
-        (err)=>{
-          setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
-          setLocLoading(false);
-        },
-        {enableHighAccuracy:true, timeout:10000, maximumAge:0}
-      );
-      return;
-    }
     setSel(prev=>prev.includes(d)?prev.filter(x=>x!==d):[...prev,d]);
   }
+
   function next(){setAnswers(a=>({...a,locations:selRef.current}));navigate("q4");}
   const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%"};
   return (
@@ -1272,7 +1232,43 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
           background:sel.includes("near me")?"var(--red)":"white",
           color:sel.includes("near me")?"white":"var(--red)",
           border:"1.5px solid var(--red)",fontWeight:700}}
-          onClick={()=>toggle("near me")}>
+          onClick={()=>{
+            // Call getCurrentPosition FIRST before any React state updates
+            // This preserves the user gesture context on iOS
+            if(!sel.includes("near me")){
+              setLocLoading(true);
+              navigator.geolocation.getCurrentPosition(
+                (pos)=>{
+                  const {latitude:userLat, longitude:userLng} = pos.coords;
+                  let detectedDistrict = null;
+                  let minDist = Infinity;
+                  (allVenues||[]).filter(v=>v.status==="active"&&v.latitude&&v.longitude).forEach(v=>{
+                    const dLat=(v.latitude-userLat)*Math.PI/180, dLon=(v.longitude-userLng)*Math.PI/180;
+                    const a=Math.sin(dLat/2)**2+Math.cos(userLat*Math.PI/180)*Math.cos(v.latitude*Math.PI/180)*Math.sin(dLon/2)**2;
+                    const dist=6371*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+                    if(dist<minDist){minDist=dist;detectedDistrict=v.district;}
+                  });
+                  if(!detectedDistrict){
+                    const m=(allVenues||[]).find(v=>v.address&&v.address.match(/1[0-2]\d{2}/));
+                    if(m){const p=m.address.match(/1[0-2]\d{2}/);if(p)detectedDistrict=districtFromAddress(m.address);}
+                  }
+                  if(detectedDistrict){
+                    setSel(prev=>[...prev.filter(x=>x!=="near me"&&x!==detectedDistrict),detectedDistrict]);
+                    selRef.current=[detectedDistrict];
+                    if(!["V","VI","VII"].includes(detectedDistrict)) setShowMore(true);
+                  } else {
+                    setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
+                    selRef.current=["near me"];
+                  }
+                  setLocLoading(false);
+                },
+                ()=>{ setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]); selRef.current=["near me"]; setLocLoading(false); },
+                {enableHighAccuracy:true,timeout:10000,maximumAge:0}
+              );
+            } else {
+              setSel(prev=>prev.filter(x=>x!=="near me"));
+            }
+          }}>
           <span>{locLoading?"📍 locating...":"📍 detect my location"}</span>
           {sel.includes("near me")&&<span>✓</span>}
         </button>
