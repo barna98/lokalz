@@ -1187,7 +1187,9 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
 function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
   const [sel, setSel] = useState(answers.locations||(partnerDistrict?[partnerDistrict]:[]));
   const [showMore, setShowMore] = useState(false);
-
+  const [locLoading, setLocLoading] = useState(false);
+  const selRef = React.useRef(sel);
+  React.useEffect(()=>{ selRef.current = sel; }, [sel]);
 
   function postalToDistrict(postal){
     const code = parseInt(postal);
