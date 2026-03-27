@@ -1189,45 +1189,11 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
   const [showMore, setShowMore] = useState(false);
   const [locLoading, setLocLoading] = useState(false);
 
-  async function getDistrictFromCoords(lat, lng){
-    // Use Google Geocoding API for accurate reverse geocoding
-    const apiKey = "YOUR_GOOGLE_MAPS_API_KEY";
-    try {
-      const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}&language=en`);
-      const data = await res.json();
-      if(data.results?.length>0){
-        // Look for postal code in address components
-        for(const result of data.results){
-          const postal = result.address_components?.find(c=>c.types.includes("postal_code"))?.long_name;
-          if(postal){
-            // Budapest postal codes: 1011-1239, district = 2nd+3rd digit
-            const code = parseInt(postal);
-            if(code>=1011&&code<=1239){
-              const districtNum = Math.floor((code-1000)/10);
-              const ROMAN = ["","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"];
-              return ROMAN[districtNum]||null;
-            }
-          }
-        }
-      }
-    } catch(e){}
-    return null;
-  }
-
   function toggle(d){
     if(d==="near me" && !sel.includes("near me")){
       setLocLoading(true);
       navigator.geolocation?.getCurrentPosition(
-        async (pos)=>{
-          const {latitude:lat, longitude:lng} = pos.coords;
-          const district = await getDistrictFromCoords(lat, lng);
-          if(district){
-            setSel(prev=>[...prev.filter(x=>x!=="near me"&&x!==district), district]);
-          } else {
-            setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
-          }
-          setLocLoading(false);
-        },
+        ()=>{ setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]); setLocLoading(false); },
         ()=>{ setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]); setLocLoading(false); }
       );
       return;
@@ -1473,15 +1439,14 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
     }
     return 0;
   });
-  const pool = shuffle(sorted);
-  const [shown,setShown]=useState(pool.slice(0,BATCH));
-  const [page,setPage]=useState(1);
-  const noMore=page*BATCH>=pool.length;
+  const pool = React.useMemo(()=>shuffle(sorted),[filtered.length, answers]);
+  const [shownCount, setShownCount] = useState(BATCH);
+  const shown = pool.slice(0, shownCount);
+  const noMore = shownCount >= pool.length;
 
-  // Reset pagination when answers/pool changes
+  // Reset when answers change
   React.useEffect(()=>{
-    setShown(pool.slice(0,BATCH));
-    setPage(1);
+    setShownCount(BATCH);
   },[answers]);
 
   // Save partner analytics on first render
@@ -1500,9 +1465,7 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
   },[]);
 
   function showMore(){
-    const next=pool.slice(page*BATCH,(page+1)*BATCH);
-    setShown(p=>[...p,...next]);
-    setPage(p=>p+1);
+    setShownCount(c=>Math.min(c+BATCH, pool.length));
   }
 
   return (
