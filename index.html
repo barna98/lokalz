@@ -1237,6 +1237,8 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
           });
           if(closest){
             setSel(prev=>[...prev.filter(x=>x!=="near me"&&x!==closest), closest]);
+            // If detected district is not in main list, expand "more districts"
+            if(!["near me","V","VI","VII"].includes(closest)) setShowMore(true);
           } else {
             setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
           }
