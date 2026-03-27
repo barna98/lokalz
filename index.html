@@ -37,6 +37,8 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 }
 
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes skeleton{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:skeleton 1.5s infinite;}
 @keyframes glow-pulse{
   0%,100%{box-shadow:0 0 16px 4px rgba(220,38,38,.3),0 0 40px 8px rgba(255,255,255,.2);}
   50%{box-shadow:0 0 28px 10px rgba(220,38,38,.5),0 0 60px 20px rgba(255,255,255,.3);}
@@ -339,6 +341,12 @@ const CUISINES = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","It
 const CUISINES_FILTER = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","Italian","French","Spanish","Greek","Mexican","American","Hungarian","Middle Eastern","Mediterranean","Other"];
 const GROUP_SIZES = ["2","3-6","6-8","9+"];
 const CITIES = ["Budapest","Vienna","Prague"];
+
+function haptic(style="light"){
+  if(navigator.vibrate){
+    navigator.vibrate(style==="light"?10:style==="medium"?20:40);
+  }
+}
 
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 
@@ -1058,7 +1066,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
       <div className="scroll" style={{padding:"0 20px 100px"}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           {CATS.map(c=>(
-            <div key={c.id} onClick={()=>setSel(c.id)}
+            <div key={c.id} onClick={()=>{haptic("light");setSel(c.id);}}
               style={{
                 background:sel===c.id?"var(--black)":"white",
                 border:"1.5px solid black",
@@ -1102,6 +1110,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
   const availableTags = getTagsForCategory(category);
 
   function toggleOcc(id){
+    haptic("light");
     if(id==="Not sure yet"){
       setSelOcc(prev=>prev.includes(id)?[]:["Not sure yet"]);
       return;
@@ -1111,7 +1120,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
       return without.includes(id)?without.filter(x=>x!==id):[...without,id];
     });
   }
-  function toggleTag(t){setSelTags(prev=>prev.includes(t)?prev.filter(x=>x!==t):[...prev,t]);}
+  function toggleTag(t){haptic("light");setSelTags(prev=>prev.includes(t)?prev.filter(x=>x!==t):[...prev,t]);}
 
   function next(){
     const occasions = selOcc.includes("Not sure yet") ? [] : selOcc;
@@ -1189,6 +1198,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
   const [showMore, setShowMore] = useState(false);
 
   function toggle(d){
+    haptic("light");
     setSel(prev=>prev.includes(d)?prev.filter(x=>x!==d):[...prev,d]);
   }
 
@@ -1376,6 +1386,19 @@ function capacityMatches(venueCapacity, searchGroup) {
   return vIdx >= sIdx;
 }
 
+function SkeletonCard(){
+  return (
+    <div style={{background:"white",borderRadius:16,padding:"14px",marginBottom:12,display:"flex",gap:12,alignItems:"center"}}>
+      <div className="skeleton" style={{width:72,height:72,borderRadius:12,flexShrink:0}}/>
+      <div style={{flex:1}}>
+        <div className="skeleton" style={{height:16,borderRadius:8,marginBottom:8,width:"70%"}}/>
+        <div className="skeleton" style={{height:12,borderRadius:8,marginBottom:6,width:"50%"}}/>
+        <div className="skeleton" style={{height:12,borderRadius:8,width:"40%"}}/>
+      </div>
+    </div>
+  );
+}
+
 function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
   const BATCH=5;
   const active = allVenues.filter(v=>v.status==="active").sort((a,b)=>a.name.localeCompare(b.name));
@@ -1464,6 +1487,27 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
     setShownCount(c=>Math.min(c+BATCH, pool.length));
   }
 
+  const pullRef = React.useRef(null);
+  const pullStartY = React.useRef(null);
+  const [pullDist, setPullDist] = React.useState(0);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  function onPullStart(e){ pullStartY.current = e.touches[0].clientY; }
+  function onPullMove(e){
+    if(pullStartY.current===null||pullRef.current?.scrollTop>0) return;
+    const dist = Math.max(0, Math.min(80, e.touches[0].clientY - pullStartY.current));
+    setPullDist(dist);
+  }
+  function onPullEnd(){
+    if(pullDist>60){
+      setRefreshing(true);
+      haptic("medium");
+      setTimeout(()=>{ setRefreshing(false); setShownCount(BATCH); }, 800);
+    }
+    setPullDist(0);
+    pullStartY.current = null;
+  }
+
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -1478,8 +1522,15 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
       <div style={{padding:"8px 20px 12px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>our picks for you</div>
       </div>
-      <div className="scroll" style={{padding:"0 20px"}}>
-        {shown.length===0&&(
+      <div className="scroll" style={{padding:"0 20px"}} ref={pullRef}
+        onTouchStart={onPullStart} onTouchMove={onPullMove} onTouchEnd={onPullEnd}>
+        {(pullDist>0||refreshing)&&(
+          <div style={{textAlign:"center",padding:"8px",fontFamily:"var(--body)",fontSize:13,color:"#888",transform:`translateY(${pullDist}px)`,transition:pullDist===0?"all .3s":"none"}}>
+            {refreshing?"refreshing...":"↓ release to refresh"}
+          </div>
+        )}
+        {refreshing&&[1,2,3].map(i=><SkeletonCard key={i}/>)}
+        {!refreshing&&shown.length===0&&(
           <div className="empty">
             <div className="empty-icon">😕</div>
             <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:600,color:"#555",lineHeight:1.6,textAlign:"center",marginBottom:8}}>
@@ -1493,7 +1544,7 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
             </button>
           </div>
         )}
-        {shown.map((v,i)=>(
+        {!refreshing&&shown.map((v,i)=>(
           <div key={v.id} style={{animation:`fadeUp .3s ${Math.min(i,.4)*0.07}s ease both`,opacity:0,animationFillMode:"forwards"}}>
             <VenueCard venue={v} onClick={()=>navigate("venue",v)}/>
           </div>
@@ -1717,7 +1768,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           </div>
         )}
         <button className="back-btn" style={{position:"absolute",top:16,left:16,background:"rgba(0,0,0,.4)",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:22}} onClick={()=>navigate(-1)}>‹</button>
-        <button onClick={()=>{toggleSave(venue.id);showToast(saved?"removed":"saved ♥");}}
+        <button onClick={()=>{haptic("medium");toggleSave(venue.id);showToast(saved?"removed":"saved ♥");}}
           style={{position:"absolute",top:16,right:16,background:"rgba(0,0,0,.4)",border:"none",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,color:saved?"#F97B30":"white"}}>
           {saved?"♥":"♡"}
         </button>
@@ -3801,7 +3852,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
     if(error){showMsg("Upload error: "+error.message,true);setUploadingImg(false);return;}
     const {data} = supabase.storage.from("venue-images").getPublicUrl(path);
     const publicUrl = data.publicUrl + '?t=' + Date.now();
-    const {error: updateError} = await supabase.from("users").update({profile_image: data.publicUrl}).eq("id",user.id);
+    const {error: updateError} = await supabase.from("users").update({profile_image: publicUrl}).eq("id",user.id);
     if(updateError){showMsg("Save error: "+updateError.message,true);setUploadingImg(false);return;}
     setUser(u=>({...u, profile_image:publicUrl}));
     showMsg("Photo updated ✓");
