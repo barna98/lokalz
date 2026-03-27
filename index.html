@@ -1244,11 +1244,9 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict}) {
           setLocLoading(false);
         },
         (err)=>{
-          // Permission denied or unavailable
           console.log("Geolocation error:", err.code, err.message);
+          setSel(prev=>[...prev.filter(x=>x!=="near me"),"near me"]);
           setLocLoading(false);
-          // Keep near me deselected, just show toast
-          alert("Location access denied. Please select a district manually.");
         },
         {enableHighAccuracy:true, timeout:10000, maximumAge:0}
       );
