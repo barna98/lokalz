@@ -530,7 +530,7 @@ function Menu({onClose, navigate, role, onSignOut}) {
   const itemStyle = {fontFamily:"var(--body)",fontWeight:400,fontSize:22,color:"var(--black)",padding:"10px 0",cursor:"pointer",lineHeight:1.2};
   const boldStyle = {fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",padding:"10px 0",cursor:"pointer",lineHeight:1.2};
   return (
-    <div style={{position:"absolute",inset:0,background:"white",zIndex:101,animation:"fadeIn .22s ease",display:"flex",flexDirection:"column",padding:"0 28px 40px"}}>
+    <div style={{position:"absolute",inset:0,background:"white",zIndex:101,animation:"fadeIn .22s ease",display:"flex",flexDirection:"column",padding:"0 28px 80px"}}>
       <div style={{padding:"20px 0 0"}}/>
       <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none",marginTop:8}}>LOKAL&#39;Z</div>
       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:40}}>Beyond the obvious.</div>
@@ -874,7 +874,7 @@ function OnboardingScreen({navigate, user, setUser}) {
       <div className="scroll" style={{flex:1,padding:"16px 0 80px",display:"flex",flexDirection:"column",gap:10}}>
         {SCOUT_BADGES.filter(b=>b.id!=="The Founder"||["78be06ee-5e05-402a-b74e-b9e4e60ee1f0","b20cd939-2165-42be-b69b-d15faa5ed8e3"].includes(user?.id)).map(b=>(
           <button key={b.id} className={`opt-btn${badge===b.id?" sel":""}`} onClick={()=>setBadge(b.id)}
-            style={{padding:"16px 20px 80px"}}>
+            style={{padding:"16px 20px"}}>
             <div style={{display:"flex",alignItems:"center",gap:12}}>
               <span style={{fontSize:24}}>{b.emoji}</span>
               <div>
@@ -2145,7 +2145,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           </div>
         </div>
       </div>
-      <div style={{background:"var(--black)",padding:"12px 20px 80px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
+      <div style={{background:"var(--black)",padding:"12px 20px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
         <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.1)",borderRadius:50,padding:"8px 14px"}}>
           <span style={{color:"rgba(255,255,255,.5)",fontSize:13}}>🔍</span>
           <input placeholder="search..." value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
@@ -3992,7 +3992,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
       <div className="scroll" style={{padding:"16px 20px 80px",background:"white",flex:1}}>
 
         {/* Profile header — fekete pill kártya */}
-        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16,padding:"16px 20px 80px",background:"black",borderRadius:50}}>
+        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16,padding:"16px 20px",background:"black",borderRadius:50}}>
           <label style={{cursor:"pointer",flexShrink:0}}>
             <input type="file" accept="image/*" style={{display:"none"}} onChange={e=>e.target.files[0]&&uploadProfileImage(e.target.files[0])}/>
             <div style={{width:72,height:72,borderRadius:"50%",background:"white",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
@@ -4040,7 +4040,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
 
         {/* Badge — scouts only */}
         {(user?.role==="scout"||user?.role==="city_lead")&&(
-          <div style={{...rowStyle,borderRadius:14,padding:"14px 20px 80px"}} onClick={()=>setEditing(editing==="badge"?null:"badge")}>
+          <div style={{...rowStyle,borderRadius:14,padding:"14px 20px"}} onClick={()=>setEditing(editing==="badge"?null:"badge")}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>badge</div>
@@ -4239,7 +4239,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
           </div>
         </div>
       </div>
-      <div style={{background:"var(--black)",padding:"12px 20px 80px",flexShrink:0}}>
+      <div style={{background:"var(--black)",padding:"12px 20px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.1)",borderRadius:50,padding:"8px 14px"}}>
           <span style={{color:"rgba(255,255,255,.5)",fontSize:13}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search scouts..."
@@ -4455,7 +4455,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
         )}
 
         {/* Venue lista */}
-        <div style={{padding:"14px 20px 80px"}}>
+        <div style={{padding:"14px 20px"}}>
           {filtered.length===0&&(
             <div className="empty">
               <div className="empty-icon">📍</div>
