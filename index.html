@@ -486,24 +486,27 @@ function VenueCard({venue, onClick}) {
   );
 }
 
-function BottomNav({screen, navigate, role}) {
+function BottomNav({screen, navigate, onMenu}) {
   const tabs = [
-    {id:"home", icon:"🏠", label:"home"},
-    {id:"q1",   icon:"🔍", label:"discover"},
-    {id:"saved", icon:"❤️", label:"saved"},
-    {id:"profile", icon:"👤", label:"profile"},
+    {id:"home",       icon:"🏠", label:"home"},
+    {id:"q1",         icon:"🔍", label:"discover"},
+    {id:"saved",      icon:"❤️", label:"saved"},
+    {id:"all_venues", icon:"📍", label:"all venues"},
+    {id:"menu",       icon:"☰",  label:"menu"},
   ];
   const active = (id) => {
     if(id==="home") return screen==="home";
     if(id==="q1") return ["q1","q2","q3","q4","q5","q6","results"].includes(screen);
+    if(id==="menu") return false;
     return screen===id;
   };
   return (
     <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"white",borderTop:"1px solid #eee",display:"flex",zIndex:200,paddingBottom:"env(safe-area-inset-bottom)"}}>
       {tabs.map(t=>(
-        <button key={t.id} onClick={()=>navigate(t.id)}
+        <button key={t.id}
+          onClick={()=>t.id==="menu"?onMenu():navigate(t.id)}
           style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"10px 0 8px",background:"none",border:"none",cursor:"pointer",gap:3}}>
-          <span style={{fontSize:20,lineHeight:1}}>{t.icon}</span>
+          <span style={{fontSize:t.id==="menu"?22:20,lineHeight:1,fontFamily:"var(--body)"}}>{t.icon}</span>
           <span style={{fontFamily:"var(--body)",fontSize:10,fontWeight:active(t.id)?700:400,color:active(t.id)?"var(--red)":"#888"}}>{t.label}</span>
         </button>
       ))}
@@ -523,7 +526,7 @@ function Menu({onClose, navigate, role, onSignOut}) {
       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:40}}>Beyond the obvious.</div>
 
       <div style={{display:"flex",flexDirection:"column",gap:0,paddingLeft:8}}>
-        <div style={itemStyle} onClick={()=>{navigate("all_venues");onClose();}}>all venues</div>
+        <div style={itemStyle} onClick={()=>{navigate("profile");onClose();}}>profile</div>
         <div style={itemStyle} onClick={()=>{navigate("scouts");onClose();}}>scouts</div>
         <div style={itemStyle} onClick={()=>{navigate("event_calendar");onClose();}}>events</div>
         {role==="explorer"&&(
@@ -956,17 +959,16 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
   // Load city picks and curated lists
   const cityPicks = (allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick).slice(0,5);
   const LISTS = [
-    {label:"☕ Best cafés",    filter:v=>v.category==="Café"},
-    {label:"🍽 Best restaurants", filter:v=>v.category==="Restaurant"},
-    {label:"🍷 Best bars",    filter:v=>v.category==="Bar"},
-    {label:"💎 Hidden gems",  filter:v=>(v.tags||[]).includes("Hidden gem")},
-    {label:"🌙 Late night",   filter:v=>(v.occasions||[]).includes("Late night")},
+    {label:"Restaurants", icon:"🍽", filter:v=>v.category==="Restaurant"},
+    {label:"Cafés",       icon:"☕", filter:v=>v.category==="Café"},
+    {label:"Bars",        icon:"🍷", filter:v=>v.category==="Bar"},
+    {label:"Bakeries",    icon:"🥐", filter:v=>v.category==="Bakery"||v.category==="Patisserie"},
+    {label:"Late night",  icon:"🌙", filter:v=>(v.occasions||[]).includes("Late night")},
   ];
 
   return (
     <div className="screen" style={{paddingBottom:64}}>
       <div style={{padding:"20px 28px 0",display:"flex",alignItems:"center"}}>
-        <Hamburger onClick={onMenu}/>
       </div>
       <div style={{padding:"8px 28px 0",flex:1,display:"flex",flexDirection:"column"}}>
         <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none"}}>LOKAL&#39;Z</div>
@@ -1053,43 +1055,35 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
           );
         })()}
 
-        {/* City picks */}
-        {cityPicks.length>0&&(
-          <div style={{marginTop:24,marginBottom:8}}>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:12}}>⭐ city picks</div>
-            <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              {cityPicks.map(v=>(
-                <button key={v.id} onClick={()=>navigate("venue",v)}
-                  style={{display:"flex",alignItems:"center",gap:12,background:"white",border:"1.5px solid #eee",borderRadius:14,padding:"12px 14px",cursor:"pointer",textAlign:"left",width:"100%"}}>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{v.name}</div>
-                    <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#888",marginTop:2}}>{v.category} · District {v.district} · {v.price_level||v.price||""}</div>
-                  </div>
-                  <span style={{color:"#ccc",fontSize:18,flexShrink:0}}>›</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Curated lists */}
-        <div style={{marginTop:24,marginBottom:80}}>
-          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:12}}>explore by vibe</div>
-          <div style={{display:"flex",flexDirection:"column",gap:8}}>
-            {LISTS.map(({label,filter})=>{
-              const venues = (allVenues||[]).filter(v=>v.status==="active"&&filter(v));
+        {/* City picks + curated lists */}
+        <div style={{marginTop:16,marginBottom:80}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:12}}>⭐ city picks</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:24}}>
+            {LISTS.map(({label,icon,filter})=>{
+              const venues = (allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick&&filter(v));
               if(venues.length===0) return null;
               return (
-                <button key={label} onClick={()=>{
-                  setAnswers({aiQuery:label});
-                  navigate("results_list",{venues,title:label});
-                }}
-                  style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:"white",border:"1.5px solid #eee",borderRadius:14,padding:"14px 16px",cursor:"pointer",width:"100%"}}>
-                  <span style={{fontFamily:"var(--body)",fontWeight:600,fontSize:15,color:"var(--black)"}}>{label}</span>
-                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"#888"}}>{venues.length} spots ›</span>
-                </button>
+                <div key={label} onClick={()=>navigate("results_list",{venues,title:label})}
+                  style={{background:"var(--black)",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:"pointer",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8}}>
+                  <span style={{fontSize:32}}>{icon}</span>
+                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"white",lineHeight:1.2}}>{label}</span>
+                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"rgba(255,255,255,.5)"}}>{venues.length} spots</span>
+                </div>
               );
             })}
+            {/* Hidden gems - no category filter */}
+            {(()=>{
+              const venues=(allVenues||[]).filter(v=>v.status==="active"&&(v.tags||[]).includes("Hidden gem"));
+              if(venues.length===0) return null;
+              return (
+                <div onClick={()=>navigate("results_list",{venues,title:"💎 Hidden gems"})}
+                  style={{background:"var(--black)",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:"pointer",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8}}>
+                  <span style={{fontSize:32}}>💎</span>
+                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"white",lineHeight:1.2}}>Hidden gems</span>
+                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"rgba(255,255,255,.5)"}}>{venues.length} spots</span>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -1120,7 +1114,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
@@ -1579,7 +1573,7 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
@@ -2036,7 +2030,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>saved</div>
@@ -2134,7 +2128,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>all venues</div>
@@ -2973,7 +2967,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>scout mode</div>
@@ -3608,7 +3602,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>city lead</div>
@@ -3978,7 +3972,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
       {/* Pink header */}
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>profile</div>
@@ -4208,7 +4202,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>scouts</div>
@@ -4228,7 +4222,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
     <div className="screen" style={{background:"white",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>scouts</div>
@@ -4705,7 +4699,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={onMenu}/>
+          
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>events</div>
@@ -4879,7 +4873,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   if(!isPremium) return (
     <div className="screen">
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><Hamburger onClick={onMenu}/><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
       <div style={{padding:"60px 28px",textAlign:"center"}}>
         <div style={{fontSize:56,marginBottom:20}}>🎉</div>
         <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:22,color:"var(--black)",marginBottom:10}}>Premium Feature</div>
@@ -4891,7 +4885,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   return (
     <div className="screen">
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><Hamburger onClick={onMenu}/><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
       <div style={{padding:"12px 24px 16px",flexShrink:0}}>
         <div className="logo-md">Lokal&#39;z</div>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",marginTop:6}}>My events</div>
@@ -5747,7 +5741,7 @@ function App() {
         : <>
             {screens[screen]||screens.signin}
             {showMenu&&<Menu onClose={()=>setShowMenu(false)} navigate={navigate} role={user?.role||"explorer"} onSignOut={signOut}/>}
-      {user&&!appLoading&&<BottomNav screen={screen} navigate={navigate} role={user?.role||"explorer"}/>}
+      {user&&!appLoading&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)}/>}
             {toast&&<div className="toast">{toast}</div>}
           </>
       }
