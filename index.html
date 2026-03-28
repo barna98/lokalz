@@ -1171,15 +1171,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
     navigate("q2");
   }
 
-  const CATS = [
-    {id:"Restaurant", emoji:"🍽"},
-    {id:"Café",       emoji:"☕"},
-    {id:"Bar",        emoji:"🍸"},
-    {id:"Bakery",     emoji:"🥐"},
-    {id:"Patisserie", emoji:"🎂"},
-    {id:"Street food",emoji:"🌮"},
-    {id:"Other",      emoji:"✨"},
-  ];
+  const CATS = ["Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"];
 
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
@@ -1198,27 +1190,24 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
       <div className="scroll" style={{padding:"0 20px 100px"}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           {CATS.map(c=>(
-            <div key={c.id} onClick={()=>{haptic("light");setSel(c.id);}}
-              onTouchStart={e=>e.currentTarget.style.transform="scale(.95)"}
+            <div key={c} onClick={()=>{haptic("light");setSel(c);}}
+              onTouchStart={e=>e.currentTarget.style.transform="scale(.96)"}
               onTouchEnd={e=>e.currentTarget.style.transform=""}
-              style={{transition:"transform .12s ease",
-                background:sel===c.id?"var(--black)":"white",
+              style={{
+                background:sel===c?"var(--black)":"white",
                 border:"1.5px solid black",
                 borderRadius:20,
                 padding:"20px 12px",
                 cursor:"pointer",
                 aspectRatio:"1/1",
                 display:"flex",
-                flexDirection:"column",
                 alignItems:"center",
                 justifyContent:"center",
                 textAlign:"center",
-                transition:"all .15s",
-                gap:8,
+                transition:"all .13s cubic-bezier(.2,.8,.4,1)",
               }}>
-              <span style={{fontSize:32}}>{c.emoji}</span>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:sel===c.id?"white":"var(--black)",lineHeight:1.2}}>
-                {c.id.toUpperCase()}
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:sel===c?"white":"var(--black)",lineHeight:1.2,letterSpacing:"-.01em"}}>
+                {c.toUpperCase()}
               </div>
             </div>
           ))}
@@ -2167,6 +2156,13 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
   const [budget,setBudget]=useState("");
   const [district,setDistrict]=useState("");
   const [subcategory,setSubcategory]=useState("");
+  const scrollRef = React.useRef(null);
+  const scrollPos = React.useRef(0);
+  React.useEffect(()=>{
+    if(scrollRef.current&&scrollPos.current>0){
+      scrollRef.current.scrollTop = scrollPos.current;
+    }
+  });
 
 
   const CATEGORIES = ["Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"];
@@ -2238,10 +2234,11 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           )}
         </div>
       </div>
-      <div className="scroll" style={{padding:"12px 20px 80px"}}>
+      <div className="scroll" style={{padding:"12px 20px 80px"}} ref={scrollRef}
+        onScroll={e=>scrollPos.current=e.currentTarget.scrollTop}>
         {sorted.length===0
           ?<div className="empty"><div className="empty-icon">🍽</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#777"}}>no venues found</div></div>
-          :sorted.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)
+          :sorted.map(v=><VenueCard key={v.id} venue={v} onClick={()=>{if(scrollRef.current)scrollPos.current=scrollRef.current.scrollTop;navigate("venue",v);}}/>)
         }
       </div>
     </div>
@@ -2465,6 +2462,8 @@ function DraggableImageGrid({previews, onMove, onRemove, onAdd, maxPhotos=5}) {
 }
 
 function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user, cities}) {
+  const scoutScrollRef = React.useRef(null);
+  const scoutScrollPos = React.useRef(0);
   const [tab,setTab]=useState("add");
   const [editingVenue, setEditingVenue]=useState(null);
   const [editForm, setEditForm]=useState({});
@@ -4307,7 +4306,8 @@ function ScoutsScreen({navigate, onMenu, user}) {
             style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}}/>
         </div>
       </div>
-      <div className="scroll" style={{padding:"12px 20px 80px"}}>
+      <div className="scroll" style={{padding:"12px 20px 80px"}} ref={scrollRef}
+        onScroll={e=>scrollPos.current=e.currentTarget.scrollTop}>
         {loading&&<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>}
         {!loading&&filtered.length===0&&<div style={{textAlign:"center",padding:32,fontFamily:"var(--body)",fontSize:14,color:"#888"}}>no scouts found</div>}
         {filtered.map(s=>(
@@ -5792,7 +5792,7 @@ function App() {
             </div>
           </div>
           <div className="scroll" style={{padding:"0 20px 80px"}}>
-            {listVenues.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)}
+            {listVenues.map(v=><VenueCard key={v.id} venue={v} onClick={()=>{if(scoutScrollRef.current)scoutScrollPos.current=scoutScrollRef.current.scrollTop;navigate("venue",v);}}/>)}
           </div>
         </div>
       );
