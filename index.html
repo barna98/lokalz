@@ -2040,7 +2040,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(-1)} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>saved</div>
@@ -2138,7 +2138,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(-1)} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>all venues</div>
@@ -2977,7 +2977,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(-1)} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>scout mode</div>
@@ -3612,7 +3612,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(-1)} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>city lead</div>
@@ -3982,7 +3982,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
       {/* Pink header */}
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(-1)} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>profile</div>
@@ -4212,7 +4212,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(-1)} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>scouts</div>
@@ -4709,7 +4709,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(-1)} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>events</div>
