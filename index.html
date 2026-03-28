@@ -497,7 +497,7 @@ function NavIcon({id, active}) {
   return null;
 }
 
-function BottomNav({screen, navigate, onMenu}) {
+function BottomNav({screen, navigate, onMenu, menuOpen}) {
   const tabs = [
     {id:"home",       label:"home"},
     {id:"q1",         label:"discover"},
@@ -510,7 +510,7 @@ function BottomNav({screen, navigate, onMenu}) {
     if(id==="q1") return ["q1","q2","q3","q4","q5","q6","results"].includes(screen);
     if(id==="saved") return screen==="saved";
     if(id==="all_venues") return screen==="all_venues";
-    if(id==="menu") return false;
+    if(id==="menu") return !!menuOpen;
     return screen===id;
   };
   return (
@@ -532,9 +532,7 @@ function Menu({onClose, navigate, role, onSignOut}) {
   const boldStyle = {fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",padding:"10px 0",cursor:"pointer",lineHeight:1.2};
   return (
     <div style={{position:"absolute",inset:0,background:"white",zIndex:101,animation:"fadeIn .22s ease",display:"flex",flexDirection:"column",padding:"0 28px 40px"}}>
-      <div style={{padding:"20px 0 0"}}>
-        <Hamburger onClick={onClose}/>
-      </div>
+      <div style={{padding:"20px 0 0"}}/>
       <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none",marginTop:8}}>LOKAL&#39;Z</div>
       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:40}}>Beyond the obvious.</div>
 
@@ -5754,7 +5752,7 @@ function App() {
         : <>
             {screens[screen]||screens.signin}
             {showMenu&&<Menu onClose={()=>setShowMenu(false)} navigate={navigate} role={user?.role||"explorer"} onSignOut={signOut}/>}
-      {user&&!appLoading&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)}/>}
+      {user&&!appLoading&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)} menuOpen={showMenu}/>}
             {toast&&<div className="toast">{toast}</div>}
           </>
       }
