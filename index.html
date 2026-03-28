@@ -920,6 +920,54 @@ function OnboardingScreen({navigate, user, setUser}) {
   );
 }
 
+function CityPickBox({label, cat, venues, navigate, isPremium}) {
+  const [imgs, setImgs] = React.useState([]);
+
+  React.useEffect(()=>{
+    if(venues.length===0) return;
+    const ids = venues.slice(0,4).map(v=>v.id);
+    Promise.all(ids.map(id=>
+      supabase.from("venue_images").select("url").eq("venue_id",id).eq("is_primary",true).limit(1)
+        .then(({data})=>data&&data[0]?data[0].url:null)
+    )).then(urls=>setImgs(urls.filter(Boolean)));
+  },[venues.length]);
+
+  const hasImgs = imgs.length>0;
+
+  return (
+    <div onClick={()=>isPremium&&venues.length>0&&navigate("results_list",{venues,title:label})}
+      onTouchStart={e=>isPremium&&(e.currentTarget.style.transform="scale(.96)")}
+      onTouchEnd={e=>e.currentTarget.style.transform=""}
+      style={{
+        background:"white",border:"1.5px solid black",borderRadius:20,
+        cursor:isPremium&&venues.length>0?"pointer":"default",
+        aspectRatio:"1/1",overflow:"hidden",display:"flex",flexDirection:"column",
+        opacity:isPremium?(venues.length>0?1:.35):.35,
+        filter:!isPremium?"blur(3px)":"none",
+        userSelect:"none",
+        transition:"transform .12s ease",
+        position:"relative",
+      }}>
+      {/* Top: collage */}
+      <div style={{flex:1,display:"grid",gridTemplateColumns:imgs.length>=2?"1fr 1fr":"1fr",gridTemplateRows:imgs.length>=3?"1fr 1fr":"1fr",gap:2,background:"#f0f0f0",overflow:"hidden"}}>
+        {hasImgs
+          ? imgs.slice(0,4).map((url,i)=>(
+              <div key={i} style={{background:`url(${url}) center/cover no-repeat`,backgroundSize:"cover"}}/>
+            ))
+          : <div style={{display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,background:"#eee"}}>
+              {cat==="Restaurant"?"🍽":cat==="Bar"?"🍷":cat==="Bakery"?"🥐":"☕"}
+            </div>
+        }
+      </div>
+      {/* Bottom: white label strip */}
+      <div style={{padding:"10px 14px",background:"white",flexShrink:0,borderTop:"1px solid #f0f0f0"}}>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",lineHeight:1.1}}>{label}</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"#888",marginTop:2}}>{venues.length} places like this</div>
+      </div>
+    </div>
+  );
+}
+
 function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading, allVenues}) {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -1098,15 +1146,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
               {label:"CAFÉ",       cat:"Café"},
             ].map(({label,cat})=>{
               const venues=(allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick&&v.category===cat);
-              return (
-                <div key={cat} onClick={()=>isPremium&&venues.length>0&&navigate("results_list",{venues,title:label})}
-                  style={{background:"white",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:isPremium&&venues.length>0?"pointer":"default",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8,opacity:isPremium?(venues.length>0?1:.35):.35,filter:!isPremium?"blur(3px)":"none",userSelect:!isPremium?"none":"auto",transition:"transform .12s ease"}}
-                  onTouchStart={e=>isPremium&&(e.currentTarget.style.transform="scale(.95)")}
-                  onTouchEnd={e=>e.currentTarget.style.transform=""}>
-                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",lineHeight:1.1}}>{label}</span>
-                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"#888"}}>{venues.length} spots</span>
-                </div>
-              );
+              return <CityPickBox key={cat} label={label} cat={cat} venues={venues} navigate={navigate} isPremium={isPremium}/>;
             })}
             {!isPremium&&(
               <div onClick={()=>navigate("upgrade")}
