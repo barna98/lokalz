@@ -47,13 +47,33 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
   0%{background-position:200% center;}
   100%{background-position:-200% center;}
 }
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideInLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 @keyframes slideInUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes staggerUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes imgFadeIn{from{opacity:0}to{opacity:1}}
 
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:fadeUp .28s ease both;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:fadeUp .2s cubic-bezier(.25,.46,.45,.94) both;}
+
+/* Tap feedback */
+.tap{transition:transform .12s ease,opacity .12s ease;}
+.tap:active{transform:scale(.96);opacity:.85;}
+
+/* Staggered cards */
+.stagger-1{animation:staggerUp .3s .04s ease both;}
+.stagger-2{animation:staggerUp .3s .08s ease both;}
+.stagger-3{animation:staggerUp .3s .12s ease both;}
+.stagger-4{animation:staggerUp .3s .16s ease both;}
+.stagger-5{animation:staggerUp .3s .20s ease both;}
+
+/* Smooth image load */
+.img-fade{animation:imgFadeIn .4s ease both;}
+
+/* Bottom nav tap */
+.nav-btn{transition:transform .1s ease;}
+.nav-btn:active{transform:scale(.88);}
 
 /* LOGO — large on auth screens, medium on inner screens */
 .logo{font-family:var(--display);font-size:52px;color:var(--red);line-height:.88;letter-spacing:0;user-select:none;}
@@ -248,11 +268,11 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
   border-radius:20px;
   overflow:hidden;
   cursor:pointer;
-  transition:transform .15s;
+  transition:transform .13s cubic-bezier(.2,.8,.4,1), box-shadow .13s ease;
   margin-bottom:14px;
-  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  box-shadow:0 2px 8px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04);
 }
-.venue-card:active{transform:scale(.98);}
+.venue-card:active{transform:scale(.97);box-shadow:0 1px 3px rgba(0,0,0,.06);}
 .venue-img{width:100%;height:170px;background:var(--black);display:flex;align-items:center;justify-content:center;font-size:60px;position:relative;}
 .venue-body{padding:16px 18px;}
 .venue-name{font-family:var(--body);font-weight:700;font-size:20px;color:var(--black);margin-bottom:5px;}
@@ -265,7 +285,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .tab.on{color:var(--black);border-bottom-color:var(--black);}
 
 /* MISC */
-.scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
+.scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;}
 .scroll::-webkit-scrollbar{display:none;}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
 .back-btn{background:none;border:none;font-size:32px;color:var(--black);cursor:pointer;padding:0;line-height:1;font-weight:300;}
@@ -459,7 +479,9 @@ function VenueCard({venue, onClick}) {
     default:"linear-gradient(135deg,#000000,#000000)",
   };
 
+  const [imgLoaded, setImgLoaded] = useState(false);
   useEffect(()=>{
+    setImgLoaded(false);
     supabase.from("venue_images").select("url").eq("venue_id",venue.id).eq("is_primary",true).limit(1).then(({data})=>{
       if(data&&data.length>0) setImgUrl(data[0].url);
     });
@@ -469,7 +491,7 @@ function VenueCard({venue, onClick}) {
     <div className="venue-card" onClick={onClick}>
       <div className="venue-img" style={{background:imgUrl?"#111":grads[venue.cuisine]||grads.default,padding:0}}>
         {imgUrl
-          ?<img src={imgUrl} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+          ?<img src={imgUrl} onLoad={()=>setImgLoaded(true)} style={{width:"100%",height:"100%",objectFit:"cover",transition:"opacity .35s ease",opacity:imgLoaded?1:0}}/>
           :<span style={{fontSize:52}}>🍽</span>
         }
       </div>
@@ -517,7 +539,9 @@ function BottomNav({screen, navigate, onMenu, menuOpen}) {
       {tabs.map(t=>(
         <button key={t.id}
           onClick={()=>t.id==="menu"?onMenu():navigate(t.id)}
-          style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"10px 0 8px",background:"none",border:"none",cursor:"pointer",gap:4}}>
+          style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"10px 0 8px",background:"none",border:"none",cursor:"pointer",gap:4,transition:"transform .1s ease"}}
+          onTouchStart={e=>e.currentTarget.style.transform="scale(.88)"}
+          onTouchEnd={e=>e.currentTarget.style.transform=""}>
           <NavIcon id={t.id} active={active(t.id)}/>
           <span style={{fontFamily:"var(--body)",fontSize:10,fontWeight:active(t.id)?700:400,color:active(t.id)?"white":"rgba(255,255,255,.4)"}}>{t.label}</span>
         </button>
@@ -1076,7 +1100,9 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
               const venues=(allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick&&v.category===cat);
               return (
                 <div key={cat} onClick={()=>isPremium&&venues.length>0&&navigate("results_list",{venues,title:label})}
-                  style={{background:"white",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:isPremium&&venues.length>0?"pointer":"default",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8,opacity:isPremium?(venues.length>0?1:.35):.35,filter:!isPremium?"blur(3px)":"none",userSelect:!isPremium?"none":"auto"}}>
+                  style={{background:"white",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:isPremium&&venues.length>0?"pointer":"default",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8,opacity:isPremium?(venues.length>0?1:.35):.35,filter:!isPremium?"blur(3px)":"none",userSelect:!isPremium?"none":"auto",transition:"transform .12s ease"}}
+                  onTouchStart={e=>isPremium&&(e.currentTarget.style.transform="scale(.95)")}
+                  onTouchEnd={e=>e.currentTarget.style.transform=""}>
                   <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",lineHeight:1.1}}>{label}</span>
                   <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"#888"}}>{venues.length} spots</span>
                 </div>
@@ -1133,7 +1159,9 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           {CATS.map(c=>(
             <div key={c.id} onClick={()=>{haptic("light");setSel(c.id);}}
-              style={{
+              onTouchStart={e=>e.currentTarget.style.transform="scale(.95)"}
+              onTouchEnd={e=>e.currentTarget.style.transform=""}
+              style={{transition:"transform .12s ease",
                 background:sel===c.id?"var(--black)":"white",
                 border:"1.5px solid black",
                 borderRadius:20,
@@ -1269,7 +1297,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
   }
 
   function next(){setAnswers(a=>({...a,locations:sel}));navigate("q4");}
-  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px 80px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%"};
+  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -1352,7 +1380,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
   const [sel, setSel] = useState(answers.budgets||[]);
   function toggle(b){setSel(prev=>prev.includes(b)?prev.filter(x=>x!==b):[...prev,b]);}
   function next(){setAnswers(a=>({...a,budgets:sel}));navigate(answers.category==="Restaurant"?"q5":"q6");}
-  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px 80px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%"};
+  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -1385,7 +1413,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
   const [sel,setSel]=useState(answers.cuisines||[]);
   function toggle(x){setSel(prev=>prev.includes(x)?prev.filter(v=>v!==x):[...prev,x]);}
   function next(){setAnswers(a=>({...a,cuisines:sel}));navigate("q6");}
-  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px 80px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%"};
+  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -1417,7 +1445,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
 
 function Q6Screen({navigate, onMenu, answers, setAnswers}) {
   function select(g){setAnswers(a=>({...a,group:g}));setTimeout(()=>navigate("results"),200);}
-  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px 80px",width:"100%"};
+  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -1611,7 +1639,7 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
           </div>
         )}
         {!refreshing&&shown.map((v,i)=>(
-          <div key={v.id} style={{animation:`fadeUp .3s ${Math.min(i,.4)*0.07}s ease both`,opacity:0,animationFillMode:"forwards"}}>
+          <div key={v.id} style={{animation:`staggerUp .3s ${Math.min(i,5)*0.06}s cubic-bezier(.2,.8,.4,1) both`,opacity:0,animationFillMode:"forwards"}}>
             <VenueCard venue={v} onClick={()=>navigate("venue",v)}/>
           </div>
         ))}
@@ -1823,7 +1851,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           touchStartX.current = null;
         }}>
         {images.length>0
-          ?<img src={images[imgIdx]} style={{width:"100%",height:"100%",objectFit:"cover",...swingStyle}}/>
+          ?<img src={images[imgIdx]} className="img-fade" style={{width:"100%",height:"100%",objectFit:"cover",...swingStyle}}/>
           :<span>🍽</span>
         }
         {images.length>1&&(
