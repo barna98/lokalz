@@ -1059,8 +1059,8 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
           );
         })()}
 
-        {/* City picks */}
-        <div style={{marginTop:16,marginBottom:16}}>
+        {/* City picks - premium only */}
+        {isPremium&&<div style={{marginTop:16,marginBottom:16}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:12}}>⭐ city picks</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
             {[
@@ -1079,7 +1079,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
               );
             })}
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );
