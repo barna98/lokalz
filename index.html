@@ -2048,9 +2048,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
 
           if(similar.length===0) return null;
 
-          const label = venue.category==="Restaurant"&&venue.cuisine
-            ? `more ${venue.cuisine.toLowerCase()} spots`
-            : `more ${venue.category?.toLowerCase()||"spots"} you might like`;
+          const label = "more places like this";
 
           return (
             <div style={{marginTop:24}}>
