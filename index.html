@@ -968,6 +968,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
 
   // Load city picks and curated lists
   const cityPicks = (allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick).slice(0,5);
+  const isPremium = user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead"||!!partner;
 
 
   return (
