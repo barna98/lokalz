@@ -265,7 +265,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .tab.on{color:var(--black);border-bottom-color:var(--black);}
 
 /* MISC */
-.scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;padding-bottom:70px;}
+.scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
 .scroll::-webkit-scrollbar{display:none;}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
 .back-btn{background:none;border:none;font-size:32px;color:var(--black);cursor:pointer;padding:0;line-height:1;font-weight:300;}
@@ -970,7 +970,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
     <div className="screen">
       <div style={{padding:"20px 28px 0",display:"flex",alignItems:"center"}}>
       </div>
-      <div className="scroll" style={{padding:"0 28px 140px",flex:1}}>
+      <div className="scroll" style={{padding:"8px 28px 0"}}>
         <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none"}}>LOKAL&#39;Z</div>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:0}}>Beyond the obvious.</div>
 
@@ -1056,7 +1056,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
         })()}
 
         {/* City picks + curated lists */}
-        <div style={{marginTop:16,marginBottom:16}}>
+        <div style={{marginTop:16,marginBottom:80}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:12}}>⭐ city picks</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:24}}>
             {LISTS.map(({label,icon,filter})=>{
@@ -1086,6 +1086,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
             })()}
           </div>
         </div>
+      </div>
     </div>
   );
 }
@@ -1151,7 +1152,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
 
         </div>
       </div>
-      <div style={{position:"absolute",bottom:84,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
+      <div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel&&next()}
           style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel?"pointer":"default",opacity:sel?1:.4,whiteSpace:"nowrap"}}>
           next
@@ -1243,7 +1244,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
         </div>
       </div>
 
-      <div style={{position:"absolute",bottom:84,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
+      <div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>selOcc.length>0&&next()}
           style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:selOcc.length>0?"pointer":"default",whiteSpace:"nowrap",opacity:selOcc.length>0?1:.4}}>
           next
@@ -1300,7 +1301,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
           <span>surprise me</span>{sel.includes("Anywhere in Budapest")&&<span>✓</span>}
         </button>
       </div>
-      <div style={{position:"absolute",bottom:84,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
+      <div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel.length>0?"pointer":"default",opacity:sel.length>0?1:.4,whiteSpace:"nowrap"}}>next</button>
       </div>
     </div>
@@ -1368,7 +1369,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
           </button>
         ))}
       </div>
-      <div style={{position:"absolute",bottom:84,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
+      <div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel.length>0?"pointer":"default",whiteSpace:"nowrap",opacity:sel.length>0?1:.4}}>next</button>
       </div>
     </div>
@@ -1402,7 +1403,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
         ))}
         <button style={{...PILL,background:"white",color:"#aaa",borderColor:"#ddd",justifyContent:"center"}} onClick={()=>{setAnswers(a=>({...a,cuisines:[]}));navigate("q6");}}>not sure yet...</button>
       </div>
-      <div style={{position:"absolute",bottom:84,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
+      <div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel.length>0?"pointer":"default",whiteSpace:"nowrap",opacity:sel.length>0?1:.4}}>next</button>
       </div>
     </div>
@@ -5707,17 +5708,24 @@ function App() {
 
     event_plan_detail: selectedPlan&&<EventPlanDetailScreen navigate={navigate} plan={selectedPlan} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
     scout_profile: selectedScout&&<ScoutProfileScreen navigate={navigate} scoutId={selectedScout} allVenues={allVenues} savedIds={savedIds} user={user}/>,
-    results_list: <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>‹</button>
-          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)"}}>{selectedVenue?.title||"spots"}</div>
+    results_list: (()=>{
+      const listData = selectedVenue||{};
+      const listVenues = listData.venues||[];
+      const listTitle = listData.title||"spots";
+      return (
+        <div className="screen" style={{background:"var(--bg)"}}>
+          <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>‹</button>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)"}}>{listTitle}</div>
+            </div>
+          </div>
+          <div className="scroll" style={{padding:"0 20px 80px"}}>
+            {listVenues.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)}
+          </div>
         </div>
-      </div>
-      <div className="scroll" style={{padding:"0 20px"}}>
-        {(selectedVenue?.venues||[]).map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)}
-      </div>
-    </div>,
+      );
+    })(),
     partner_activate: partner&&user&&<PartnerActivateScreen partner={partner} navigate={navigate} user={user} onActivate={u=>{setUser(u);}} showToast={showToastMsg}/>,
     partner_signup: <SignUpScreen navigate={navigate} onLogin={onLogin} partner={partner}/>,
     partner_signin: <SignInScreen navigate={navigate} onLogin={onLogin} partner={partner}/>,
