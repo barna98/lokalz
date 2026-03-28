@@ -1060,10 +1060,13 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
           );
         })()}
 
-        {/* City picks - premium only */}
-        {isPremium&&<div style={{marginTop:16,marginBottom:16}}>
-          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:12}}>⭐ city picks</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+        {/* City picks */}
+        <div style={{marginTop:16,marginBottom:16}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+            <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)"}}>⭐ city picks</span>
+            {!isPremium&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20}}>pro only</span>}
+          </div>
+          <div style={{position:"relative",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
             {[
               {label:"RESTAURANT", cat:"Restaurant"},
               {label:"BAR",        cat:"Bar"},
@@ -1072,15 +1075,22 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
             ].map(({label,cat})=>{
               const venues=(allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick&&v.category===cat);
               return (
-                <div key={cat} onClick={()=>venues.length>0&&navigate("results_list",{venues,title:label})}
-                  style={{background:"white",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:venues.length>0?"pointer":"default",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8,opacity:venues.length>0?1:.35}}>
+                <div key={cat} onClick={()=>isPremium&&venues.length>0&&navigate("results_list",{venues,title:label})}
+                  style={{background:"white",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:isPremium&&venues.length>0?"pointer":"default",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8,opacity:isPremium?(venues.length>0?1:.35):.35,filter:!isPremium?"blur(3px)":"none",userSelect:!isPremium?"none":"auto"}}>
                   <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",lineHeight:1.1}}>{label}</span>
                   <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"#888"}}>{venues.length} spots</span>
                 </div>
               );
             })}
+            {!isPremium&&(
+              <div onClick={()=>navigate("upgrade")}
+                style={{position:"absolute",inset:0,borderRadius:20,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,background:"rgba(245,184,236,.15)"}}>
+                <span style={{fontSize:32}}>🔒</span>
+                <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"var(--black)",background:"white",padding:"6px 16px",borderRadius:20,boxShadow:"0 2px 8px rgba(0,0,0,.12)"}}>explorer pro</span>
+              </div>
+            )}
           </div>
-        </div>}
+        </div>
       </div>
     </div>
   );
