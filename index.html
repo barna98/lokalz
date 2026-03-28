@@ -486,6 +486,31 @@ function VenueCard({venue, onClick}) {
   );
 }
 
+function BottomNav({screen, navigate, role}) {
+  const tabs = [
+    {id:"home", icon:"🏠", label:"home"},
+    {id:"q1",   icon:"🔍", label:"discover"},
+    {id:"saved", icon:"❤️", label:"saved"},
+    {id:"profile", icon:"👤", label:"profile"},
+  ];
+  const active = (id) => {
+    if(id==="home") return screen==="home";
+    if(id==="q1") return ["q1","q2","q3","q4","q5","q6","results"].includes(screen);
+    return screen===id;
+  };
+  return (
+    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"white",borderTop:"1px solid #eee",display:"flex",zIndex:200,paddingBottom:"env(safe-area-inset-bottom)"}}>
+      {tabs.map(t=>(
+        <button key={t.id} onClick={()=>navigate(t.id)}
+          style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"10px 0 8px",background:"none",border:"none",cursor:"pointer",gap:3}}>
+          <span style={{fontSize:20,lineHeight:1}}>{t.icon}</span>
+          <span style={{fontFamily:"var(--body)",fontSize:10,fontWeight:active(t.id)?700:400,color:active(t.id)?"var(--red)":"#888"}}>{t.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function Menu({onClose, navigate, role, onSignOut}) {
   const itemStyle = {fontFamily:"var(--body)",fontWeight:400,fontSize:22,color:"var(--black)",padding:"10px 0",cursor:"pointer",lineHeight:1.2};
   const boldStyle = {fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",padding:"10px 0",cursor:"pointer",lineHeight:1.2};
@@ -498,9 +523,6 @@ function Menu({onClose, navigate, role, onSignOut}) {
       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:40}}>Beyond the obvious.</div>
 
       <div style={{display:"flex",flexDirection:"column",gap:0,paddingLeft:8}}>
-        <div style={itemStyle} onClick={()=>{navigate("home");onClose();}}>discover</div>
-        <div style={itemStyle} onClick={()=>{navigate("profile");onClose();}}>profile</div>
-        <div style={itemStyle} onClick={()=>{navigate("saved");onClose();}}>saved</div>
         <div style={itemStyle} onClick={()=>{navigate("all_venues");onClose();}}>all venues</div>
         <div style={itemStyle} onClick={()=>{navigate("scouts");onClose();}}>scouts</div>
         <div style={itemStyle} onClick={()=>{navigate("event_calendar");onClose();}}>events</div>
@@ -861,7 +883,7 @@ function OnboardingScreen({navigate, user, setUser}) {
   );
 }
 
-function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading}) {
+function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading, allVenues}) {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -931,8 +953,18 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading}
     navigate("results");
   }
 
+  // Load city picks and curated lists
+  const cityPicks = (allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick).slice(0,5);
+  const LISTS = [
+    {label:"☕ Best cafés",    filter:v=>v.category==="Café"},
+    {label:"🍽 Best restaurants", filter:v=>v.category==="Restaurant"},
+    {label:"🍷 Best bars",    filter:v=>v.category==="Bar"},
+    {label:"💎 Hidden gems",  filter:v=>(v.tags||[]).includes("Hidden gem")},
+    {label:"🌙 Late night",   filter:v=>(v.occasions||[]).includes("Late night")},
+  ];
+
   return (
-    <div className="screen">
+    <div className="screen" style={{paddingBottom:64}}>
       <div style={{padding:"20px 28px 0",display:"flex",alignItems:"center"}}>
         <Hamburger onClick={onMenu}/>
       </div>
@@ -949,7 +981,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading}
         )}
 
         {/* Spacer */}
-        <div style={{minHeight:220}}/>
+        <div style={{minHeight:40}}/>
 
         {/* AI Search */}
         {(()=>{
@@ -1021,13 +1053,44 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading}
           );
         })()}
 
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:10}}>or...</div>
-        <button style={{background:"black",color:"white",border:"none",borderRadius:50,padding:"12px 28px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:"pointer",width:"100%",display:"block",display:"flex",alignItems:"center",justifyContent:"center",gap:10}} onClick={()=>{setAnswers({});navigate("q1");}}>
-          {venuesLoading&&<div style={{width:14,height:14,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid white",borderRadius:"50%",animation:"spin .7s linear infinite",flexShrink:0}}/>}
-          discover
-        </button>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"rgba(0,0,0,.4)",textAlign:"center",marginTop:8,marginBottom:16}}>
-          Answer a few. We'll handle the rest.
+        {/* City picks */}
+        {cityPicks.length>0&&(
+          <div style={{marginTop:24,marginBottom:8}}>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:12}}>⭐ city picks</div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {cityPicks.map(v=>(
+                <button key={v.id} onClick={()=>navigate("venue",v)}
+                  style={{display:"flex",alignItems:"center",gap:12,background:"white",border:"1.5px solid #eee",borderRadius:14,padding:"12px 14px",cursor:"pointer",textAlign:"left",width:"100%"}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{v.name}</div>
+                    <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#888",marginTop:2}}>{v.category} · District {v.district} · {v.price_level||v.price||""}</div>
+                  </div>
+                  <span style={{color:"#ccc",fontSize:18,flexShrink:0}}>›</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Curated lists */}
+        <div style={{marginTop:24,marginBottom:80}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:12}}>explore by vibe</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {LISTS.map(({label,filter})=>{
+              const venues = (allVenues||[]).filter(v=>v.status==="active"&&filter(v));
+              if(venues.length===0) return null;
+              return (
+                <button key={label} onClick={()=>{
+                  setAnswers({aiQuery:label});
+                  navigate("results_list",{venues,title:label});
+                }}
+                  style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:"white",border:"1.5px solid #eee",borderRadius:14,padding:"14px 16px",cursor:"pointer",width:"100%"}}>
+                  <span style={{fontFamily:"var(--body)",fontWeight:600,fontSize:15,color:"var(--black)"}}>{label}</span>
+                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"#888"}}>{venues.length} spots ›</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -5538,6 +5601,7 @@ function App() {
     }
     setHistory(h=>[...h,{screen,venue:selectedVenue,scout:selectedScout,event:selectedEvent,plan:selectedPlan}]);
     if(target==="venue"&&data){setSelectedVenue(data);}
+    if(target==="results_list"&&data){setSelectedVenue(data);}
     if(target==="scout_profile"&&data){setSelectedScout(data);}
     if(target==="event_detail"&&data){setSelectedEvent(data);}
     if(target==="event_plan_detail"&&data){setSelectedPlan(data);}
@@ -5628,7 +5692,7 @@ function App() {
     signin: <SignInScreen navigate={navigate} onLogin={onLogin}/>,
     signup: <SignUpScreen navigate={navigate} onLogin={onLogin}/>,
     onboarding: <OnboardingScreen navigate={navigate} user={user} setUser={setUser}/>,
-    home: <HomeScreen navigate={navigate} onMenu={()=>setShowMenu(true)} setAnswers={setAnswers} user={user} partner={isPartnerActive ? partner : null} venuesLoading={venuesLoading}/>,
+    home: <HomeScreen navigate={navigate} onMenu={()=>setShowMenu(true)} setAnswers={setAnswers} user={user} partner={isPartnerActive ? partner : null} venuesLoading={venuesLoading} allVenues={allVenues}/>,
     q1: <Q1Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     q2: <Q2Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     q3: <Q3Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} partnerDistrict={isPartnerActive ? partner?.district : null} allVenues={allVenues}/>,
@@ -5650,6 +5714,24 @@ function App() {
 
     event_plan_detail: selectedPlan&&<EventPlanDetailScreen navigate={navigate} plan={selectedPlan} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
     scout_profile: selectedScout&&<ScoutProfileScreen navigate={navigate} scoutId={selectedScout} allVenues={allVenues} savedIds={savedIds} user={user}/>,
+    results_list: (()=>{
+      const listData = selectedVenue||{};
+      const listVenues = listData.venues||[];
+      const listTitle = listData.title||"spots";
+      return (
+        <div className="screen" style={{background:"var(--bg)"}}>
+          <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>‹</button>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)"}}>{listTitle}</div>
+            </div>
+          </div>
+          <div className="scroll" style={{padding:"0 20px 80px"}}>
+            {listVenues.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)}
+          </div>
+        </div>
+      );
+    })(),
     partner_activate: partner&&user&&<PartnerActivateScreen partner={partner} navigate={navigate} user={user} onActivate={u=>{setUser(u);}} showToast={showToastMsg}/>,
     partner_signup: <SignUpScreen navigate={navigate} onLogin={onLogin} partner={partner}/>,
     partner_signin: <SignInScreen navigate={navigate} onLogin={onLogin} partner={partner}/>,
@@ -5665,6 +5747,7 @@ function App() {
         : <>
             {screens[screen]||screens.signin}
             {showMenu&&<Menu onClose={()=>setShowMenu(false)} navigate={navigate} role={user?.role||"explorer"} onSignOut={signOut}/>}
+      {user&&!appLoading&&<BottomNav screen={screen} navigate={navigate} role={user?.role||"explorer"}/>}
             {toast&&<div className="toast">{toast}</div>}
           </>
       }
