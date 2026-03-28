@@ -486,13 +486,24 @@ function VenueCard({venue, onClick}) {
   );
 }
 
+function NavIcon({id, active}) {
+  const c = active ? "white" : "rgba(255,255,255,.4)";
+  const s = {display:"block"};
+  if(id==="home") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>;
+  if(id==="q1") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>;
+  if(id==="saved") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill={active?"white":"none"} stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>;
+  if(id==="all_venues") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>;
+  if(id==="menu") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>;
+  return null;
+}
+
 function BottomNav({screen, navigate, onMenu}) {
   const tabs = [
-    {id:"home",       icon:"🏠", label:"home"},
-    {id:"q1",         icon:"🔍", label:"discover"},
-    {id:"saved",      icon:"❤️", label:"saved"},
-    {id:"all_venues", icon:"📍", label:"all venues"},
-    {id:"menu",       icon:"☰",  label:"menu"},
+    {id:"home",       label:"home"},
+    {id:"q1",         label:"discover"},
+    {id:"saved",      label:"saved"},
+    {id:"all_venues", label:"all venues"},
+    {id:"menu",       label:"menu"},
   ];
   const active = (id) => {
     if(id==="home") return screen==="home";
@@ -501,13 +512,13 @@ function BottomNav({screen, navigate, onMenu}) {
     return screen===id;
   };
   return (
-    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"white",borderTop:"1px solid #eee",display:"flex",zIndex:200,paddingBottom:"env(safe-area-inset-bottom)"}}>
+    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"var(--black)",display:"flex",zIndex:200,paddingBottom:"env(safe-area-inset-bottom)"}}>
       {tabs.map(t=>(
         <button key={t.id}
           onClick={()=>t.id==="menu"?onMenu():navigate(t.id)}
-          style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"10px 0 8px",background:"none",border:"none",cursor:"pointer",gap:3}}>
-          <span style={{fontSize:t.id==="menu"?22:20,lineHeight:1,fontFamily:"var(--body)"}}>{t.icon}</span>
-          <span style={{fontFamily:"var(--body)",fontSize:10,fontWeight:active(t.id)?700:400,color:active(t.id)?"var(--red)":"#888"}}>{t.label}</span>
+          style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"10px 0 8px",background:"none",border:"none",cursor:"pointer",gap:4}}>
+          <NavIcon id={t.id} active={active(t.id)}/>
+          <span style={{fontFamily:"var(--body)",fontSize:10,fontWeight:active(t.id)?700:400,color:active(t.id)?"white":"rgba(255,255,255,.4)"}}>{t.label}</span>
         </button>
       ))}
     </div>
@@ -1064,10 +1075,10 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
               if(venues.length===0) return null;
               return (
                 <div key={label} onClick={()=>navigate("results_list",{venues,title:label})}
-                  style={{background:"var(--black)",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:"pointer",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8}}>
+                  style={{background:"white",border:"1.5px solid #eee",borderRadius:20,padding:"20px 12px",cursor:"pointer",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8}}>
                   <span style={{fontSize:32}}>{icon}</span>
-                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"white",lineHeight:1.2}}>{label}</span>
-                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"rgba(255,255,255,.5)"}}>{venues.length} spots</span>
+                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",lineHeight:1.2}}>{label}</span>
+                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"#888"}}>{venues.length} spots</span>
                 </div>
               );
             })}
@@ -1077,10 +1088,10 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
               if(venues.length===0) return null;
               return (
                 <div onClick={()=>navigate("results_list",{venues,title:"💎 Hidden gems"})}
-                  style={{background:"var(--black)",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:"pointer",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8}}>
+                  style={{background:"white",border:"1.5px solid #eee",borderRadius:20,padding:"20px 12px",cursor:"pointer",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8}}>
                   <span style={{fontSize:32}}>💎</span>
-                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"white",lineHeight:1.2}}>Hidden gems</span>
-                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"rgba(255,255,255,.5)"}}>{venues.length} spots</span>
+                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",lineHeight:1.2}}>Hidden gems</span>
+                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"#888"}}>{venues.length} spots</span>
                 </div>
               );
             })()}
