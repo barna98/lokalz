@@ -5707,24 +5707,17 @@ function App() {
 
     event_plan_detail: selectedPlan&&<EventPlanDetailScreen navigate={navigate} plan={selectedPlan} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
     scout_profile: selectedScout&&<ScoutProfileScreen navigate={navigate} scoutId={selectedScout} allVenues={allVenues} savedIds={savedIds} user={user}/>,
-    results_list: (()=>{
-      const listData = selectedVenue||{};
-      const listVenues = listData.venues||[];
-      const listTitle = listData.title||"spots";
-      return (
-        <div className="screen" style={{background:"var(--bg)"}}>
-          <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-            <div style={{display:"flex",alignItems:"center",gap:12}}>
-              <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>‹</button>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)"}}>{listTitle}</div>
-            </div>
-          </div>
-          <div className="scroll" style={{padding:"0 20px 80px"}}>
-            {listVenues.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)}
-          </div>
+    results_list: <div className="screen" style={{background:"var(--bg)"}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>‹</button>
+          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)"}}>{selectedVenue?.title||"spots"}</div>
         </div>
-      );
-    })(),
+      </div>
+      <div className="scroll" style={{padding:"0 20px"}}>
+        {(selectedVenue?.venues||[]).map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)}
+      </div>
+    </div>,
     partner_activate: partner&&user&&<PartnerActivateScreen partner={partner} navigate={navigate} user={user} onActivate={u=>{setUser(u);}} showToast={showToastMsg}/>,
     partner_signup: <SignUpScreen navigate={navigate} onLogin={onLogin} partner={partner}/>,
     partner_signin: <SignInScreen navigate={navigate} onLogin={onLogin} partner={partner}/>,
