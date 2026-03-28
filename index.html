@@ -968,13 +968,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
 
   // Load city picks and curated lists
   const cityPicks = (allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick).slice(0,5);
-  const LISTS = [
-    {label:"Restaurants", icon:"🍽", filter:v=>v.category==="Restaurant"},
-    {label:"Cafés",       icon:"☕", filter:v=>v.category==="Café"},
-    {label:"Bars",        icon:"🍷", filter:v=>v.category==="Bar"},
-    {label:"Bakeries",    icon:"🥐", filter:v=>v.category==="Bakery"||v.category==="Patisserie"},
-    {label:"Late night",  icon:"🌙", filter:v=>(v.occasions||[]).includes("Late night")},
-  ];
+
 
   return (
     <div className="screen">
@@ -1065,35 +1059,25 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
           );
         })()}
 
-        {/* City picks + curated lists */}
-        <div style={{marginTop:16,marginBottom:80}}>
+        {/* City picks */}
+        <div style={{marginTop:16,marginBottom:16}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:12}}>⭐ city picks</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:24}}>
-            {LISTS.map(({label,icon,filter})=>{
-              const venues = (allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick&&filter(v));
-              if(venues.length===0) return null;
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+            {[
+              {label:"RESTAURANT", cat:"Restaurant"},
+              {label:"BAR",        cat:"Bar"},
+              {label:"BAKERY",     cat:"Bakery"},
+              {label:"CAFÉ",       cat:"Café"},
+            ].map(({label,cat})=>{
+              const venues=(allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick&&v.category===cat);
               return (
-                <div key={label} onClick={()=>navigate("results_list",{venues,title:label})}
-                  style={{background:"white",border:"1.5px solid #eee",borderRadius:20,padding:"20px 12px",cursor:"pointer",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8}}>
-                  <span style={{fontSize:32}}>{icon}</span>
-                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",lineHeight:1.2}}>{label}</span>
+                <div key={cat} onClick={()=>venues.length>0&&navigate("results_list",{venues,title:label})}
+                  style={{background:"white",border:"1.5px solid black",borderRadius:20,padding:"20px 12px",cursor:venues.length>0?"pointer":"default",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8,opacity:venues.length>0?1:.35}}>
+                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",lineHeight:1.1}}>{label}</span>
                   <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"#888"}}>{venues.length} spots</span>
                 </div>
               );
             })}
-            {/* Hidden gems - no category filter */}
-            {(()=>{
-              const venues=(allVenues||[]).filter(v=>v.status==="active"&&(v.tags||[]).includes("Hidden gem"));
-              if(venues.length===0) return null;
-              return (
-                <div onClick={()=>navigate("results_list",{venues,title:"💎 Hidden gems"})}
-                  style={{background:"white",border:"1.5px solid #eee",borderRadius:20,padding:"20px 12px",cursor:"pointer",aspectRatio:"1/1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",gap:8}}>
-                  <span style={{fontSize:32}}>💎</span>
-                  <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",lineHeight:1.2}}>Hidden gems</span>
-                  <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"#888"}}>{venues.length} spots</span>
-                </div>
-              );
-            })()}
           </div>
         </div>
       </div>
@@ -1124,7 +1108,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(-1)} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <div/>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
@@ -2040,7 +2024,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <div/>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>saved</div>
@@ -2138,7 +2122,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <div/>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>all venues</div>
@@ -2977,7 +2961,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>scout mode</div>
@@ -3612,7 +3596,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>city lead</div>
@@ -3982,7 +3966,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
       {/* Pink header */}
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>profile</div>
@@ -4212,7 +4196,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>scouts</div>
@@ -4709,7 +4693,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
     <div className="screen" style={{background:"white"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("home")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
+          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"var(--body)",fontSize:28,color:"var(--black)",padding:0,lineHeight:1}}>&#8249;</button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>events</div>
