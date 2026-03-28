@@ -356,7 +356,7 @@ const ALL_DISTRICTS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","
 function districtLabel(d){ return d==="near me"?d:"District "+d+"."; }
 const BUDGETS = ["$","$$","$$$","$$$$"];
 const DIETARY_OPTIONS = ["Gluten-free","Vegan","Vegetarian","Halal","Kosher","Dairy-free","Nut-free","Pescatarian"];
-const TAGS = ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Cocktails","Wine bar","Speakeasy","Live music","Good music","Good for groups","Romantic","Lively","Upscale","Scenic","Underrated","Aesthetic"];
+const TAGS = ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Cocktails","Wine bar","Speakeasy","Live music","Good music","Good for groups","Romantic","Lively","Upscale","Scenic","Underrated","Aesthetic","Outdoor seating","Indoor seating"];
 const CUISINES = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","Italian","French","Spanish","Greek","Mexican","American","Hungarian","Middle Eastern","Mediterranean"];
 const CUISINES_FILTER = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","Italian","French","Spanish","Greek","Mexican","American","Hungarian","Middle Eastern","Mediterranean","Other"];
 const GROUP_SIZES = ["2","3-6","6-8","9+"];
@@ -1011,7 +1011,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
       const parsed = result.data||{};
       const VALID_CAT = ["Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"];
       const VALID_OCC = ["Casual dining","Fine dining","Dinner with friends","Date night","Lunch","Breakfast and brunch","Quick bite","Coffee","Quiet work spot","Pre-drinks / drinks","Late night","Celebration","Family outing"];
-      const VALID_TAGS = ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Cocktails","Wine bar","Speakeasy","Live music","Good music","Good for groups","Romantic","Lively","Upscale","Scenic","Underrated","Aesthetic"];
+      const VALID_TAGS = ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Cocktails","Wine bar","Speakeasy","Live music","Good music","Good for groups","Romantic","Lively","Upscale","Scenic","Underrated","Aesthetic","Outdoor seating","Indoor seating"];
       const VALID_CUI = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","Italian","French","Spanish","Greek","Mexican","American","Hungarian","Middle Eastern","Mediterranean"];
       const VALID_DIS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","Anywhere in Budapest"];
       const VALID_DIE = ["Gluten-free","Vegan","Vegetarian","Halal","Kosher","Dairy-free","Nut-free","Pescatarian"];
@@ -1387,12 +1387,12 @@ const CATEGORY_OCCASIONS = {
 };
 
 const CATEGORY_TAGS = {
-  "Restaurant":  ["Hidden gem","Cozy","Chill","Quiet","Lively","Upscale","Good music","Scenic","Underrated","Aesthetic","Romantic","Good for groups"],
-  "Café":        ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Upscale","Good music","Scenic","Underrated","Aesthetic","Romantic","Good for groups"],
-  "Bar":         ["Hidden gem","Cozy","Chill","Cocktails","Wine bar","Speakeasy","Lively","Upscale","Good music","Scenic","Underrated","Aesthetic","Romantic","Good for groups"],
-  "Bakery":      ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Scenic","Underrated","Aesthetic"],
-  "Patisserie":  ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Upscale","Scenic","Underrated","Aesthetic","Romantic"],
-  "Street food": ["Hidden gem","Chill","Grab & go","Lively","Scenic","Underrated","Aesthetic","Good for groups"],
+  "Restaurant":  ["Hidden gem","Cozy","Chill","Quiet","Lively","Upscale","Good music","Scenic","Underrated","Aesthetic","Romantic","Good for groups","Outdoor seating","Indoor seating"],
+  "Café":        ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Upscale","Good music","Scenic","Underrated","Aesthetic","Romantic","Good for groups","Outdoor seating","Indoor seating"],
+  "Bar":         ["Hidden gem","Cozy","Chill","Cocktails","Wine bar","Speakeasy","Lively","Upscale","Good music","Scenic","Underrated","Aesthetic","Romantic","Good for groups","Outdoor seating","Indoor seating"],
+  "Bakery":      ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Scenic","Underrated","Aesthetic","Outdoor seating","Indoor seating"],
+  "Patisserie":  ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Upscale","Scenic","Underrated","Aesthetic","Romantic","Outdoor seating","Indoor seating"],
+  "Street food": ["Hidden gem","Chill","Grab & go","Lively","Scenic","Underrated","Aesthetic","Good for groups","Outdoor seating","Indoor seating"],
   "Other":       null,
 };
 
