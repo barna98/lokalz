@@ -583,7 +583,15 @@ function VenueCard({venue, onClick}) {
       <div className="venue-body">
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
           <div className="venue-name" style={{flex:1}}>{venue.name}</div>
-          <button onClick={openMaps} style={{background:"var(--red)",border:"none",cursor:"pointer",padding:"4px 10px",flexShrink:0,color:"white",fontSize:11,fontFamily:"var(--body)",fontWeight:600,borderRadius:20,lineHeight:1.4,whiteSpace:"nowrap"}}>maps</button>
+          <div style={{display:"flex",gap:6,flexShrink:0}}>
+            <button onClick={openMaps} style={{background:"var(--red)",border:"none",cursor:"pointer",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8,color:"white"}}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            </button>
+            <button onClick={e=>{e.stopPropagation();if(navigator.share){navigator.share({title:venue.name,text:`Check out ${venue.name} on LOKAL'Z`,url:window.location.href});}else{navigator.clipboard?.writeText(`${venue.name} — ${window.location.href}`);}}}
+              style={{background:"var(--black)",border:"none",cursor:"pointer",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8,color:"white"}}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
+          </div>
         </div>
         <div className="venue-meta">
           <span>{venue.category||venue.cuisine}</span><span>·</span>
