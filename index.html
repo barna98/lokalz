@@ -1819,6 +1819,21 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
       </div>
       <div style={{padding:"8px 20px 12px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>our picks for you</div>
+        {(()=>{
+          const pills = [];
+          if(answers.category) pills.push(answers.category);
+          if(answers.locations?.length>0&&!answers.locations.includes("Anywhere in Budapest")) pills.push(...answers.locations.map(l=>`Dist. ${l}`));
+          if(answers.budgets?.length>0) pills.push(...answers.budgets);
+          if(answers.occasions?.length>0) pills.push(answers.occasions[0]);
+          if(pills.length===0) return null;
+          return <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:8}}>
+            {pills.map((p,i)=>(
+              <span key={i} style={{fontFamily:"var(--body)",fontSize:12,fontWeight:600,background:"var(--black)",color:"white",padding:"3px 10px",borderRadius:20}}>
+                {p}
+              </span>
+            ))}
+          </div>;
+        })()}
       </div>
       <div className="scroll" style={{padding:"0 20px 80px"}} ref={pullRef}
         onTouchStart={onPullStart} onTouchMove={onPullMove} onTouchEnd={onPullEnd}>
