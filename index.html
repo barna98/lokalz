@@ -16,7 +16,7 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <!-- Google Places API - replace with your own API key -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&language=hu" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCfYEBb75s8KMg_sOZ1Kv6rqQmR29o0FYI&libraries=places&language=hu" async defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;}
@@ -495,6 +495,20 @@ function StatusPill({status}) {
   return <span className={`status-pill ${map[status]||""}`}>{labels[status]||status}</span>;
 }
 
+function useOpenStatus(placeId) {
+  const [status, setStatus] = React.useState(null); // null | "open" | "closed"
+  React.useEffect(()=>{
+    if(!placeId||!window.google?.maps?.places) return;
+    const svc = new window.google.maps.places.PlacesService(document.createElement("div"));
+    svc.getDetails({placeId, fields:["opening_hours"]}, (place, s)=>{
+      if(s==="OK"&&place?.opening_hours){
+        setStatus(place.opening_hours.isOpen()?"open":"closed");
+      }
+    });
+  },[placeId]);
+  return status;
+}
+
 function VenueCard({venue, onClick}) {
   const [imgUrl, setImgUrl] = useState(null);
   const grads={
@@ -510,6 +524,7 @@ function VenueCard({venue, onClick}) {
   };
 
   const [imgLoaded, setImgLoaded] = useState(false);
+  const openStatus = useOpenStatus(venue.google_place_id);
   useEffect(()=>{
     setImgLoaded(false);
     supabase.from("venue_images").select("url").eq("venue_id",venue.id).eq("is_primary",true).limit(1).then(({data})=>{
@@ -540,7 +555,9 @@ function VenueCard({venue, onClick}) {
           <span>{venue.category||venue.cuisine}</span><span>·</span>
           <span>Dist. {venue.district}</span><span>·</span>
           <span>{venue.price_level||venue.price}</span>
-
+          {openStatus&&<span style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:11,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"2px 7px",borderRadius:10}}>
+            {openStatus==="open"?"open now":"closed"}
+          </span>}
         </div>
       </div>
     </div>
@@ -1391,6 +1408,39 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
 function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVenues}) {
   const [sel, setSel] = useState(answers.locations||(partnerDistrict?[partnerDistrict]:[]));
   const [showMore, setShowMore] = useState(false);
+  const [locLoading, setLocLoading] = useState(false);
+
+  function detectLocation(){
+    setLocLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        const {latitude:lat, longitude:lng} = pos.coords;
+        fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyCfYEBb75s8KMg_sOZ1Kv6rqQmR29o0FYI&language=en`)
+          .then(r=>r.json())
+          .then(data=>{
+            const postalComp = data.results?.flatMap(r=>r.address_components||[]).find(c=>c.types?.includes("postal_code"));
+            const postal = postalComp?.short_name;
+            let district = null;
+            if(postal){
+              const code=parseInt(postal);
+              if(code>=1011&&code<=1239){
+                const num=Math.floor((code-1000)/10);
+                const R=["","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"];
+                district=R[num]||null;
+              }
+            }
+            if(district){
+              setSel([district]);
+              if(!["V","VI","VII"].includes(district)) setShowMore(true);
+            }
+            setLocLoading(false);
+          })
+          .catch(()=>setLocLoading(false));
+      },
+      ()=>setLocLoading(false),
+      {enableHighAccuracy:true, timeout:10000, maximumAge:0}
+    );
+  }
 
   function toggle(d){
     haptic("light");
@@ -1415,9 +1465,10 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>Where in the city?</div>
       </div>
       <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
-        <button disabled style={{...PILL,background:"white",color:"#bbb",border:"1.5px solid #ddd",cursor:"not-allowed",opacity:.6}}>
-          <span>📍 detect my location</span>
-          <span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,background:"#eee",color:"#999",padding:"2px 8px",borderRadius:20}}>coming soon</span>
+        <button onClick={detectLocation}
+          style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&!["Anywhere in Budapest"].includes(sel[0])&&sel.length===1?"var(--black)":"white",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&!["Anywhere in Budapest"].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid black"}}>
+          <span>{locLoading?"📍 locating...":"📍 detect my location"}</span>
+          {!locLoading&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,background:"var(--bg)",color:"var(--black)",padding:"2px 8px",borderRadius:20}}>GPS</span>}
         </button>
         {DISTRICTS_MAIN.filter(d=>d!=="near me").map(d=>(
           <button key={d} style={{...PILL,background:sel.includes(d)?"var(--black)":"white",color:sel.includes(d)?"white":"var(--black)"}} onClick={()=>toggle(d)}>
@@ -1861,6 +1912,17 @@ function ScoutFeedbackSection({venue, user, showToast}) {
 function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, isScout, user, allVenues}) {
   const [imgIdx,setImgIdx]=useState(0);
   const [images,setImages]=useState([]);
+  const openStatus = useOpenStatus(venue.google_place_id);
+  const [openHours, setOpenHours] = React.useState(null);
+  React.useEffect(()=>{
+    if(!venue.google_place_id||!window.google?.maps?.places) return;
+    const svc = new window.google.maps.places.PlacesService(document.createElement("div"));
+    svc.getDetails({placeId:venue.google_place_id, fields:["opening_hours"]}, (place, s)=>{
+      if(s==="OK"&&place?.opening_hours?.weekday_text){
+        setOpenHours(place.opening_hours.weekday_text);
+      }
+    });
+  },[venue.google_place_id]);
   const [showReport,setShowReport]=useState(false);
   const [reportType,setReportType]=useState("");
   const [reportSubmitting,setReportSubmitting]=useState(false);
@@ -1986,12 +2048,16 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         </button>
       </div>
       <div className="scroll" style={{padding:"20px 24px 80px"}}>
-        <div style={{fontFamily:"var(--display)",fontSize:"36px",color:"var(--red)",lineHeight:1,letterSpacing:0,marginBottom:6}}>{venue.name}</div>
+        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",marginBottom:6}}>
+          <div style={{fontFamily:"var(--display)",fontSize:"36px",color:"var(--red)",lineHeight:1,letterSpacing:0}}>{venue.name}</div>
+          {openStatus&&<span style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:12,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"3px 10px",borderRadius:12,flexShrink:0}}>
+            {openStatus==="open"?"open now":"closed"}
+          </span>}
+        </div>
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
           <span className="venue-tag">{venue.subcategory||venue.category||venue.cuisine}</span>
           <span className="venue-tag">Dist. {venue.district}</span>
           <span className="venue-tag">{venue.price_level||venue.price}</span>
-
           {venue.is_city_pick&&(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&<span className="venue-tag" style={{background:"#FFF3CD",color:"#856404"}}>⭐ City pick</span>}
         </div>
         {venue.tags&&venue.tags.length>0&&(
@@ -2006,6 +2072,16 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--red)",marginBottom:16,display:"block",textDecoration:"none"}}>
           📍 {venue.address}
         </a>
+
+        {/* Opening hours */}
+        {openHours&&(
+          <div style={{marginBottom:16}}>
+            <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:700,color:"#888",marginBottom:6}}>opening hours</div>
+            {openHours.map((h,i)=>(
+              <div key={i} style={{fontFamily:"var(--body)",fontSize:13,color:"#444",lineHeight:1.8}}>{h}</div>
+            ))}
+          </div>
+        )}
 
         {/* Why locals */}
         <div style={{fontFamily:"var(--body)",fontSize:16,fontWeight:700,color:"var(--black)",marginBottom:6}}>why locals go here</div>
