@@ -1179,13 +1179,14 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
 
               {/* Glowing container */}
               <div style={{
-                borderRadius:28,
-                padding:isPremium?3:2,
-                background:isPremium?"linear-gradient(135deg,#DC2626,#ffffff,#DC2626)":"rgba(0,0,0,.1)",
+                borderRadius:24,
+                padding:isPremium?2:2,
+                background:isPremium?"linear-gradient(135deg,#DC2626,#ffaaaa,#DC2626)":"rgba(0,0,0,.08)",
                 backgroundSize:"200% 200%",
                 animation:isPremium?"glow-pulse 2.5s ease-in-out infinite":"none",
+                boxShadow:isPremium?"0 8px 32px rgba(220,38,38,.18), 0 2px 8px rgba(0,0,0,.08)":"0 4px 16px rgba(0,0,0,.08)",
               }}>
-                <div style={{position:"relative",borderRadius:26,overflow:"hidden",background:"white"}}>
+                <div style={{position:"relative",borderRadius:22,overflow:"hidden",background:"white"}}>
                   <textarea
                     value={query}
                     onChange={e=>isPremium&&setQuery(e.target.value)}
