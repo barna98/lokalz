@@ -2112,47 +2112,87 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         </button>
       </div>
       <div className="scroll" style={{padding:"20px 24px 80px"}}>
+
+        {/* 1. Name + open status */}
         <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",marginBottom:6}}>
           <div style={{fontFamily:"var(--display)",fontSize:"36px",color:"var(--red)",lineHeight:1,letterSpacing:0}}>{venue.name}</div>
           {openStatus&&<span style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:12,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"3px 10px",borderRadius:12,flexShrink:0}}>
             {openStatus==="open"?"open now":"closed"}
           </span>}
         </div>
-        <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
+
+        {/* 2. Category pills */}
+        <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
           <span className="venue-tag">{venue.subcategory||venue.category||venue.cuisine}</span>
           <span className="venue-tag">Dist. {venue.district}</span>
           <span className="venue-tag">{venue.price_level||venue.price}</span>
           {venue.is_city_pick&&(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&<span className="venue-tag" style={{background:"#FFF3CD",color:"#856404"}}>⭐ City pick</span>}
         </div>
+
+        {/* 3. Tags */}
         {venue.tags&&venue.tags.length>0&&(
-          <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
             {venue.tags.map(t=><span key={t} style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"#555",background:"#f0f0f0",borderRadius:20,padding:"4px 10px"}}>{t}</span>)}
           </div>
         )}
 
-        {/* Address - clickable Google Maps link */}
-        <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:700,color:"#888",marginBottom:2}}>address</div>
-        <a href={venue.google_maps_url||`https://maps.google.com/?q=${encodeURIComponent(venue.address||venue.name)}`} target="_blank" rel="noreferrer"
-          style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--red)",marginBottom:16,display:"block",textDecoration:"none"}}>
-          📍 {venue.address}
-        </a>
+        {/* 4. Action links row */}
+        <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
+          <a href={venue.google_maps_url||`https://maps.google.com/?q=${encodeURIComponent(venue.address||venue.name)}`} target="_blank" rel="noreferrer"
+            style={{display:"flex",alignItems:"center",gap:6,background:"var(--red)",color:"white",borderRadius:10,padding:"9px 14px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,textDecoration:"none"}}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            directions
+          </a>
+          {venue.instagram_url&&<a href={venue.instagram_url} target="_blank" rel="noreferrer"
+            style={{display:"flex",alignItems:"center",gap:6,background:"white",border:"1.5px solid #ddd",color:"var(--black)",borderRadius:10,padding:"9px 14px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,textDecoration:"none"}}>
+            📸 Instagram
+          </a>}
+          {venue.reservation_url&&<a href={venue.reservation_url} target="_blank" rel="noreferrer"
+            style={{display:"flex",alignItems:"center",gap:6,background:"white",border:"1.5px solid #ddd",color:"var(--black)",borderRadius:10,padding:"9px 14px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,textDecoration:"none"}}>
+            🍽 Reserve
+          </a>}
+          {venue.website_url&&<a href={venue.website_url} target="_blank" rel="noreferrer"
+            style={{display:"flex",alignItems:"center",gap:6,background:"white",border:"1.5px solid #ddd",color:"var(--black)",borderRadius:10,padding:"9px 14px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,textDecoration:"none"}}>
+            🌐 Website
+          </a>}
+        </div>
 
-        {/* Opening hours */}
+        <div style={{height:1,background:"#f0f0f0",marginBottom:16}}/>
+
+        {/* 5. Address */}
+        <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:12}}>
+          <span style={{fontSize:16,flexShrink:0,marginTop:1}}>📍</span>
+          <div>
+            <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"#444",lineHeight:1.5}}>{venue.address}</div>
+            <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>Budapest, District {venue.district}</div>
+          </div>
+        </div>
+
+        {/* 6. Opening hours */}
         {openHours&&(
-          <div style={{marginBottom:16}}>
-            <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:700,color:"#888",marginBottom:6}}>opening hours</div>
-            {openHours.map((h,i)=>(
-              <div key={i} style={{fontFamily:"var(--body)",fontSize:13,color:"#444",lineHeight:1.8}}>{h}</div>
-            ))}
+          <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:12}}>
+            <span style={{fontSize:16,flexShrink:0,marginTop:1}}>🕐</span>
+            <div>
+              <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"var(--black)",marginBottom:4}}>
+                {openStatus==="open"
+                  ?<span style={{color:"#16a34a"}}>Open now</span>
+                  :<span style={{color:"#dc2626"}}>Closed</span>}
+              </div>
+              {openHours.map((h,i)=>(
+                <div key={i} style={{fontFamily:"var(--body)",fontSize:12,color:"#666",lineHeight:1.7}}>{h}</div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Why locals */}
-        <div style={{fontFamily:"var(--body)",fontSize:16,fontWeight:700,color:"var(--black)",marginBottom:6}}>why locals go here</div>
-        <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#444",lineHeight:1.7,marginBottom:4}}>{venue.why}</div>
+        <div style={{height:1,background:"#f0f0f0",marginBottom:16}}/>
 
-        <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:400,marginBottom:20}}>
-          — <span
+        {/* 7. Why locals go here */}
+        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>why locals go here</div>
+        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"#222",lineHeight:1.7,marginBottom:8}}>{venue.why}</div>
+        <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>
+          <span>—</span>
+          <span
             style={{color:(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")?"var(--red)":"#aaa",
               cursor:(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")?"pointer":"default",
               fontWeight:700}}
@@ -2163,49 +2203,36 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
             {venue.scout_alias}
           </span>
           {(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&venue.submitted_by&&
-            <span style={{fontSize:11,color:"#bbb",marginLeft:6}}>· view picks ›</span>}
+            <span style={{fontSize:11,color:"#bbb"}}>· view picks ›</span>}
         </div>
 
-        {/* Action buttons - only Instagram and Reservation */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9,marginBottom:14}}>
-          {[
-            ["📸","Instagram", venue.instagram_url],
-            ["🍽","Reservation", venue.reservation_url]
-          ].filter(([,,url])=>url).map(([ico,label,url])=>(
-            <button key={label}
-              onClick={()=>window.open(url,"_blank")}
-              style={{background:"white",border:"1.5px solid #ddd",borderRadius:12,padding:"12px 8px",fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"var(--black)",cursor:"pointer",transition:"all .15s"}}
-              onMouseEnter={e=>e.currentTarget.style.borderColor="var(--red)"}
-              onMouseLeave={e=>e.currentTarget.style.borderColor="#ddd"}>
-              {ico} {label}
+        <div style={{height:1,background:"#f0f0f0",marginBottom:16}}/>
+
+        {/* 8. Rate this spot */}
+        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:10}}>been here?</div>
+        <div style={{display:"flex",gap:8,marginBottom:20}}>
+          {[["like","👍","love it"],["neutral","😐","it's ok"],["dislike","👎","not for me"]].map(([type,icon,label])=>(
+            <button key={type} onClick={()=>submitVote(type)} disabled={!user?.id||votingLoading}
+              style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"10px 6px",borderRadius:12,border:"1.5px solid",borderColor:myVote===type?"var(--black)":"#ddd",background:myVote===type?"var(--black)":"white",cursor:user?.id?"pointer":"default",transition:"all .15s"}}>
+              <span style={{fontSize:18}}>{icon}</span>
+              <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:myVote===type?"white":"#888"}}>{label}</span>
+              <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:myVote===type?"white":"var(--black)"}}>{votes[type]}</span>
             </button>
           ))}
         </div>
 
-        <button style={{background:"var(--red)",color:"white",border:"none",borderRadius:12,padding:"13px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",marginBottom:10}}
-          onClick={()=>{navigator.clipboard?.writeText(`https://lokalz.app/venue/${venue.id}`);showToast("link copied!");}}>
-          🔗 share this place
-        </button>
-
-        {/* Like / Neutral / Dislike */}
-        <div style={{marginBottom:10}}>
-          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"#888",marginBottom:8}}>been here? rate this spot</div>
-          <div style={{display:"flex",gap:8}}>
-            {[["like","👍","love it"],["neutral","😐","it's ok"],["dislike","👎","not for me"]].map(([type,icon,label])=>(
-              <button key={type} onClick={()=>submitVote(type)} disabled={!user?.id||votingLoading}
-                style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"10px 6px",borderRadius:12,border:"1.5px solid",borderColor:myVote===type?"var(--black)":"#ddd",background:myVote===type?"var(--black)":"white",cursor:user?.id?"pointer":"default",transition:"all .15s"}}>
-                <span style={{fontSize:18}}>{icon}</span>
-                <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:myVote===type?"white":"#888"}}>{label}</span>
-                <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:myVote===type?"white":"var(--black)"}}>{votes[type]}</span>
-              </button>
-            ))}
-          </div>
+        {/* 9. Share + Report */}
+        <div style={{display:"flex",gap:8,marginBottom:8}}>
+          <button style={{flex:1,background:"var(--black)",color:"white",border:"none",borderRadius:12,padding:"13px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}
+            onClick={()=>{if(navigator.share){navigator.share({title:venue.name,text:`Check out ${venue.name} on LOKAL'Z`,url:window.location.href});}else{navigator.clipboard?.writeText(window.location.href);showToast("link copied!");}}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            share
+          </button>
+          <button style={{flex:1,background:"transparent",color:"#888",border:"1.5px solid #ddd",borderRadius:12,padding:"13px",fontFamily:"var(--body)",fontWeight:400,fontSize:13,cursor:"pointer"}}
+            onClick={()=>setShowReport(true)}>
+            ⚑ report
+          </button>
         </div>
-
-        <button style={{background:"transparent",color:"#888",border:"1.5px solid #ddd",borderRadius:12,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:13,cursor:"pointer",marginBottom:8}}
-          onClick={()=>setShowReport(true)}>
-          ⚑ report venue
-        </button>
         {showReport&&(
           <div style={{background:"#FFF8F8",border:"1.5px solid #F8D7DA",borderRadius:16,padding:16,marginBottom:12,animation:"fadeUp .2s ease both"}}>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"#58151C",marginBottom:10}}>report this venue</div>
