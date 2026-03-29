@@ -368,6 +368,30 @@ function haptic(style="light"){
   }
 }
 
+// Weekly city picks - seeded by week number so everyone sees the same picks
+function getWeekNumber() {
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return d.getFullYear() * 100 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7) + 1;
+}
+function seededRandom(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+function getWeeklyPicks(venues, cat, n=5) {
+  const pool = venues.filter(v => v.status==="active" && v.is_city_pick && v.category===cat);
+  if(pool.length===0) return [];
+  const seed = getWeekNumber() * 31 + cat.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const rng = seededRandom(seed);
+  const shuffled = [...pool].sort(()=>rng()-0.5);
+  return shuffled.slice(0, n);
+}
+
 // Global scroll position store - persists across re-renders
 const _scrollPos = {};
 function saveScroll(key, el){ if(el) _scrollPos[key] = el.scrollTop; }
@@ -967,7 +991,7 @@ function CityPickBox({label, cat, venues, navigate, isPremium}) {
       {/* Bottom: white label strip */}
       <div style={{padding:"10px 14px",background:"white",flexShrink:0,borderTop:"1px solid #f0f0f0"}}>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",lineHeight:1.1}}>{label}</div>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:"#888",marginTop:2}}>{venues.length} places like this</div>
+
       </div>
     </div>
   );
@@ -1140,17 +1164,18 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
         {/* City picks */}
         <div style={{marginTop:16,marginBottom:16}}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-            <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,letterSpacing:0,color:"var(--black)"}}>⭐ city picks</span>
+            <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,letterSpacing:0,color:"var(--black)"}}>⭐ this week's city picks</span>
             {!isPremium&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20}}>pro only</span>}
           </div>
           <div style={{position:"relative",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
             {[
-              {label:"RESTAURANT", cat:"Restaurant"},
-              {label:"BAR",        cat:"Bar"},
-              {label:"BAKERY",     cat:"Bakery"},
-              {label:"CAFÉ",       cat:"Café"},
+              {label:"RESTAURANT",  cat:"Restaurant"},
+              {label:"STREET FOOD", cat:"Street food"},
+              {label:"BAKERY",      cat:"Bakery"},
+              {label:"CAFÉ",        cat:"Café"},
+              {label:"BAR",         cat:"Bar"},
             ].map(({label,cat})=>{
-              const venues=(allVenues||[]).filter(v=>v.status==="active"&&v.is_city_pick&&v.category===cat);
+              const venues=getWeeklyPicks(allVenues||[], cat, 5);
               return <CityPickBox key={cat} label={label} cat={cat} venues={venues} navigate={navigate} isPremium={isPremium}/>;
             })}
             {!isPremium&&(
