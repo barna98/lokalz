@@ -517,6 +517,12 @@ function VenueCard({venue, onClick}) {
     });
   },[venue.id]);
 
+  function openMaps(e){
+    e.stopPropagation();
+    const q = encodeURIComponent(venue.name+", Budapest");
+    window.open(venue.google_maps_url||`https://www.google.com/maps/search/?api=1&query=${q}`,"_blank");
+  }
+
   return (
     <div className="venue-card" onClick={onClick}>
       <div className="venue-img" style={{background:imgUrl?"#111":grads[venue.cuisine]||grads.default,padding:0}}>
@@ -526,7 +532,10 @@ function VenueCard({venue, onClick}) {
         }
       </div>
       <div className="venue-body">
-        <div className="venue-name">{venue.name}</div>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
+          <div className="venue-name" style={{flex:1}}>{venue.name}</div>
+          <button onClick={openMaps} style={{background:"none",border:"none",cursor:"pointer",padding:"2px 0",flexShrink:0,color:"#aaa",fontSize:16,lineHeight:1}} title="Open in Maps">📍</button>
+        </div>
         <div className="venue-meta">
           <span>{venue.category||venue.cuisine}</span><span>·</span>
           <span>Dist. {venue.district}</span><span>·</span>
@@ -833,13 +842,13 @@ function OnboardingScreen({navigate, user, setUser}) {
   if(step==="intro1") return (
     <div className="screen" style={{background:"var(--bg)",padding:"0",display:"flex",flexDirection:"column"}}>
       <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"48px 32px 24px"}}>
-        <div className="logo" style={{textAlign:"center",marginBottom:32}}>Lokal&#39;z</div>
+        <div className="logo" style={{textAlign:"center",marginBottom:32}}>LOKAL&#39;Z</div>
         <div style={{fontSize:56,marginBottom:24}}>🗺️</div>
-        <div style={{...BODY,fontSize:26,fontWeight:700,color:"var(--black)",textAlign:"center",lineHeight:1.2,marginBottom:16}}>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:26,color:"var(--black)",textAlign:"center",lineHeight:1.2,marginBottom:16}}>
           Beyond the obvious.
         </div>
-        <div style={{...BODY,fontSize:16,color:"#555",textAlign:"center",lineHeight:1.6}}>
-          Budapest legjobb helyei — nem algoritmusok, hanem helyiek ajánlásai alapján. Nincs reklám, nincs turistacsapda.
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:16,color:"#555",textAlign:"center",lineHeight:1.6}}>
+          The best spots in Budapest — curated by locals, not algorithms. No ads, no tourist traps.
         </div>
       </div>
       <div style={{padding:"0 28px 48px"}}>
@@ -854,11 +863,11 @@ function OnboardingScreen({navigate, user, setUser}) {
     <div className="screen" style={{background:"var(--bg)",padding:"0",display:"flex",flexDirection:"column"}}>
       <div style={{flex:1,display:"flex",flexDirection:"column",padding:"48px 32px 24px"}}>
         <div className="logo" style={{textAlign:"center",marginBottom:32}}>Lokal&#39;z</div>
-        <div style={{...BODY,fontSize:24,fontWeight:700,color:"var(--black)",marginBottom:28,textAlign:"center"}}>How it works</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:24,color:"var(--black)",marginBottom:28,textAlign:"center"}}>How it works</div>
         {[
-          {icon:"🔍", title:"Discover", desc:"Mondd el mit keresel — alkalom, hangulat, kerület. Mi megtaláljuk a tökéletes helyet."},
-          {icon:"❤️", title:"Save", desc:"Mentsd el a kedvenc spotjaidat és böngészd vissza bármikor."},
-          {icon:"📍", title:"Explore", desc:"Fedezd fel Budapest rejtett gyöngyszemeit helyi scoutok szemével."},
+          {icon:"🔍", title:"Discover", desc:"Tell us the vibe, occasion, and district. We'll find the perfect spot for you."},
+          {icon:"❤️", title:"Save", desc:"Save your favourite spots and come back to them anytime."},
+          {icon:"🧭", title:"Explore", desc:"Uncover Budapest's hidden gems through the eyes of local scouts."},
         ].map(({icon,title,desc})=>(
           <div key={title} style={{display:"flex",gap:16,marginBottom:24,alignItems:"flex-start"}}>
             <div style={{fontSize:32,flexShrink:0,width:40,textAlign:"center"}}>{icon}</div>
@@ -1122,7 +1131,12 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
                     value={query}
                     onChange={e=>isPremium&&setQuery(e.target.value)}
                     onKeyDown={e=>{if(isPremium&&e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleAISearch();}}}
-                    placeholder={"eg. I'm grabbing lunch with friends, chill vibes, preferably with a terrace option"}
+                    placeholder={[
+                      "e.g. cozy café to work from in the 7th district",
+                      "e.g. date night spot, something special, not too pricey",
+                      "e.g. quick lunch near me, local vibes",
+                      "e.g. hidden gem bar for drinks with friends",
+                    ][Math.floor(Date.now()/10000)%4]}
                     rows={4}
                     readOnly={!isPremium}
                     style={{
@@ -1192,6 +1206,22 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
   );
 }
 
+function QProgress({step}) {
+  const steps = ["q1","q2","q3","q4","q5","q6"];
+  const idx = steps.indexOf(step);
+  const total = 6;
+  return (
+    <div style={{padding:"0 24px 8px",flexShrink:0}}>
+      <div style={{display:"flex",gap:4}}>
+        {steps.map((_,i)=>(
+          <div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=idx?"var(--black)":"rgba(0,0,0,.12)",transition:"background .2s"}}/>
+        ))}
+      </div>
+      <div style={{fontFamily:"var(--body)",fontSize:11,color:"#888",marginTop:4,textAlign:"right"}}>{idx+1} / {total}</div>
+    </div>
+  );
+}
+
 function Q1Screen({navigate, onMenu, answers, setAnswers}) {
   const [sel, setSel] = useState(answers.category||"");
 
@@ -1222,6 +1252,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
           </div>
         </div>
       </div>
+      <QProgress step="q1"/>
       <div style={{padding:"8px 20px 12px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>What kind of place are we talking?</div>
       </div>
@@ -1319,7 +1350,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
           </div>
         </div>
       </div>
-
+      <QProgress step="q2"/>
       <div className="scroll" style={{padding:"8px 20px 100px"}}>
         {/* Occasions */}
         <div style={{marginBottom:24}}>
@@ -1379,6 +1410,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
           </div>
         </div>
       </div>
+      <QProgress step="q3"/>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>Where in the city?</div>
       </div>
@@ -1462,6 +1494,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
             </div>
         </div>
       </div>
+      <QProgress step="q4"/>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>How much damage are we doing?</div>
       </div>
@@ -1495,6 +1528,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
             </div>
         </div>
       </div>
+      <QProgress step="q5"/>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>Craving anything specific?</div>
       </div>
@@ -1527,6 +1561,7 @@ function Q6Screen({navigate, onMenu, answers, setAnswers}) {
             </div>
         </div>
       </div>
+      <QProgress step="q6"/>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>How many are you?</div>
       </div>
@@ -1696,11 +1731,25 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
         {!refreshing&&shown.length===0&&(
           <div className="empty">
             <div className="empty-icon">😕</div>
-            <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:600,color:"#555",lineHeight:1.6,textAlign:"center",marginBottom:8}}>
+            <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:700,color:"var(--black)",marginBottom:8}}>
               No {answers.category||"venues"} found{answers.locations?.length>0&&!answers.locations.includes("Anywhere in Budapest")?" in this area":""}.
             </div>
-            <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"#888",textAlign:"center",marginBottom:20}}>
-              Try a different district, fewer filters, or "surprise me".
+            <div style={{fontFamily:"var(--body)",fontSize:13,color:"#888",textAlign:"center",marginBottom:16,lineHeight:1.5}}>
+              Try relaxing your filters.
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:8,width:"100%",marginBottom:16}}>
+              {answers.locations?.length>0&&!answers.locations.includes("Anywhere in Budapest")&&(
+                <button style={{background:"white",border:"1.5px solid black",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer"}}
+                  onClick={()=>{setAnswers(a=>({...a,locations:["Anywhere in Budapest"]}));}}>
+                  🗺️ try anywhere in Budapest
+                </button>
+              )}
+              {answers.budgets?.length>0&&(
+                <button style={{background:"white",border:"1.5px solid black",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer"}}
+                  onClick={()=>{setAnswers(a=>({...a,budgets:[]}));}}>
+                  💸 remove budget filter
+                </button>
+              )}
             </div>
             <button className="btn-black" style={{width:"auto",padding:"14px 28px"}} onClick={()=>navigate("q1")}>
               start over
@@ -2147,7 +2196,12 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
       {tab==="places"&&(
         <div className="scroll" style={{padding:"16px 20px 80px"}}>
           {saved.length===0
-            ?<div className="empty"><div className="empty-icon">🔖</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No saved places yet.<br/>Tap ♡ on any venue.</div></div>
+            ?<div className="empty">
+                <div className="empty-icon">🤍</div>
+                <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:700,color:"var(--black)",marginBottom:8}}>Nothing saved yet.</div>
+                <div style={{fontFamily:"var(--body)",fontSize:13,color:"#888",marginBottom:20}}>Start exploring and save the spots you love.</div>
+                <button className="btn-black" style={{width:"auto",padding:"14px 28px"}} onClick={()=>navigate("q1")}>start discovering</button>
+              </div>
             :saved.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)
           }
         </div>
@@ -2270,7 +2324,15 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         </div>
       </div>
       <div className="scroll" style={{padding:"12px 20px 80px"}} ref={scrollRef}
-        onScroll={e=>saveScroll("allVenues", e.currentTarget)}>
+        onScroll={e=>saveScroll("allVenues", e.currentTarget)}
+        onTouchStart={e=>{ if(scrollRef.current?.scrollTop===0) window._avPullStart=e.touches[0].clientY; }}
+        onTouchEnd={e=>{
+          if(window._avPullStart&&scrollRef.current?.scrollTop===0){
+            const dist=e.changedTouches[0].clientY-window._avPullStart;
+            if(dist>60){ haptic("medium"); setSearch(""); setCategory(""); setCuisine(""); setBudget(""); setDistrict(""); setSubcategory(""); }
+          }
+          window._avPullStart=null;
+        }}>
         {sorted.length===0
           ?<div className="empty"><div className="empty-icon">🍽</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#777"}}>no venues found</div></div>
           :sorted.map(v=><VenueCard key={v.id} venue={v} onClick={()=>{saveScroll("allVenues",scrollRef.current);navigate("venue",v);}}/>)
@@ -4340,6 +4402,11 @@ function ScoutsScreen({navigate, onMenu, user}) {
           </div>
         </div>
       </div>
+      <div style={{padding:"8px 20px 12px",flexShrink:0}}>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"#888",lineHeight:1.5}}>
+          Scouts are locals who know Budapest inside out — they curate every venue you see in the app.
+        </div>
+      </div>
       <div style={{background:"var(--black)",padding:"12px 20px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.1)",borderRadius:50,padding:"8px 14px"}}>
           <span style={{color:"rgba(255,255,255,.5)",fontSize:13}}>🔍</span>
@@ -4348,7 +4415,15 @@ function ScoutsScreen({navigate, onMenu, user}) {
         </div>
       </div>
       <div className="scroll" style={{padding:"12px 20px 80px"}} ref={scrollRef}
-        onScroll={e=>saveScroll("allVenues", e.currentTarget)}>
+        onScroll={e=>saveScroll("allVenues", e.currentTarget)}
+        onTouchStart={e=>{ if(scrollRef.current?.scrollTop===0) window._avPullStart=e.touches[0].clientY; }}
+        onTouchEnd={e=>{
+          if(window._avPullStart&&scrollRef.current?.scrollTop===0){
+            const dist=e.changedTouches[0].clientY-window._avPullStart;
+            if(dist>60){ haptic("medium"); setSearch(""); setCategory(""); setCuisine(""); setBudget(""); setDistrict(""); setSubcategory(""); }
+          }
+          window._avPullStart=null;
+        }}>
         {loading&&<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>}
         {!loading&&filtered.length===0&&<div style={{textAlign:"center",padding:32,fontFamily:"var(--body)",fontSize:14,color:"#888"}}>no scouts found</div>}
         {filtered.map(s=>(
