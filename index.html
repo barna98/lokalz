@@ -1572,11 +1572,10 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
     // 1. Occasions — legalább egy egyezzen
     if(answers.occasions?.length>0 && !answers.occasions.some(o=>(v.occasions||[]).includes(o))) return false;
     // 1b. Tags — at least one must match
-    if(answers.tags?.length>0 && !answers.tags.some(t=>(v.tags||[]).includes(t))) return false;
     // 2. Budget — singular (AI) vagy plural (discover flow) egyaránt
     const vPrice = (v.price_level||v.price||"").trim();
-    if(answers.budget && vPrice !== answers.budget.trim()) return false;
-    if(answers.budgets?.length>0 && !answers.budgets.includes(vPrice)) return false;
+    const budgetList = answers.budgets?.length>0 ? answers.budgets : (answers.budget ? [answers.budget.trim()] : []);
+    if(budgetList.length>0 && !budgetList.includes(vPrice)) return false;
     // 3. Cuisines — legalább egy egyezzen
     if(answers.cuisines?.length>0 && v.cuisine && !answers.cuisines.some(c=>v.cuisine.toLowerCase().includes(c.toLowerCase()))) return false;
     // 4. Group / capacity
@@ -3364,7 +3363,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       await supabase.functions.invoke("send-email", {
         body: { type, to: scout.email, venue_name: venue.name, edit_comment: editComment }
       });
-    } catch(e) { console.log("Email error:", e); }
+    } catch(e) { }
   }
 
   async function updateStatus(id, status){
@@ -3513,7 +3512,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       website_url: editForm.website_url||null,
     }).eq("id", editingVenue.id);
     if(error){
-      console.error("saveEdit error full:", JSON.stringify(error));
+
       showToast("Error: "+error.message+" | "+error.details+" | "+error.hint);
       setSaving(false);return;
     }
@@ -4297,7 +4296,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
       .in("role",["scout","city_lead","SCOUT","CITY_LEAD"])
       .order("name")
       .then(({data, error})=>{
-        console.log("Scouts:", data, error);
+
         if(data) setScouts(data);
         setLoading(false);
       });
@@ -5629,7 +5628,7 @@ function App() {
           }
         }
       } catch(e){
-        console.log("Session restore error:", e);
+
       } finally {
         clearTimeout(timeout);
         setAppLoading(false);
