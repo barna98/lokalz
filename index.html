@@ -1698,7 +1698,7 @@ function SkeletonCard(){
   );
 }
 
-function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
+function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partner, user}) {
   const BATCH=5;
   const active = allVenues.filter(v=>v.status==="active").sort((a,b)=>a.name.localeCompare(b.name));
   const filtered = active.filter(v=>{
@@ -1855,13 +1855,13 @@ function ResultsScreen({navigate, onMenu, answers, allVenues, partner, user}) {
             <div style={{display:"flex",flexDirection:"column",gap:8,width:"100%",marginBottom:16,alignItems:"center"}}>
               {answers.locations?.length>0&&!answers.locations.includes("Anywhere in Budapest")&&(
                 <button style={{background:"white",border:"1.5px solid black",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer"}}
-                  onClick={()=>{setAnswers(a=>({...a,locations:["Anywhere in Budapest"]}));}}>
+                  onClick={()=>{setAnswers(a=>({...a,locations:["Anywhere in Budapest"]}));setShownCount(BATCH);}}>
                   🗺️ try anywhere in Budapest
                 </button>
               )}
               {answers.budgets?.length>0&&(
                 <button style={{background:"white",border:"1.5px solid black",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer"}}
-                  onClick={()=>{setAnswers(a=>({...a,budgets:[]}));}}>
+                  onClick={()=>{setAnswers(a=>({...a,budgets:[],budget:null}));setShownCount(BATCH);}}>
                   💸 remove budget filter
                 </button>
               )}
@@ -6085,7 +6085,7 @@ function App() {
     q4: <Q4Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     q5: <Q5Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     q6: <Q6Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
-    results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user}/>,
+    results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user}/>,
     venue: selectedVenue&&<VenueDetailScreen venue={selectedVenue} navigate={navigate} savedIds={savedIds} toggleSave={toggleSave} showToast={showToastMsg} isScout={isScout} user={user} allVenues={allVenues}/>,
     saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user}/>,
     scouts: <ScoutsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user}/>,
