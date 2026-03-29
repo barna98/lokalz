@@ -1313,7 +1313,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
       </div>
       <QProgress step="q1"/>
       <div style={{padding:"8px 20px 12px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>What kind of place are we talking?</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>What kind of place are we talking?</div>
       </div>
       <div className="scroll" style={{padding:"0 20px 100px"}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
@@ -1413,7 +1413,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
       <div className="scroll" style={{padding:"8px 20px 100px"}}>
         {/* Occasions */}
         <div style={{marginBottom:24}}>
-          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:12}}>What's the mood?</div>
+          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8,marginBottom:12}}>What's the mood?</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
             {[...occList,{id:"Not sure yet",label:"Not sure yet"}].map(o=>(
               <button key={o.id} type="button" onClick={()=>toggleOcc(o.id)} style={pillStyle(selOcc.includes(o.id))}>
@@ -1511,7 +1511,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
       </div>
       <QProgress step="q3"/>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>Where in the city?</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>Where in the city?</div>
       </div>
       <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
         <button onClick={detectLocation}
@@ -1596,7 +1596,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
       </div>
       <QProgress step="q4"/>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>How much damage are we doing?</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>How much damage are we doing?</div>
       </div>
       <div style={{padding:"0 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
         {BUDGETS.map(b=>(
@@ -1630,7 +1630,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
       </div>
       <QProgress step="q5"/>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>Craving anything specific?</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>Craving anything specific?</div>
       </div>
       <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
         {CUISINES.map(x=>(
@@ -1663,7 +1663,7 @@ function Q6Screen({navigate, onMenu, answers, setAnswers}) {
       </div>
       <QProgress step="q6"/>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>How many are you?</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>How many are you?</div>
       </div>
       <div style={{padding:"0 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
         {[["2","2"],["3-6","3-6"],["6-8","6-8"],["9+","9+"],["solo","solo mission"]].map(([val,label])=>(
@@ -2157,10 +2157,10 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           </a>}
         </div>
 
-        <div style={{height:1,background:"#f0f0f0",marginBottom:16}}/>
+        <div style={{height:1,background:"#f0f0f0",marginBottom:20}}/>
 
         {/* 5. Address */}
-        <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:12}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:14}}>
           <span style={{fontSize:16,flexShrink:0,marginTop:1}}>📍</span>
           <div>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"#444",lineHeight:1.5}}>{venue.address}</div>
@@ -2170,7 +2170,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
 
         {/* 6. Opening hours */}
         {openHours&&(
-          <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:12}}>
+          <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:16}}>
             <span style={{fontSize:16,flexShrink:0,marginTop:1}}>🕐</span>
             <div>
               <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"var(--black)",marginBottom:4}}>
@@ -2185,11 +2185,11 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           </div>
         )}
 
-        <div style={{height:1,background:"#f0f0f0",marginBottom:16}}/>
+        <div style={{height:1,background:"#f0f0f0",marginBottom:20}}/>
 
         {/* 7. Why locals go here */}
-        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>why locals go here</div>
-        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"#222",lineHeight:1.7,marginBottom:8}}>{venue.why}</div>
+        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:10}}>why locals go here</div>
+        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"#222",lineHeight:1.8,marginBottom:12}}>{venue.why}</div>
         <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>
           <span>—</span>
           <span
@@ -2206,10 +2206,10 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
             <span style={{fontSize:11,color:"#bbb"}}>· view picks ›</span>}
         </div>
 
-        <div style={{height:1,background:"#f0f0f0",marginBottom:16}}/>
+        <div style={{height:1,background:"#f0f0f0",marginBottom:20}}/>
 
         {/* 8. Rate this spot */}
-        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:10}}>been here?</div>
+        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:12}}>been here?</div>
         <div style={{display:"flex",gap:8,marginBottom:20}}>
           {[["like","👍","love it"],["neutral","😐","it's ok"],["dislike","👎","not for me"]].map(([type,icon,label])=>(
             <button key={type} onClick={()=>submitVote(type)} disabled={!user?.id||votingLoading}
