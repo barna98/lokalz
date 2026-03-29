@@ -363,6 +363,15 @@ const CUISINES_FILTER = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indi
 const GROUP_SIZES = ["2","3-6","6-8","9+"];
 const CITIES = ["Budapest","Vienna","Prague"];
 
+async function fetchPlaceId(name, address) {
+  try {
+    const query = encodeURIComponent(`${name} Budapest`);
+    const res = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${query}&inputtype=textquery&fields=place_id&key=AIzaSyCfYEBb75s8KMg_sOZ1Kv6rqQmR29o0FYI`);
+    const data = await res.json();
+    return data.candidates?.[0]?.place_id || null;
+  } catch(e) { return null; }
+}
+
 function haptic(style="light"){
   if(navigator.vibrate){
     navigator.vibrate(style==="light"?10:style==="medium"?20:40);
@@ -496,15 +505,24 @@ function StatusPill({status}) {
 }
 
 function useOpenStatus(placeId) {
-  const [status, setStatus] = React.useState(null); // null | "open" | "closed"
+  const [status, setStatus] = React.useState(null);
   React.useEffect(()=>{
-    if(!placeId||!window.google?.maps?.places) return;
-    const svc = new window.google.maps.places.PlacesService(document.createElement("div"));
-    svc.getDetails({placeId, fields:["opening_hours"]}, (place, s)=>{
-      if(s==="OK"&&place?.opening_hours){
-        setStatus(place.opening_hours.isOpen()?"open":"closed");
-      }
-    });
+    if(!placeId) return;
+    function fetchStatus(){
+      if(!window.google?.maps?.places) return false;
+      const svc = new window.google.maps.places.PlacesService(document.createElement("div"));
+      svc.getDetails({placeId, fields:["opening_hours"]}, (place, s)=>{
+        if(s==="OK"&&place?.opening_hours){
+          try { setStatus(place.opening_hours.isOpen()?"open":"closed"); } catch(e){}
+        }
+      });
+      return true;
+    }
+    if(!fetchStatus()){
+      // Wait for Google Maps to load
+      const t = setInterval(()=>{ if(fetchStatus()) clearInterval(t); }, 500);
+      return ()=>clearInterval(t);
+    }
   },[placeId]);
   return status;
 }
@@ -2726,6 +2744,9 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
 
   async function submitScoutEdit(){
     setEditSubmitting(true);
+    // Auto-fetch google_place_id if not set
+    let placeId = editingVenue.google_place_id||null;
+    if(!placeId && editForm.name) placeId = await fetchPlaceId(editForm.name, editForm.address);
     const {error} = await supabase.from("venues").update({
       name: editForm.name,
       address: editForm.address,
@@ -2744,6 +2765,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       tags: editForm.tags||[],
       status: "pending",
       edit_comment: null,
+      google_place_id: placeId,
     }).eq("id", editingVenue.id);
     setEditSubmitting(false);
     if(error){showToast("Error: "+error.message);return;}
@@ -2994,7 +3016,8 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         scout_alias: (()=>{ const fn=(user?.name||"Scout").split(" ")[0]; const b=user?.badge||"The Local"; return `${fn} - ${b}`; })(),
         submitted_by: user?.id||null,
         status: "pending",
-        occasions: customOccasion.trim() ? [...selOccasions, customOccasion.trim()] : selOccasions
+        occasions: customOccasion.trim() ? [...selOccasions, customOccasion.trim()] : selOccasions,
+        google_place_id: await fetchPlaceId(form.name, form.address),
       }).select().single();
       if(error) throw error;
       // Upload images if selected
@@ -3628,6 +3651,9 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
 
   async function saveEdit(){
     setSaving(true);
+    // Auto-fetch google_place_id if not already set
+    let placeId = editingVenue.google_place_id||null;
+    if(!placeId && editForm.name) placeId = await fetchPlaceId(editForm.name, editForm.address);
     const {error} = await supabase.from("venues").update({
       name: editForm.name,
       address: editForm.address,
@@ -3637,7 +3663,6 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       cuisine: editForm.cuisine||null,
       price_level: editForm.price_level,
       capacity: editForm.capacity||null,
-
       google_maps_url: editForm.google_maps_url||null,
       instagram_url: editForm.instagram_url||null,
       reservation_url: editForm.reservation_url||null,
@@ -3648,6 +3673,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       dietary: editForm.dietary||[],
       tags: editForm.tags||[],
       website_url: editForm.website_url||null,
+      google_place_id: placeId,
     }).eq("id", editingVenue.id);
     if(error){
 
@@ -3947,6 +3973,25 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       {tab==="all"&&(
         <div className="scroll" style={{padding:"14px 20px 80px"}} ref={clScrollRef}
           onScroll={e=>saveScroll("cityLead",e.currentTarget)}>
+          <div style={{marginBottom:12,display:"flex",justifyContent:"flex-end"}}>
+            <button onClick={async()=>{
+              const toUpdate = (allVenues||[]).filter(v=>v.status==="active"&&!v.google_place_id&&v.name);
+              if(toUpdate.length===0){showToast("All venues already have Place IDs ✓");return;}
+              showToast(`Fetching Place IDs for ${toUpdate.length} venues...`);
+              let count=0;
+              for(const v of toUpdate){
+                const pid = await fetchPlaceId(v.name, v.address);
+                if(pid){
+                  await supabase.from("venues").update({google_place_id:pid}).eq("id",v.id);
+                  count++;
+                }
+                await new Promise(r=>setTimeout(r,200));
+              }
+              showToast(`Updated ${count} venues ✓`);
+            }} style={{background:"var(--black)",color:"white",border:"none",borderRadius:20,padding:"6px 14px",fontFamily:"var(--body)",fontSize:12,fontWeight:600,cursor:"pointer"}}>
+              🔍 auto-fill Place IDs
+            </button>
+          </div>
           <div className="input-wrap-light" style={{marginBottom:8}}>
             <span style={{color:"#888",fontSize:16}}>🔍</span>
             <input placeholder="Search venue..." value={clSearch} onChange={e=>setClSearch(e.target.value)}
