@@ -365,10 +365,8 @@ const CITIES = ["Budapest","Vienna","Prague"];
 
 async function fetchPlaceId(name, address) {
   try {
-    const query = encodeURIComponent(`${name} Budapest`);
-    const res = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${query}&inputtype=textquery&fields=place_id&key=AIzaSyCfYEBb75s8KMg_sOZ1Kv6rqQmR29o0FYI`);
-    const data = await res.json();
-    return data.candidates?.[0]?.place_id || null;
+    const result = await supabase.functions.invoke("place-id", { body: { name, address } });
+    return result.data?.place_id || null;
   } catch(e) { return null; }
 }
 
@@ -1433,18 +1431,21 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
     navigator.geolocation.getCurrentPosition(
       (pos)=>{
         const {latitude:lat, longitude:lng} = pos.coords;
-        fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyCfYEBb75s8KMg_sOZ1Kv6rqQmR29o0FYI&language=en`)
-          .then(r=>r.json())
-          .then(data=>{
-            const postalComp = data.results?.flatMap(r=>r.address_components||[]).find(c=>c.types?.includes("postal_code"));
-            const postal = postalComp?.short_name;
+        function runGeocode(){
+          if(!window.google?.maps) return false;
+          const geocoder = new window.google.maps.Geocoder();
+          geocoder.geocode({location:{lat,lng}}, (results, status)=>{
             let district = null;
-            if(postal){
-              const code=parseInt(postal);
-              if(code>=1011&&code<=1239){
-                const num=Math.floor((code-1000)/10);
-                const R=["","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"];
-                district=R[num]||null;
+            if(status==="OK"&&results){
+              const postalComp = results.flatMap(r=>r.address_components||[]).find(c=>c.types?.includes("postal_code"));
+              const postal = postalComp?.short_name;
+              if(postal){
+                const code=parseInt(postal);
+                if(code>=1011&&code<=1239){
+                  const num=Math.floor((code-1000)/10);
+                  const R=["","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"];
+                  district=R[num]||null;
+                }
               }
             }
             if(district){
@@ -1452,8 +1453,12 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
               if(!["V","VI","VII"].includes(district)) setShowMore(true);
             }
             setLocLoading(false);
-          })
-          .catch(()=>setLocLoading(false));
+          });
+          return true;
+        }
+        if(!runGeocode()){
+          const t=setInterval(()=>{ if(runGeocode()) clearInterval(t); },300);
+        }
       },
       ()=>setLocLoading(false),
       {enableHighAccuracy:true, timeout:10000, maximumAge:0}
