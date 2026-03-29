@@ -295,7 +295,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .divider{height:1px;background:rgba(0,0,0,.1);margin:4px 0;}
 .empty{text-align:center;padding:48px 20px;color:#888;}
 .empty-icon{font-size:44px;margin-bottom:12px;}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--white);padding:13px 26px;border-radius:50px;font-family:var(--body);font-size:14px;font-weight:600;letter-spacing:.02em;animation:popIn .25s ease both;white-space:nowrap;z-index:9999;max-width:320px;text-overflow:ellipsis;overflow:hidden;}
+.toast{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--white);padding:13px 26px;border-radius:50px;font-family:var(--body);font-size:14px;font-weight:600;letter-spacing:.02em;animation:popIn .25s ease both;white-space:nowrap;z-index:9999;max-width:320px;text-overflow:ellipsis;overflow:hidden;}
 .status-pill{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.04em;font-family:var(--body);}
 .pill-pending{background:#FFF3CD;color:#856404;}
 .pill-active{background:#D1E7DD;color:#0A3622;}
@@ -509,9 +509,27 @@ function useOpenStatus(placeId) {
     function fetchStatus(){
       if(!window.google?.maps?.places) return false;
       const svc = new window.google.maps.places.PlacesService(document.createElement("div"));
-      svc.getDetails({placeId, fields:["opening_hours"]}, (place, s)=>{
-        if(s==="OK"&&place?.opening_hours){
-          try { setStatus(place.opening_hours.isOpen()?"open":"closed"); } catch(e){}
+      svc.getDetails({placeId, fields:["opening_hours","utc_offset_minutes"]}, (place, s)=>{
+        if(s==="OK"&&place?.opening_hours?.periods){
+          try {
+            // Calculate current time in Budapest (CET/CEST)
+            const now = new Date();
+            const utcOffset = place.utc_offset_minutes ?? 60;
+            const localMinutes = now.getUTCHours()*60 + now.getUTCMinutes() + utcOffset;
+            const localDay = (now.getUTCDay() + Math.floor(localMinutes/1440)) % 7;
+            const timeOfDay = localMinutes % 1440;
+            const currentTime = Math.floor(timeOfDay/60)*100 + (timeOfDay%60);
+
+            const isOpen = place.opening_hours.periods.some(p=>{
+              if(p.open.day !== localDay) return false;
+              const openTime = p.open.time ? parseInt(p.open.time) : 0;
+              const closeTime = p.close ? parseInt(p.close.time) : 2359;
+              // Handle overnight (close < open)
+              if(closeTime < openTime) return currentTime >= openTime || currentTime < closeTime;
+              return currentTime >= openTime && currentTime < closeTime;
+            });
+            setStatus(isOpen?"open":"closed");
+          } catch(e){ try { setStatus(place.opening_hours.isOpen()?"open":"closed"); } catch(e2){} }
         }
       });
       return true;
@@ -3982,19 +4000,29 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
             <button onClick={async()=>{
               const toUpdate = (allVenues||[]).filter(v=>v.status==="active"&&!v.google_place_id?.trim()&&v.name);
               if(toUpdate.length===0){showToast("All venues already have Place IDs ✓");return;}
+              const BATCH = 10;
+              let count = 0;
+              let i = 0;
               showToast(`Fetching Place IDs for ${toUpdate.length} venues...`);
-              let count=0;
-              for(const v of toUpdate){
-                const pid = await fetchPlaceId(v.name, v.address);
-                console.log(`[place-id] ${v.name} → ${pid}`);
-                if(pid){
-                  const {error} = await supabase.from("venues").update({google_place_id:pid}).eq("id",v.id);
-                  if(!error) count++;
-                  else console.error(`[place-id] update error for ${v.name}:`, error);
+              async function processBatch(){
+                const slice = toUpdate.slice(i, i+BATCH);
+                for(const v of slice){
+                  const pid = await fetchPlaceId(v.name, v.address);
+                  if(pid){
+                    const {error} = await supabase.from("venues").update({google_place_id:pid}).eq("id",v.id);
+                    if(!error) count++;
+                  }
+                  await new Promise(r=>setTimeout(r,200));
                 }
-                await new Promise(r=>setTimeout(r,300));
+                i += BATCH;
+                if(i < toUpdate.length){
+                  showToast(`Progress: ${Math.min(i,toUpdate.length)}/${toUpdate.length}...`);
+                  setTimeout(processBatch, 1000);
+                } else {
+                  showToast(`Updated ${count} venues ✓`);
+                }
               }
-              showToast(`Updated ${count} venues ✓`);
+              processBatch();
             }} style={{background:"var(--black)",color:"white",border:"none",borderRadius:20,padding:"6px 14px",fontFamily:"var(--body)",fontSize:12,fontWeight:600,cursor:"pointer"}}>
               🔍 auto-fill Place IDs
             </button>
@@ -6064,8 +6092,8 @@ function App() {
       {user&&!appLoading&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)} menuOpen={showMenu}/>}
                 </>
       }
+      {toast&&<div className="toast">{toast}</div>}
     </div>
-    {toast&&<div className="toast">{toast}</div>}
     </>
   );
 }
