@@ -3980,7 +3980,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
           onScroll={e=>saveScroll("cityLead",e.currentTarget)}>
           <div style={{marginBottom:12,display:"flex",justifyContent:"flex-end"}}>
             <button onClick={async()=>{
-              const toUpdate = (allVenues||[]).filter(v=>v.status==="active"&&!v.google_place_id&&v.name);
+              const toUpdate = (allVenues||[]).filter(v=>v.status==="active"&&!v.google_place_id?.trim()&&v.name);
               if(toUpdate.length===0){showToast("All venues already have Place IDs ✓");return;}
               showToast(`Fetching Place IDs for ${toUpdate.length} venues...`);
               let count=0;
