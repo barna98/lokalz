@@ -16,7 +16,7 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <!-- Google Places API - replace with your own API key -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCfYEBb75s8KMg_sOZ1Kv6rqQmR29o0FYI&libraries=places&language=en" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5l6iOsve4-Ig5wSwZ5fboDDZ45V_PTUs&libraries=places&language=en" async defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;}
@@ -2752,7 +2752,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     if(!category||!tag) return;
     await supabase.from("category_tags").upsert({category,tag,count:1},{onConflict:"category,tag",ignoreDuplicates:false});
     // increment count
-    await supabase.rpc("increment_tag_count",{p_category:category,p_tag:tag}).catch(()=>{});
+    await supabase.rpc("increment_tag_count",{p_category:category,p_tag:tag}).then(()=>{}).catch?.(()=>{});
     setCategoryCustomTags(prev=>({
       ...prev,
       [category]: prev[category] ? [...new Set([...prev[category],tag])] : [tag]
