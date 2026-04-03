@@ -2608,14 +2608,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
               {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=><option key={s} value={s}>{s}</option>)}
             </select>
           )}
-          <select value={budget} onChange={e=>setBudget(e.target.value)} style={{background:"rgba(255,255,255,.1)",border:"none",borderRadius:50,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:budget?"white":"rgba(255,255,255,.5)",cursor:"pointer",outline:"none"}}>
-            <option value="">all prices</option>
-            {BUDGETS.map(b=><option key={b} value={b}>{b}</option>)}
-          </select>
-          <select value={district} onChange={e=>setDistrict(e.target.value)} style={{background:"rgba(255,255,255,.1)",border:"none",borderRadius:50,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:district?"white":"rgba(255,255,255,.5)",cursor:"pointer",outline:"none"}}>
-            <option value="">all districts</option>
-            {ALL_DISTRICTS.map(d=><option key={d} value={d}>{districtLabel(d)}</option>)}
-          </select>
+
           {category==="Restaurant"&&(
             <select value={cuisine} onChange={e=>setCuisine(e.target.value)} style={{background:"rgba(255,255,255,.1)",border:"none",borderRadius:50,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:cuisine?"white":"rgba(255,255,255,.5)",cursor:"pointer",outline:"none",animation:"fadeUp .2s ease both"}}>
               <option value="">all cuisines</option>
@@ -2624,8 +2617,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           )}
         </div>
       </div>
-      {viewMode==="map"&&(
-        <div style={{flex:1,position:"relative",overflow:"hidden"}}>
+      <div style={{flex:viewMode==="map"?1:0,position:"relative",overflow:"hidden",display:viewMode==="map"?"flex":"none",flexDirection:"column"}}>
           <div ref={mapRef} style={{position:"absolute",inset:0}}/>
           {/* Zoom + locate */}
           <div style={{position:"absolute",bottom:100,right:16,display:"flex",flexDirection:"column",gap:8}}>
@@ -2651,7 +2643,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
             </div>
           )}
         </div>
-      )}
+      </div>
       {viewMode==="list"&&<div className="scroll" style={{padding:"12px 20px 80px"}} ref={scrollRef}
         onScroll={e=>saveScroll("allVenues", e.currentTarget)}
         onTouchStart={e=>{ if(scrollRef.current?.scrollTop===0) window._avPullStart=e.touches[0].clientY; }}
