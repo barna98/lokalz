@@ -2492,47 +2492,60 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
   React.useEffect(()=>{ setTimeout(()=>restoreScroll("allVenues", scrollRef.current), 50); },[]);
 
   // Initialize map when switching to map view
+  const activeInfoRef = React.useRef(null);
+  const markersRef = React.useRef([]);
+
   React.useEffect(()=>{
     if(viewMode!=="map"||!mapRef.current) return;
     if(!window.google?.maps) return;
-    if(mapInstanceRef.current) {
-      // Update markers only
-      updateMarkers();
-      return;
-    }
-    const map = new window.google.maps.Map(mapRef.current, {
-      center:{lat:47.4979,lng:19.0402},
-      zoom:13,
-      disableDefaultUI:true,
-      zoomControl:true,
-      styles:[{featureType:"poi",elementType:"labels",stylers:[{visibility:"off"}]}],
-    });
-    mapInstanceRef.current = map;
-    updateMarkers();
 
-    function updateMarkers(){
-      const withCoords = (allVenues||[]).filter(v=>v.status==="active"&&v.latitude&&v.longitude);
-      withCoords.forEach(v=>{
-        const marker = new window.google.maps.Marker({
-          position:{lat:v.latitude,lng:v.longitude},
-          map:mapInstanceRef.current,
-          title:v.name,
-          icon:{
-            path:window.google.maps.SymbolPath.CIRCLE,
-            scale:8,
-            fillColor:"#DC2626",
-            fillOpacity:1,
-            strokeColor:"white",
-            strokeWeight:2,
-          }
-        });
-        const info = new window.google.maps.InfoWindow({
-          content:`<div style="font-family:sans-serif;padding:4px"><strong>${v.name}</strong><br/><span style="color:#666;font-size:12px">${v.category} · Dist. ${v.district}</span></div>`
-        });
-        marker.addListener("click",()=>{ info.open(mapInstanceRef.current,marker); });
+    if(!mapInstanceRef.current){
+      mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+        center:{lat:47.4979,lng:19.0402},
+        zoom:13,
+        disableDefaultUI:true,
+        zoomControl:true,
+        styles:[{featureType:"poi",elementType:"labels",stylers:[{visibility:"off"}]}],
       });
     }
-  },[viewMode, allVenues]);
+
+    // Clear existing markers
+    markersRef.current.forEach(m=>m.setMap(null));
+    markersRef.current = [];
+
+    // Apply same filters as list view
+    const withCoords = (allVenues||[]).filter(v=>{
+      if(v.status!=="active"||!v.latitude||!v.longitude) return false;
+      if(search){const q=search.toLowerCase();if(!(v.name||"").toLowerCase().includes(q)&&!(v.why||"").toLowerCase().includes(q)) return false;}
+      if(category&&v.category!==category) return false;
+      if(budget&&(v.price_level||"").trim()!==budget.trim()) return false;
+      if(district&&String(v.district).trim()!==String(district).trim()) return false;
+      return true;
+    });
+
+    withCoords.forEach(v=>{
+      const marker = new window.google.maps.Marker({
+        position:{lat:v.latitude,lng:v.longitude},
+        map:mapInstanceRef.current,
+        title:v.name,
+        icon:{path:window.google.maps.SymbolPath.CIRCLE,scale:8,fillColor:"#DC2626",fillOpacity:1,strokeColor:"white",strokeWeight:2}
+      });
+      const info = new window.google.maps.InfoWindow({
+        content:`<div style="font-family:sans-serif;padding:4px 2px"><strong style="font-size:14px">${v.name}</strong><br/><span style="color:#666;font-size:12px">${v.category} · Dist. ${v.district} · ${v.price_level||""}</span></div>`
+      });
+      marker.addListener("click",()=>{
+        if(activeInfoRef.current) activeInfoRef.current.close();
+        info.open(mapInstanceRef.current, marker);
+        activeInfoRef.current = info;
+      });
+      markersRef.current.push(marker);
+    });
+
+    // Close info on map click
+    mapInstanceRef.current.addListener("click",()=>{
+      if(activeInfoRef.current) activeInfoRef.current.close();
+    });
+  },[viewMode, allVenues, search, category, budget, district]);
 
 
   const CATEGORIES = ["Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"];
@@ -2570,17 +2583,17 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>all venues</div>
           </div>
-          <div style={{display:"flex",gap:6}}>
-            <button onClick={()=>setViewMode("list")} style={{background:viewMode==="list"?"var(--black)":"transparent",border:"1.5px solid var(--black)",borderRadius:20,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"white":"var(--black)"}}>
-              ☰ list
-            </button>
-            <button onClick={()=>setViewMode("map")} style={{background:viewMode==="map"?"var(--black)":"transparent",border:"1.5px solid var(--black)",borderRadius:20,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"white":"var(--black)"}}>
-              🗺 map
-            </button>
-          </div>
         </div>
       </div>
       <div style={{background:"var(--black)",padding:"12px 20px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
+        <div style={{display:"flex",gap:6,marginBottom:2}}>
+          <button onClick={()=>setViewMode("list")} style={{flex:1,background:viewMode==="list"?"white":"rgba(255,255,255,.15)",border:"none",borderRadius:20,padding:"7px 0",fontFamily:"var(--body)",fontSize:12,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.6)"}}>
+            ☰ list
+          </button>
+          <button onClick={()=>setViewMode("map")} style={{flex:1,background:viewMode==="map"?"white":"rgba(255,255,255,.15)",border:"none",borderRadius:20,padding:"7px 0",fontFamily:"var(--body)",fontSize:12,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.6)"}}>
+            🗺️ map
+          </button>
+        </div>
         <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.1)",borderRadius:50,padding:"8px 14px"}}>
           <span style={{color:"rgba(255,255,255,.5)",fontSize:13}}>🔍</span>
           <input placeholder="search..." value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
@@ -2613,8 +2626,8 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         </div>
       </div>
       {viewMode==="map"&&(
-        <div style={{flex:1,position:"relative"}}>
-          <div ref={mapRef} style={{width:"100%",height:"100%"}}/>
+        <div style={{flex:1,position:"relative",overflow:"hidden"}}>
+          <div ref={mapRef} style={{position:"absolute",inset:0}}/>
           {(allVenues||[]).filter(v=>v.status==="active"&&v.latitude&&v.longitude).length===0&&(
             <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,background:"white"}}>
               <div style={{fontSize:40}}>🗺️</div>
