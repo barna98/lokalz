@@ -2507,9 +2507,6 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         zoomControl:false,
         styles:[{featureType:"poi",elementType:"labels",stylers:[{visibility:"off"}]}],
       });
-    } else {
-      // Trigger resize when switching back to map view
-      window.google.maps.event.trigger(mapInstanceRef.current, "resize");
     }
 
     // Clear existing markers
@@ -2620,7 +2617,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           )}
         </div>
       </div>
-      <div style={{flex:1,position:"relative",overflow:"hidden",display:viewMode==="map"?"flex":"none"}}>
+      <div style={{flex:1,position:"relative",overflow:"hidden",display:viewMode==="map"?"flex":"none",flexDirection:"column"}}>
           <div ref={mapRef} style={{position:"absolute",inset:0}}/>
           {/* Zoom + locate */}
           <div style={{position:"absolute",bottom:100,right:16,display:"flex",flexDirection:"column",gap:8}}>
@@ -2645,7 +2642,6 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
               <div style={{fontFamily:"var(--body)",fontSize:14,color:"#888",textAlign:"center",padding:"0 32px"}}>No venues with coordinates yet. Run "auto-fill Place IDs" in City Lead first.</div>
             </div>
           )}
-        </div>
       </div>
       {viewMode==="list"&&<div className="scroll" style={{padding:"12px 20px 80px"}} ref={scrollRef}
         onScroll={e=>saveScroll("allVenues", e.currentTarget)}
