@@ -1257,8 +1257,8 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
                       width:150,
                       borderRadius:16,
                       overflow:"hidden",
-                      background:"white",
-                      boxShadow:"0 2px 8px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.04)",
+                      background:"var(--red)",
+                      boxShadow:"0 2px 8px rgba(220,38,38,.2)",
                       cursor:"pointer",
                       animation:`staggerUp .35s ${i*0.07}s cubic-bezier(.2,.8,.4,1) both`,
                       opacity:0,
@@ -1266,8 +1266,8 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
                     }}>
                     <RecentVenueThumb venueId={v.id} category={v.category}/>
                     <div style={{padding:"10px 12px 12px"}}>
-                      <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"var(--black)",lineHeight:1.2,marginBottom:3,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{v.name}</div>
-                      <div style={{fontFamily:"var(--body)",fontSize:11,color:"#888",fontWeight:400}}>{v.category} · Dist. {v.district}</div>
+                      <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"white",lineHeight:1.2,marginBottom:3,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{v.name}</div>
+                      <div style={{fontFamily:"var(--body)",fontSize:11,color:"rgba(255,255,255,.7)",fontWeight:400}}>{v.category} · Dist. {v.district}</div>
                     </div>
                   </div>
                 ))}
