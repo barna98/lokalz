@@ -633,17 +633,19 @@ function BottomNav({screen, navigate, onMenu, menuOpen}) {
     return screen===id;
   };
   return (
-    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"var(--black)",display:"flex",zIndex:200,paddingBottom:"env(safe-area-inset-bottom)"}}>
-      {tabs.map(t=>(
-        <button key={t.id}
-          onClick={()=>t.id==="menu"?onMenu():navigate(t.id)}
-          style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"10px 0 8px",background:"none",border:"none",cursor:"pointer",gap:4,transition:"transform .1s ease"}}
-          onTouchStart={e=>e.currentTarget.style.transform="scale(.88)"}
-          onTouchEnd={e=>e.currentTarget.style.transform=""}>
-          <NavIcon id={t.id} active={active(t.id)}/>
-          <span style={{fontFamily:"var(--body)",fontSize:10,fontWeight:active(t.id)?700:400,color:active(t.id)?"white":"rgba(255,255,255,.4)"}}>{t.label}</span>
-        </button>
-      ))}
+    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,display:"flex",zIndex:200,justifyContent:"center",paddingBottom:"calc(env(safe-area-inset-bottom) + 12px)",padding:"8px 16px calc(env(safe-area-inset-bottom) + 12px)"}}>
+      <div style={{background:"var(--black)",borderRadius:40,display:"flex",width:"100%",boxShadow:"0 4px 24px rgba(0,0,0,.25)"}}>
+        {tabs.map(t=>(
+          <button key={t.id}
+            onClick={()=>t.id==="menu"?onMenu():navigate(t.id)}
+            style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"10px 0 8px",background:"none",border:"none",cursor:"pointer",gap:4,transition:"transform .1s ease"}}
+            onTouchStart={e=>e.currentTarget.style.transform="scale(.88)"}
+            onTouchEnd={e=>e.currentTarget.style.transform=""}>
+            <NavIcon id={t.id} active={active(t.id)}/>
+            <span style={{fontFamily:"var(--body)",fontSize:10,fontWeight:active(t.id)?700:400,color:active(t.id)?"white":"rgba(255,255,255,.4)"}}>{t.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
