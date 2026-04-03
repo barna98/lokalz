@@ -1037,7 +1037,7 @@ function CityPickBox({label, cat, venues, navigate, isPremium}) {
       onTouchStart={e=>isPremium&&(e.currentTarget.style.transform="scale(.96)")}
       onTouchEnd={e=>e.currentTarget.style.transform=""}
       style={{
-        background:"var(--red)",border:"none",borderRadius:20,
+        background:"var(--black)",border:"none",borderRadius:20,
         cursor:isPremium&&venues.length>0?"pointer":"default",
         aspectRatio:"1/1",overflow:"hidden",display:"flex",flexDirection:"column",
         opacity:isPremium?(venues.length>0?1:.35):.35,
@@ -1045,20 +1045,20 @@ function CityPickBox({label, cat, venues, navigate, isPremium}) {
         userSelect:"none",
         transition:"transform .12s ease",
         position:"relative",
-        boxShadow:"0 2px 8px rgba(220,38,38,.2)",
+        boxShadow:"0 2px 8px rgba(0,0,0,.15)",
       }}>
       {/* Top: collage - 2 small left stacked, 1 large right */}
-      <div style={{flex:1,display:"grid",gridTemplateColumns:"1fr 1fr",gridTemplateRows:"1fr 1fr",gap:2,background:"rgba(0,0,0,.2)",overflow:"hidden"}}>
+      <div style={{flex:1,display:"grid",gridTemplateColumns:"1fr 1fr",gridTemplateRows:"1fr 1fr",gap:2,background:"rgba(255,255,255,.05)",overflow:"hidden"}}>
         {hasImgs ? <>
           {imgs[0]&&<div style={{background:`url(${imgs[0]}) center/cover`,backgroundSize:"cover"}}/>}
           {imgs[1]&&<div style={{background:`url(${imgs[1]}) center/cover`,backgroundSize:"cover",gridRow:"1/3"}}/>}
           {imgs[2]&&<div style={{background:`url(${imgs[2]}) center/cover`,backgroundSize:"cover"}}/>}
-        </> : <div style={{gridColumn:"1/-1",gridRow:"1/3",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,background:"rgba(0,0,0,.15)"}}>
+        </> : <div style={{gridColumn:"1/-1",gridRow:"1/3",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,background:"rgba(255,255,255,.05)"}}>
           {cat==="Restaurant"?"🍽":cat==="Bar"?"🍷":cat==="Bakery"?"🥐":cat==="Street food"?"🌮":"☕"}
         </div>}
       </div>
       {/* Bottom: red label strip */}
-      <div style={{padding:"10px 14px",background:"var(--red)",flexShrink:0}}>
+      <div style={{padding:"10px 14px",background:"var(--black)",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"white",lineHeight:1.1}}>{label}</div>
       </div>
     </div>
@@ -1157,13 +1157,13 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
         )}
 
         {/* Spacer */}
-        <div style={{minHeight:40}}/>
+        <div style={{minHeight:48}}/>
 
         {/* AI Search */}
         {(()=>{
           const isPremium = user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead"||partner;
           return (
-            <div style={{marginBottom:16}}>
+            <div style={{marginBottom:32}}>
               {/* Label */}
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
                 <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,letterSpacing:0,
@@ -1234,7 +1234,8 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
           );
         })()}
 
-        {/* City picks */}
+        <div style={{height:1,background:"rgba(0,0,0,.08)",margin:"0 4px 32px"}}/>
+
         {/* Recently added */}
         {(()=>{
           const recent = (allVenues||[])
@@ -1243,7 +1244,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
             .slice(0,8);
           if(recent.length===0) return null;
           return (
-            <div style={{marginTop:16,marginBottom:24}}>
+            <div style={{marginTop:0,marginBottom:32}}>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
                 <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>recently added</span>
                 <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:11,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20,letterSpacing:".04em"}}>NEW</span>
@@ -1276,8 +1277,10 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
           );
         })()}
 
-        <div style={{marginTop:16,marginBottom:100}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+        <div style={{height:1,background:"rgba(0,0,0,.08)",margin:"0 4px 32px"}}/>
+
+        <div style={{marginTop:0,marginBottom:100}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
             <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,letterSpacing:0,color:"var(--black)"}}>this week's ⭐ city picks</span>
             {!isPremium&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20}}>pro only</span>}
           </div>
