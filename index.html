@@ -2583,8 +2583,8 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
   const selectStyle={background:"white",border:"1.5px solid black",borderRadius:50,padding:"10px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",outline:"none",width:"100%",marginBottom:10};
 
   return (
-    <div className="screen" style={{background:"white"}}>
-      <div style={{background:"rgba(0,0,0,.72)",padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",flexShrink:0,display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}>
+    <div className="screen" style={{background:"white",position:"relative"}}>
+      <div style={{background:"rgba(0,0,0,.65)",padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",position:"absolute",top:0,left:0,right:0,zIndex:20,display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}>
         <div style={{display:"flex",gap:8,width:"100%",background:"rgba(255,255,255,.1)",borderRadius:50,padding:4}}>
           <button onClick={()=>setViewMode("map")} style={{flex:1,background:viewMode==="map"?"white":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.5)",transition:"all .2s"}}>
             🗺️ map
@@ -2625,7 +2625,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         </div>
       </div>
       {viewMode==="map"&&(
-        <div style={{flex:1,position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",inset:0,overflow:"hidden"}}>
           <div ref={mapRef} style={{position:"absolute",inset:0}}/>
           {/* Zoom + locate */}
           <div style={{position:"absolute",bottom:100,right:16,display:"flex",flexDirection:"column",gap:8}}>
