@@ -2581,18 +2581,18 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
   const selectStyle={background:"white",border:"1.5px solid black",borderRadius:50,padding:"10px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",outline:"none",width:"100%",marginBottom:10};
 
   return (
-    <div className="screen" style={{background:"white"}}>
-      <div style={{background:"rgba(0,0,0,.72)",padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",flexShrink:0,display:"flex",flexDirection:"column",gap:10,alignItems:"center"}}>
-        <div style={{display:"flex",gap:8,width:"100%",background:"rgba(255,255,255,.1)",borderRadius:50,padding:4}}>
-          <button onClick={()=>setViewMode("map")} style={{flex:1,background:viewMode==="map"?"white":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.5)",transition:"all .2s"}}>
+    <div className="screen" style={{background:"white",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",top:0,left:0,right:0,zIndex:10,padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",display:"flex",flexDirection:"column",gap:8,alignItems:"center"}}>
+        <div className="av-ctrl" style={{display:"flex",gap:8,width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4}}>
+          <button onClick={()=>setViewMode("map")} style={{flex:1,background:viewMode==="map"?"white":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.6)",transition:"all .2s"}}>
             🗺️ map
           </button>
-          <button onClick={()=>setViewMode("list")} style={{flex:1,background:viewMode==="list"?"white":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.5)",transition:"all .2s"}}>
+          <button onClick={()=>setViewMode("list")} style={{flex:1,background:viewMode==="list"?"white":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.6)",transition:"all .2s"}}>
             ☰ list
           </button>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.1)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
-          <span style={{color:"rgba(255,255,255,.5)",fontSize:13}}>🔍</span>
+        <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
+          <span style={{color:"rgba(255,255,255,.6)",fontSize:13}}>🔍</span>
           <input placeholder="search..." value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
@@ -2600,7 +2600,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
             const sel = category===c;
             return (
               <button key={c} onClick={()=>{setCategory(sel?"":c);setCuisine("");setSubcategory("");}}
-                style={{background:sel?"white":"rgba(255,255,255,.15)",border:sel?"none":"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>
+                style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.9)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>
                 {c}
               </button>
             );
@@ -2610,7 +2610,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
             {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=>{
               const sel=subcategory===s;
-              return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"white":"rgba(255,255,255,.1)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.7)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{s}</button>;
+              return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{s}</button>;
             })}
           </div>
         )}
@@ -2618,12 +2618,12 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
             {CUISINES_FILTER.map(c=>{
               const sel=cuisine===c;
-              return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"white":"rgba(255,255,255,.1)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.7)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{c}</button>;
+              return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{c}</button>;
             })}
           </div>
         )}
       </div>
-      <div style={{flex:1,position:"relative",overflow:"hidden",display:viewMode==="map"?"flex":"none",flexDirection:"column"}}>
+      <div style={{position:"absolute",inset:0,display:viewMode==="map"?"flex":"none",flexDirection:"column"}}>
           <div ref={mapRef} style={{position:"absolute",inset:0}}/>
           {/* Zoom + locate */}
           <div style={{position:"absolute",bottom:100,right:16,display:"flex",flexDirection:"column",gap:8}}>
@@ -2649,7 +2649,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
             </div>
           )}
       </div>
-      {viewMode==="list"&&<div className="scroll" style={{padding:"12px 20px 80px"}} ref={scrollRef}
+      {viewMode==="list"&&<div className="scroll" style={{position:"absolute",inset:0,padding:"12px 20px 80px",paddingTop:"calc(180px + env(safe-area-inset-top))"}} ref={scrollRef}
         onScroll={e=>saveScroll("allVenues", e.currentTarget)}
         onTouchStart={e=>{ if(scrollRef.current?.scrollTop===0) window._avPullStart=e.touches[0].clientY; }}
         onTouchEnd={e=>{
