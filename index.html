@@ -2507,6 +2507,9 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         zoomControl:false,
         styles:[{featureType:"poi",elementType:"labels",stylers:[{visibility:"off"}]}],
       });
+    } else {
+      // Trigger resize when switching back to map view
+      window.google.maps.event.trigger(mapInstanceRef.current, "resize");
     }
 
     // Clear existing markers
