@@ -366,7 +366,7 @@ const CITIES = ["Budapest","Vienna","Prague"];
 async function fetchPlaceId(name, address) {
   try {
     const result = await supabase.functions.invoke("place-id", { body: { name, address } });
-    return result.data?.place_id || null;
+    return result.data || null;
   } catch(e) { return null; }
 }
 
@@ -2485,8 +2485,54 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
   const [budget,setBudget]=useState("");
   const [district,setDistrict]=useState("");
   const [subcategory,setSubcategory]=useState("");
+  const [viewMode,setViewMode]=useState("list"); // "list" | "map"
   const scrollRef = React.useRef(null);
+  const mapRef = React.useRef(null);
+  const mapInstanceRef = React.useRef(null);
   React.useEffect(()=>{ setTimeout(()=>restoreScroll("allVenues", scrollRef.current), 50); },[]);
+
+  // Initialize map when switching to map view
+  React.useEffect(()=>{
+    if(viewMode!=="map"||!mapRef.current) return;
+    if(!window.google?.maps) return;
+    if(mapInstanceRef.current) {
+      // Update markers only
+      updateMarkers();
+      return;
+    }
+    const map = new window.google.maps.Map(mapRef.current, {
+      center:{lat:47.4979,lng:19.0402},
+      zoom:13,
+      disableDefaultUI:true,
+      zoomControl:true,
+      styles:[{featureType:"poi",elementType:"labels",stylers:[{visibility:"off"}]}],
+    });
+    mapInstanceRef.current = map;
+    updateMarkers();
+
+    function updateMarkers(){
+      const withCoords = (allVenues||[]).filter(v=>v.status==="active"&&v.latitude&&v.longitude);
+      withCoords.forEach(v=>{
+        const marker = new window.google.maps.Marker({
+          position:{lat:v.latitude,lng:v.longitude},
+          map:mapInstanceRef.current,
+          title:v.name,
+          icon:{
+            path:window.google.maps.SymbolPath.CIRCLE,
+            scale:8,
+            fillColor:"#DC2626",
+            fillOpacity:1,
+            strokeColor:"white",
+            strokeWeight:2,
+          }
+        });
+        const info = new window.google.maps.InfoWindow({
+          content:`<div style="font-family:sans-serif;padding:4px"><strong>${v.name}</strong><br/><span style="color:#666;font-size:12px">${v.category} · Dist. ${v.district}</span></div>`
+        });
+        marker.addListener("click",()=>{ info.open(mapInstanceRef.current,marker); });
+      });
+    }
+  },[viewMode, allVenues]);
 
 
   const CATEGORIES = ["Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"];
@@ -2524,6 +2570,14 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>all venues</div>
           </div>
+          <div style={{display:"flex",gap:6}}>
+            <button onClick={()=>setViewMode("list")} style={{background:viewMode==="list"?"var(--black)":"transparent",border:"1.5px solid var(--black)",borderRadius:20,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"white":"var(--black)"}}>
+              ☰ list
+            </button>
+            <button onClick={()=>setViewMode("map")} style={{background:viewMode==="map"?"var(--black)":"transparent",border:"1.5px solid var(--black)",borderRadius:20,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"white":"var(--black)"}}>
+              🗺 map
+            </button>
+          </div>
         </div>
       </div>
       <div style={{background:"var(--black)",padding:"12px 20px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
@@ -2558,7 +2612,18 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           )}
         </div>
       </div>
-      <div className="scroll" style={{padding:"12px 20px 80px"}} ref={scrollRef}
+      {viewMode==="map"&&(
+        <div style={{flex:1,position:"relative"}}>
+          <div ref={mapRef} style={{width:"100%",height:"100%"}}/>
+          {(allVenues||[]).filter(v=>v.status==="active"&&v.latitude&&v.longitude).length===0&&(
+            <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,background:"white"}}>
+              <div style={{fontSize:40}}>🗺️</div>
+              <div style={{fontFamily:"var(--body)",fontSize:14,color:"#888",textAlign:"center",padding:"0 32px"}}>No venues with coordinates yet. Run "auto-fill Place IDs" in City Lead first.</div>
+            </div>
+          )}
+        </div>
+      )}
+      {viewMode==="list"&&<div className="scroll" style={{padding:"12px 20px 80px"}} ref={scrollRef}
         onScroll={e=>saveScroll("allVenues", e.currentTarget)}
         onTouchStart={e=>{ if(scrollRef.current?.scrollTop===0) window._avPullStart=e.touches[0].clientY; }}
         onTouchEnd={e=>{
@@ -2576,7 +2641,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
             </div>
           ))
         }
-      </div>
+      </div>}
     </div>
   );
 }
@@ -2891,7 +2956,14 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     setEditSubmitting(true);
     // Auto-fetch google_place_id if not set
     let placeId = editingVenue.google_place_id||null;
-    if(!placeId && editForm.name) placeId = await fetchPlaceId(editForm.name, editForm.address);
+    let lat = editingVenue.latitude||null;
+    let lng = editingVenue.longitude||null;
+    if(!placeId && editForm.name) {
+      const pd = await fetchPlaceId(editForm.name, editForm.address);
+      placeId = pd?.place_id || null;
+      lat = pd?.latitude || lat;
+      lng = pd?.longitude || lng;
+    }
     const {error} = await supabase.from("venues").update({
       name: editForm.name,
       address: editForm.address,
@@ -2911,6 +2983,8 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       status: "pending",
       edit_comment: null,
       google_place_id: placeId,
+      latitude: lat,
+      longitude: lng,
     }).eq("id", editingVenue.id);
     setEditSubmitting(false);
     if(error){showToast("Error: "+error.message);return;}
@@ -3162,7 +3236,11 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         submitted_by: user?.id||null,
         status: "pending",
         occasions: customOccasion.trim() ? [...selOccasions, customOccasion.trim()] : selOccasions,
-        google_place_id: await fetchPlaceId(form.name, form.address),
+        ...await fetchPlaceId(form.name, form.address).then(pd=>({
+          google_place_id: pd?.place_id||null,
+          latitude: pd?.latitude||null,
+          longitude: pd?.longitude||null,
+        })).catch(()=>({google_place_id:null,latitude:null,longitude:null})),
       }).select().single();
       if(error) throw error;
       // Upload images if selected
@@ -3798,7 +3876,14 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
     setSaving(true);
     // Auto-fetch google_place_id if not already set
     let placeId = editingVenue.google_place_id||null;
-    if(!placeId && editForm.name) placeId = await fetchPlaceId(editForm.name, editForm.address);
+    let lat = editingVenue.latitude||null;
+    let lng = editingVenue.longitude||null;
+    if(!placeId && editForm.name) {
+      const pd = await fetchPlaceId(editForm.name, editForm.address);
+      placeId = pd?.place_id || null;
+      lat = pd?.latitude || lat;
+      lng = pd?.longitude || lng;
+    }
     const {error} = await supabase.from("venues").update({
       name: editForm.name,
       address: editForm.address,
@@ -3819,9 +3904,10 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       tags: editForm.tags||[],
       website_url: editForm.website_url||null,
       google_place_id: placeId,
+      latitude: lat,
+      longitude: lng,
     }).eq("id", editingVenue.id);
     if(error){
-
       showToast("Error: "+error.message+" | "+error.details+" | "+error.hint);
       setSaving(false);return;
     }
@@ -4129,9 +4215,13 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
               async function processBatch(){
                 const slice = toUpdate.slice(i, i+BATCH);
                 for(const v of slice){
-                  const pid = await fetchPlaceId(v.name, v.address);
-                  if(pid){
-                    const {error} = await supabase.from("venues").update({google_place_id:pid}).eq("id",v.id);
+                  const pd = await fetchPlaceId(v.name, v.address);
+                  if(pd?.place_id){
+                    const {error} = await supabase.from("venues").update({
+                      google_place_id: pd.place_id,
+                      latitude: pd.latitude||null,
+                      longitude: pd.longitude||null,
+                    }).eq("id",v.id);
                     if(!error) count++;
                   }
                   await new Promise(r=>setTimeout(r,200));
