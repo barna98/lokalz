@@ -2595,30 +2595,30 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           <span style={{color:"rgba(255,255,255,.5)",fontSize:13}}>🔍</span>
           <input placeholder="search..." value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
         </div>
-        <div style={{display:"flex",gap:6,flexWrap:"wrap",width:"100%"}}>
+        <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
           {CATEGORIES.map(c=>{
             const sel = category===c;
             return (
               <button key={c} onClick={()=>{setCategory(sel?"":c);setCuisine("");setSubcategory("");}}
-                style={{background:sel?"white":"rgba(255,255,255,.15)",border:sel?"none":"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}}>
+                style={{background:sel?"white":"rgba(255,255,255,.15)",border:sel?"none":"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>
                 {c}
               </button>
             );
           })}
         </div>
         {category==="Bar"&&(
-          <div style={{display:"flex",gap:6,flexWrap:"wrap",width:"100%"}}>
+          <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
             {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=>{
               const sel=subcategory===s;
-              return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"white":"rgba(255,255,255,.1)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.7)",cursor:"pointer",transition:"all .15s"}}>{s}</button>;
+              return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"white":"rgba(255,255,255,.1)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.7)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{s}</button>;
             })}
           </div>
         )}
         {category==="Restaurant"&&(
-          <div style={{display:"flex",gap:6,flexWrap:"wrap",width:"100%"}}>
+          <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
             {CUISINES_FILTER.map(c=>{
               const sel=cuisine===c;
-              return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"white":"rgba(255,255,255,.1)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.7)",cursor:"pointer",transition:"all .15s"}}>{c}</button>;
+              return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"white":"rgba(255,255,255,.1)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.7)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{c}</button>;
             })}
           </div>
         )}
