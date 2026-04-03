@@ -1244,8 +1244,9 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
           if(recent.length===0) return null;
           return (
             <div style={{marginTop:16,marginBottom:24}}>
-              <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:12}}>
-                recently added 🆕
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+                <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>recently added</span>
+                <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:11,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20,letterSpacing:".04em"}}>NEW</span>
               </div>
               <div style={{display:"flex",gap:12,overflowX:"auto",paddingBottom:8,scrollbarWidth:"none",WebkitOverflowScrolling:"touch"}}>
                 {recent.map((v,i)=>(
