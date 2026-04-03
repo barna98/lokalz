@@ -2505,7 +2505,10 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         zoom:13,
         disableDefaultUI:true,
         zoomControl:false,
-        styles:[{featureType:"poi",elementType:"labels",stylers:[{visibility:"off"}]}],
+        styles:[
+          {featureType:"poi",elementType:"all",stylers:[{visibility:"off"}]},
+          {featureType:"transit",elementType:"all",stylers:[{visibility:"off"}]},
+        ],
       });
     }
 
