@@ -2518,8 +2518,6 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
       if(v.status!=="active"||!v.latitude||!v.longitude) return false;
       if(search){const q=search.toLowerCase();if(!(v.name||"").toLowerCase().includes(q)&&!(v.why||"").toLowerCase().includes(q)) return false;}
       if(category&&v.category!==category) return false;
-      if(budget&&(v.price_level||"").trim()!==budget.trim()) return false;
-      if(district&&String(v.district).trim()!==String(district).trim()) return false;
       return true;
     });
 
@@ -2538,13 +2536,17 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           anchor: new window.google.maps.Point(12,22),
         }
       });
-      const info = new window.google.maps.InfoWindow({
-        content:`<div style="font-family:sans-serif;padding:4px 2px"><strong style="font-size:14px">${v.name}</strong><br/><span style="color:#666;font-size:12px">${v.category} · Dist. ${v.district} · ${v.price_level||""}</span></div>`
-      });
+      const infoDiv = document.createElement("div");
+      infoDiv.innerHTML = `<div style="font-family:sans-serif;padding:6px 4px;min-width:160px"><strong style="font-size:14px">${v.name}</strong><br/><span style="color:#666;font-size:12px">${v.category} · Dist. ${v.district}</span><br/><button id="info-btn-${v.id}" style="margin-top:8px;background:#DC2626;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:sans-serif">view →</button></div>`;
+      const info = new window.google.maps.InfoWindow({ content: infoDiv });
       marker.addListener("click",()=>{
         if(activeInfoRef.current) activeInfoRef.current.close();
         info.open(mapInstanceRef.current, marker);
         activeInfoRef.current = info;
+        setTimeout(()=>{
+          const btn = document.getElementById(`info-btn-${v.id}`);
+          if(btn) btn.addEventListener("click",()=>{ info.close(); navigate("venue",v); });
+        }, 100);
       });
       markersRef.current.push(marker);
     });
@@ -2553,7 +2555,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
     mapInstanceRef.current.addListener("click",()=>{
       if(activeInfoRef.current) activeInfoRef.current.close();
     });
-  },[viewMode, allVenues, search, category, budget, district]);
+  },[viewMode, allVenues, search, category, navigate]);
 
 
   const CATEGORIES = ["Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"];
@@ -2573,10 +2575,6 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
     if(subcategory&&v.subcategory!==subcategory) return false;
 
     if(cuisine&&v.cuisine!==cuisine) return false;
-    if(budget&&(v.price_level||v.price||"").trim()!==budget.trim()) return false;
-    if(district&&String(v.district).trim()!==String(district).trim()) return false;
-
-
     return true;
   });
   const sorted=[...filtered].sort((a,b)=>a.name.localeCompare(b.name));
@@ -2597,25 +2595,33 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           <span style={{color:"rgba(255,255,255,.5)",fontSize:13}}>🔍</span>
           <input placeholder="search..." value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
         </div>
-        <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"center",width:"100%"}}>
-          <select value={category} onChange={e=>{setCategory(e.target.value);setCuisine("");setSubcategory("");}} style={{background:"rgba(255,255,255,.1)",border:"none",borderRadius:50,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:category?"white":"rgba(255,255,255,.5)",cursor:"pointer",outline:"none"}}>
-            <option value="">all categories</option>
-            {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
-          </select>
-          {category==="Bar"&&(
-            <select value={subcategory||""} onChange={e=>setSubcategory(e.target.value)} style={{background:"rgba(255,255,255,.1)",border:"none",borderRadius:50,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:subcategory?"white":"rgba(255,255,255,.5)",cursor:"pointer",outline:"none"}}>
-              <option value="">all bar types</option>
-              {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=><option key={s} value={s}>{s}</option>)}
-            </select>
-          )}
-
-          {category==="Restaurant"&&(
-            <select value={cuisine} onChange={e=>setCuisine(e.target.value)} style={{background:"rgba(255,255,255,.1)",border:"none",borderRadius:50,padding:"6px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:cuisine?"white":"rgba(255,255,255,.5)",cursor:"pointer",outline:"none",animation:"fadeUp .2s ease both"}}>
-              <option value="">all cuisines</option>
-              {CUISINES_FILTER.map(c=><option key={c} value={c}>{c}</option>)}
-            </select>
-          )}
+        <div style={{display:"flex",gap:6,flexWrap:"wrap",width:"100%"}}>
+          {CATEGORIES.map(c=>{
+            const sel = category===c;
+            return (
+              <button key={c} onClick={()=>{setCategory(sel?"":c);setCuisine("");setSubcategory("");}}
+                style={{background:sel?"white":"rgba(255,255,255,.15)",border:sel?"none":"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap"}}>
+                {c}
+              </button>
+            );
+          })}
         </div>
+        {category==="Bar"&&(
+          <div style={{display:"flex",gap:6,flexWrap:"wrap",width:"100%"}}>
+            {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=>{
+              const sel=subcategory===s;
+              return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"white":"rgba(255,255,255,.1)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.7)",cursor:"pointer",transition:"all .15s"}}>{s}</button>;
+            })}
+          </div>
+        )}
+        {category==="Restaurant"&&(
+          <div style={{display:"flex",gap:6,flexWrap:"wrap",width:"100%"}}>
+            {CUISINES_FILTER.map(c=>{
+              const sel=cuisine===c;
+              return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"white":"rgba(255,255,255,.1)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.7)",cursor:"pointer",transition:"all .15s"}}>{c}</button>;
+            })}
+          </div>
+        )}
       </div>
       <div style={{flex:1,position:"relative",overflow:"hidden",display:viewMode==="map"?"flex":"none",flexDirection:"column"}}>
           <div ref={mapRef} style={{position:"absolute",inset:0}}/>
@@ -2649,7 +2655,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         onTouchEnd={e=>{
           if(window._avPullStart&&scrollRef.current?.scrollTop===0){
             const dist=e.changedTouches[0].clientY-window._avPullStart;
-            if(dist>60){ haptic("medium"); setSearch(""); setCategory(""); setCuisine(""); setBudget(""); setDistrict(""); setSubcategory(""); }
+            if(dist>60){ haptic("medium"); setSearch(""); setCategory(""); setCuisine(""); setSubcategory(""); }
           }
           window._avPullStart=null;
         }}>
