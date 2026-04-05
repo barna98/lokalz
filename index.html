@@ -912,7 +912,7 @@ function OnboardingScreen({navigate, user, setUser}) {
           The best spots in Budapest — curated by locals, not algorithms. No ads, no tourist traps.
         </div>
       </div>
-      <div style={{padding:"0 28px 48px"}}>
+      <div style={{padding:"0 28px calc(48px + env(safe-area-inset-bottom))"}}>
         <Dots/>
         <button className="btn-black" onClick={()=>setStep("intro2")}>next →</button>
       </div>
@@ -923,7 +923,7 @@ function OnboardingScreen({navigate, user, setUser}) {
   if(step==="intro2") return (
     <div className="screen" style={{background:"var(--bg)",padding:"0",display:"flex",flexDirection:"column"}}>
       <div style={{flex:1,display:"flex",flexDirection:"column",padding:"48px 32px 24px"}}>
-        <div className="logo" style={{textAlign:"center",marginBottom:32}}>Lokal&#39;z</div>
+        <div className="logo" style={{textAlign:"center",marginBottom:32}}>LOKAL&#39;Z</div>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:24,color:"var(--black)",marginBottom:28,textAlign:"center"}}>How it works</div>
         {[
           {icon:"🔍", title:"Discover", desc:"Tell us the vibe, occasion, and district. We'll find the perfect spot for you."},
@@ -939,7 +939,7 @@ function OnboardingScreen({navigate, user, setUser}) {
           </div>
         ))}
       </div>
-      <div style={{padding:"0 28px 48px"}}>
+      <div style={{padding:"0 28px calc(48px + env(safe-area-inset-bottom))"}}>
         <Dots/>
         <div style={{display:"flex",gap:10}}>
           <button onClick={()=>setStep("intro1")} style={{background:"none",border:"2px solid rgba(0,0,0,.2)",borderRadius:50,padding:"18px 22px",fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",color:"var(--black)"}}>←</button>
@@ -951,9 +951,9 @@ function OnboardingScreen({navigate, user, setUser}) {
 
   // City pick
   if(step==="city") return (
-    <div className="screen" style={{padding:"48px 28px 48px",justifyContent:"space-between"}}>
+    <div className="screen" style={{padding:`calc(48px + env(safe-area-inset-top)) 28px calc(48px + env(safe-area-inset-bottom))`,justifyContent:"space-between"}}>
       <div>
-        <div className="logo">Lokal&#39;z</div>
+        <div className="logo">LOKAL&#39;Z</div>
         <div style={{marginTop:32}}>
           <div style={{...BODY,fontSize:22,fontWeight:700,color:"var(--black)",marginBottom:4}}>Pick your city</div>
           <div style={{...BODY,fontSize:16,color:"#555",lineHeight:1.5}}>
@@ -984,9 +984,9 @@ function OnboardingScreen({navigate, user, setUser}) {
 
   // Badge pick (scouts only)
   return (
-    <div className="screen" style={{padding:"48px 28px 48px",justifyContent:"space-between"}}>
+    <div className="screen" style={{padding:`calc(48px + env(safe-area-inset-top)) 28px calc(48px + env(safe-area-inset-bottom))`,justifyContent:"space-between"}}>
       <div>
-        <div className="logo">Lokal&#39;z</div>
+        <div className="logo">LOKAL&#39;Z</div>
         <div style={{marginTop:32}}>
           <div style={{...BODY,fontSize:22,fontWeight:700,color:"var(--black)",marginBottom:4}}>Your scout badge</div>
           <div style={{...BODY,fontSize:16,color:"#555",lineHeight:1.5}}>
