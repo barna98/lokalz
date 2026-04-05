@@ -6321,7 +6321,7 @@ function App() {
         : <>
             {screens[screen]||screens.signin}
             {showMenu&&<Menu onClose={()=>setShowMenu(false)} navigate={navigate} role={user?.role||"explorer"} onSignOut={signOut}/>}
-      {user&&!appLoading&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)} menuOpen={showMenu}/>}
+      {user&&!appLoading&&screen!=="onboarding"&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)} menuOpen={showMenu}/>}
                 </>
       }
       {toast&&<div className="toast">{toast}</div>}
