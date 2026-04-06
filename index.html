@@ -1203,8 +1203,8 @@ function SignInScreen({navigate, onLogin}) {
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:160}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:2}}>{t("auth.login_with")}</div>
-        <input className="input-field" placeholder={t("auth.email")} type="email" value={email} onChange={e=>{setEmail(e.target.value);setError(null);}}/>
-        <input className="input-field" placeholder={t("auth.password")} type="password" value={pw} onChange={e=>{setPw(e.target.value);setError(null);}} onKeyDown={e=>e.key==="Enter"&&go()}/>
+        <input className="input-field" placeholder={t("auth.email")}} type="email" value={email} onChange={e=>{setEmail(e.target.value);setError(null);}}/>
+        <input className="input-field" placeholder={t("auth.password")}} type="password" value={pw} onChange={e=>{setPw(e.target.value);setError(null);}} onKeyDown={e=>e.key==="Enter"&&go()}/>
         {error&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"#c00",fontWeight:400,background:"rgba(255,0,0,.08)",padding:"10px 14px",borderRadius:10}}>{error}</div>}
         <div style={{display:"flex",justifyContent:"center"}}>
           <button style={{background:"black",color:"white",border:"none",borderRadius:50,padding:"12px 0",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:"pointer",width:"60%",opacity:loading?0.6:1}} onClick={go}>
@@ -1298,12 +1298,12 @@ function SignUpScreen({navigate, onLogin}) {
       <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:80}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:2}}>{t("auth.sign_up")}</div>
         <div style={{display:"flex",gap:10}}>
-          <input className="input-field" placeholder=t("auth.first_name") value={firstName} onChange={e=>setFirstName(e.target.value)} style={{flex:1}}/>
-          <input className="input-field" placeholder=t("auth.last_name") value={lastName} onChange={e=>setLastName(e.target.value)} style={{flex:1}}/>
+          <input className="input-field" placeholder={t("auth.first_name")} value={firstName} onChange={e=>setFirstName(e.target.value)} style={{flex:1}}/>
+          <input className="input-field" placeholder={t("auth.last_name")} value={lastName} onChange={e=>setLastName(e.target.value)} style={{flex:1}}/>
         </div>
-        <input className="input-field" placeholder={t("auth.email")} type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
-        <input className="input-field" placeholder={t("auth.password")} type="password" value={pw} onChange={e=>setPw(e.target.value)}/>
-        <input className="input-field" placeholder={t("auth.confirm_password")} type="password" value={pw2} onChange={e=>setPw2(e.target.value)}/>
+        <input className="input-field" placeholder={t("auth.email")}} type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
+        <input className="input-field" placeholder={t("auth.password")}} type="password" value={pw} onChange={e=>setPw(e.target.value)}/>
+        <input className="input-field" placeholder={t("auth.confirm_password")}} type="password" value={pw2} onChange={e=>setPw2(e.target.value)}/>
         <input className="input-field" type="date" value={dob} onChange={e=>setDob(e.target.value)}
           max={new Date().toISOString().split("T")[0]}
           lang="en-GB"
@@ -3088,7 +3088,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         </div>
         <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
           <span style={{color:"rgba(255,255,255,.6)",fontSize:13}}>🔍</span>
-          <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
+          <input placeholder={t("search.placeholder")}} value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
           {CATEGORIES.map(c=>{
@@ -4682,7 +4682,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
                     <textarea
                       value={editComment[v.id]||""}
                       onChange={e=>setEditComment(prev=>({...prev,[v.id]:e.target.value}))}
-                      placeholder={t("cl.edit_placeholder")}
+                      placeholder={t("cl.edit_placeholder")}}
                       rows={3}
                       style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"10px 12px",fontFamily:"var(--body)",fontSize:13,fontWeight:600,resize:"none",outline:"none",marginBottom:6}}
                     />
@@ -5135,7 +5135,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
               <input
                 value={newName}
                 onChange={e=>setNewName(e.target.value)}
-                placeholder={t("profile.new_name")}
+                placeholder={t("profile.new_name")}}
                 style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
               <button onClick={async()=>{
                 if(!newName.trim()) return showMsg("Name cannot be empty.",true);
@@ -5170,9 +5170,9 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
           </div>
           {editing==="password"&&(
             <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
-              <input type="password" placeholder={t("profile.new_password")} value={newPassword} onChange={e=>setNewPassword(e.target.value)}
+              <input type="password" placeholder={t("profile.new_password")}} value={newPassword} onChange={e=>setNewPassword(e.target.value)}
                 style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:8,outline:"none"}}/>
-              <input type="password" placeholder={t("profile.confirm_password")} value={newPassword2} onChange={e=>setNewPassword2(e.target.value)}
+              <input type="password" placeholder={t("profile.confirm_password")}} value={newPassword2} onChange={e=>setNewPassword2(e.target.value)}
                 style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
               <button onClick={savePassword} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
                 {saving?t("btn.saving"):t("btn.save_password")}
@@ -5230,7 +5230,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
           :<div style={{border:"1.5px solid var(--red)",borderRadius:20,padding:16}}>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--red)",marginBottom:8}}>{t("profile.are_you_sure")}</div>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"#888",marginBottom:12}}>{t("profile.type_delete")}</div>
-            <input placeholder={t("profile.type_delete_placeholder")} value={deleteConfirm} onChange={e=>setDeleteConfirm(e.target.value)}
+            <input placeholder={t("profile.type_delete_placeholder")}} value={deleteConfirm} onChange={e=>setDeleteConfirm(e.target.value)}
               className="input-field" style={{marginBottom:10}}/>
             <div style={{display:"flex",gap:8}}>
               <button onClick={deleteAccount} style={{flex:1,background:"var(--red)",color:"white",border:"none",borderRadius:50,padding:"12px",fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",opacity:deleteConfirm==="delete"?1:.5}}>
@@ -5697,7 +5697,7 @@ function PartnerActivateScreen({partner, navigate, user, onActivate, showToast})
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",letterSpacing:0,marginBottom:8}}>PIN CODE</div>
           <input
             className="input-field"
-            placeholder={t("misc.enter_pin")}
+            placeholder={t("misc.enter_pin")}}
             value={pin}
             onChange={e=>{setPin(e.target.value);setError(null);}}
             maxLength={8}
