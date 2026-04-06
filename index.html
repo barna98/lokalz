@@ -323,7 +323,331 @@ const SUPABASE_URL = "https://fljuckkagktvopquvqjs.supabase.co";
 const SUPABASE_KEY = "sb_publishable_IzCTiaNEH3RXKq9GJrTmEA_7cLYV_VI";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ── i18n ───────────────────────────────────────
+let _lang = localStorage.getItem("lokalz_lang") || "en";
+function setLang(l){ _lang = l; localStorage.setItem("lokalz_lang", l); }
+function t(key){ return (TRANSLATIONS[_lang]||TRANSLATIONS.en)[key] || TRANSLATIONS.en[key] || key; }
 
+const TRANSLATIONS = {
+  en: {
+    // Nav
+    "nav.home": "home", "nav.saved": "saved", "nav.menu": "menu",
+    // Auth
+    "auth.login": t("auth.login"), "auth.signup": t("auth.signup"), "auth.signin": t("auth.signin"),
+    "auth.signing_in": t("auth.signing_in"), "auth.signing_up": t("auth.signing_up"),
+    "auth.password_mismatch": t("auth.password_mismatch"),
+    "auth.password_short": t("auth.password_short"),
+    "auth.email": "email", "auth.password": "password", "auth.confirm_password": "confirm password",
+    "auth.name": "your name",
+    "auth.dob": "date of birth",
+    "auth.no_account": "No account?", "auth.have_account": "Already have an account?",
+    // Onboarding
+    "onboard.beyond": "Beyond the obvious.",
+    "onboard.tagline": "The best spots in Budapest — curated by locals, not algorithms. No ads, no tourist traps.",
+    "onboard.how_it_works": "How it works",
+    "onboard.discover_title": "Discover", "onboard.discover_desc": "Tell us the vibe, occasion, and district. We'll find the perfect spot for you.",
+    "onboard.save_title": "Save", "onboard.save_desc": "Save your favourite spots and come back to them anytime.",
+    "onboard.explore_title": "Explore", "onboard.explore_desc": "Uncover Budapest's hidden gems through the eyes of local scouts.",
+    "onboard.pick_city": "Pick your city", "onboard.pick_city_desc": "{t("onboard.pick_city_desc")}",
+    "onboard.scout_badge": "Your scout badge", "onboard.scout_badge_desc": "{t("onboard.scout_badge_desc")}",
+    // Buttons
+    "btn.next": "next →", "btn.lets_go": "let's go →", "btn.saving": "saving...",
+    "btn.loading": "loading...", "btn.submitting": t("btn.submitting"), "btn.sending": t("btn.sending"),
+    "btn.cancel": t("btn.cancel"), "btn.back": "back", "btn.save": "save",
+    "btn.edit": "edit", "btn.delete": "delete", "btn.submit": "submit",
+    "btn.approve": "approve", "btn.reject": "reject", "btn.share": "share",
+    "btn.report": "⚑ report", "btn.follow": "+ FOLLOW", "btn.following": "✓ FOLLOWING",
+    "btn.save_changes": t("btn.save_changes"), "btn.save_profile": t("btn.save_profile"),
+    "btn.save_name": t("btn.save_name"), "btn.save_password": t("btn.save_password"), "btn.save_city": t("btn.save_city"),
+    "btn.submit_review": t("btn.submit_review"), "btn.submit_approval": t("btn.submit_approval"),
+    "btn.send_report": t("btn.send_report"), "btn.add_event": t("btn.add_event"),
+    "btn.save_changes_arrow": t("btn.save_changes_arrow"),
+    // Map / List
+    "map.map": "🗺️ map", "map.list": "☰ list",
+    // Search
+    "search.placeholder": t("search.placeholder"),
+    // Venue
+    "venue.open_now": "open now", "venue.closed": "closed",
+    "venue.no_venues": t("venue.no_venues"),
+    "venue.dist": "Dist.",
+    "venue.district": "District",
+    "venue.near_me": t("venue.near_me"),
+    "venue.recently_added": t("venue.recently_added"),
+    "venue.city_picks": t("venue.city_picks"),
+    // Home
+    "home.discover_title": "Discover", "home.discover_desc": "Tell us the vibe, occasion, and district. We'll find the perfect spot for you.",
+    "home.save_title": "Save", "home.explore_title": "Explore",
+    "home.all_venues": t("home.all_venues"),
+    "home.event_calendar": t("home.event_calendar"),
+    // Q screens
+    "q.what_kind": t("q.what_kind"),
+    "q.what_occasion": t("q.what_occasion"),
+    "q.where": t("q.where"),
+    "q.anywhere": t("q.anywhere"),
+    "q.more_districts": t("q.more_districts"),
+    "q.group_size": t("q.group_size"),
+    "q.budget": t("q.budget"),
+    "q.dietary": t("q.dietary"),
+    "q.skip": t("q.skip"),
+    "q.find_spot": t("q.find_spot"),
+    "q.finding": t("q.finding"),
+    "q.ai_placeholder": "e.g. cozy café to work from in the 7th district",
+    // Results
+    "results.title": t("results.title"),
+    "results.no_results": t("results.no_results"),
+    "results.try_again": t("results.try_again"),
+    "results.see_all": t("results.see_all"),
+    // Saved
+    "saved.title": t("saved.title"),
+    "saved.empty": t("saved.empty"),
+    "saved.empty_sub": t("saved.empty_sub"),
+    // Profile
+    "profile.title": "profile",
+    "profile.language": "language",
+    "profile.sign_out": "sign out",
+    "profile.change_name": "change name",
+    "profile.change_password": "change password",
+    "profile.change_city": "change city",
+    "profile.new_name": "New name",
+    "profile.new_password": "New password",
+    "profile.confirm_password": "Confirm new password",
+    "profile.upgrade": "upgrade to explorer pro",
+    "profile.explorer_pro": "explorer pro",
+    // Scout
+    "scout.my_submissions": t("scout.my_submissions"),
+    "scout.no_submissions": t("scout.no_submissions"),
+    "scout.add_venue": "add a venue",
+    "scout.resubmit": t("scout.resubmit"),
+    "scout.activity": t("scout.activity"),
+    "scout.events": "events",
+    "scout.venues_tab": "venues",
+    "scout.approved": t("scout.approved"), "scout.pending": t("status.pending"),
+    // City lead
+    "cl.pending_review": "pending review",
+    "cl.all_venues": "all venues",
+    "cl.approve": t("cl.approve"),
+    "cl.reject": t("cl.reject"),
+    "cl.request_edit": t("cl.request_edit"),
+    "cl.send_edit": t("cl.send_edit"),
+    "cl.edit_placeholder": t("cl.edit_placeholder"),
+    "cl.search_venues": t("cl.search_venues"),
+    "cl.autofill_places": t("cl.autofill_places"),
+    "cl.batch_filling": t("cl.batch_filling"),
+    // Status pills
+    "status.pending": "Pending", "status.active": "Active",
+    "status.rejected": t("status.rejected"), "status.needs_edit": t("status.needs_edit"),
+    // Report types
+    "report.closed": "Report closed", "report.wrong_info": "Wrong info", "report.duplicate": "Duplicate",
+    // Toast messages
+    "toast.saved": t("toast.saved"), "toast.removed": t("toast.removed"),
+    "toast.submitted": t("toast.submitted"),
+    "toast.resubmitted": t("toast.resubmitted"),
+    "toast.report_sent": t("toast.report_sent"),
+    "toast.feedback": t("toast.feedback"),
+    "toast.event_submitted": t("toast.event_submitted"),
+    "toast.event_approved": t("toast.event_approved"),
+    "toast.image_uploaded": t("toast.image_uploaded"),
+    "toast.link_copied": t("toast.link_copied"),
+    "toast.event_created": t("toast.event_created"),
+    "toast.error": "Error: ",
+    // Empty states
+    "empty.no_scouts": "No followed scouts yet.\nVisit a scout's profile to follow them.",
+    "empty.no_coords": "No venues with coordinates yet. Run \"auto-fill Place IDs\" in City Lead first.",
+    // Menu
+    "menu.all_venues": t("menu.all_venues"), "menu.event_calendar": t("menu.event_calendar"),
+    "menu.scouts": t("menu.scouts"), "menu.about": t("menu.about"),
+    "menu.city_lead": t("menu.city_lead"), "menu.scout_dashboard": t("menu.scout_dashboard"),
+    // Misc
+    "misc.or": "or", "misc.more": t("q.more_districts"),
+    "misc.last_updated": t("misc.last_updated"),
+    "misc.no_image": "No venues with coordinates yet.",
+    "misc.enter_pin": t("misc.enter_pin"),
+  },
+  hu: {
+    "nav.home": "főoldal", "nav.saved": "mentett", "nav.menu": "menü",
+    "auth.login": "bejelentkezés", "auth.signup": "regisztráció", "auth.signin": "bejelentkezés",
+    "auth.signing_in": "belépés...", "auth.signing_up": "regisztrálás...",
+    "auth.password_mismatch": "A jelszavak nem egyeznek.",
+    "auth.password_short": "A jelszónak legalább 6 karakter hosszúnak kell lennie.",
+    "auth.email": "email", "auth.password": "jelszó", "auth.confirm_password": "jelszó megerősítése",
+    "auth.name": "neved", "auth.dob": "születési dátum",
+    "auth.no_account": "Nincs fiókod?", "auth.have_account": "Van már fiókod?",
+    "onboard.beyond": "A nyilvánvalón túl.",
+    "onboard.tagline": "Budapest legjobb helyei — helyiek által válogatva, nem algoritmusok. Nincs reklám, nincs turistacsapda.",
+    "onboard.how_it_works": "Hogyan működik",
+    "onboard.discover_title": "Fedezd fel", "onboard.discover_desc": "Mondd el a hangulatot, az alkalmat és a kerületet. Megtaláljuk a tökéletes helyet.",
+    "onboard.save_title": "Mentsd el", "onboard.save_desc": "Mentsd el a kedvenc helyeidet és térj vissza hozzájuk bármikor.",
+    "onboard.explore_title": "Fedezd fel", "onboard.explore_desc": "Tárd fel Budapest rejtett kincseit a helyi scouток szemével.",
+    "onboard.pick_city": "Válassz várost", "onboard.pick_city_desc": "Megmutatjuk a legjobb közeli helyeket.",
+    "onboard.scout_badge": "A scout jelvényed", "onboard.scout_badge_desc": "Válaszd ki, amelyik a legjobban illik hozzád. Ez megjelenik minden általad hozzáadott helyen.",
+    "btn.next": "tovább →", "btn.lets_go": "induljunk →", "btn.saving": "mentés...",
+    "btn.loading": "töltés...", "btn.submitting": "küldés...", "btn.sending": "küldés...",
+    "btn.cancel": "mégse", "btn.back": "vissza", "btn.save": "mentés",
+    "btn.edit": "szerkesztés", "btn.delete": "törlés", "btn.submit": "beküldés",
+    "btn.approve": "jóváhagyás", "btn.reject": "elutasítás", "btn.share": "megosztás",
+    "btn.report": "⚑ jelentés", "btn.follow": "+ KÖVETÉS", "btn.following": "✓ KÖVETED",
+    "btn.save_changes": "VÁLTOZÁSOK MENTÉSE", "btn.save_profile": "profil mentése",
+    "btn.save_name": "név mentése", "btn.save_password": "jelszó mentése", "btn.save_city": "város mentése",
+    "btn.submit_review": "beküldés ellenőrzésre", "btn.submit_approval": "beküldés jóváhagyásra →",
+    "btn.send_report": "jelentés küldése", "btn.add_event": "+ esemény hozzáadása",
+    "btn.save_changes_arrow": "változások mentése →",
+    "map.map": "🗺️ térkép", "map.list": "☰ lista",
+    "search.placeholder": "keresés...",
+    "venue.open_now": "nyitva", "venue.closed": "zárva",
+    "venue.no_venues": "nincs találat",
+    "venue.dist": "Ker.", "venue.district": "Kerület",
+    "venue.near_me": "közel hozzám",
+    "venue.recently_added": "legutóbb hozzáadva",
+    "venue.city_picks": "a hét ⭐ city pickjei",
+    "home.discover_title": "Felfedezés", "home.discover_desc": "Mondd el a hangulatot, az alkalmat és a kerületet. Megtaláljuk a tökéletes helyet.",
+    "home.save_title": "Mentés", "home.explore_title": "Felfedezés",
+    "home.all_venues": "Böngészd a teljes válogatott listát",
+    "home.event_calendar": "Fedezd fel a helyi eseményeket",
+    "q.what_kind": "Milyen helyre gondolsz?",
+    "q.what_occasion": "Mi az alkalom?",
+    "q.where": "Hol Budapesten?",
+    "q.anywhere": "Bárhol Budapesten",
+    "q.more_districts": "több kerület...",
+    "q.group_size": "Hányan vagytok?",
+    "q.budget": "Mekkora a büdzsé?",
+    "q.dietary": "Van-e étkezési igény?",
+    "q.skip": "kihagyás →",
+    "q.find_spot": "keress helyet →",
+    "q.finding": "keresés...",
+    "q.ai_placeholder": "pl. hangulatos kávézó ahol dolgozni lehet a 7. kerületben",
+    "results.title": "íme a helyed",
+    "results.no_results": "Nincs találat a keresésedre.",
+    "results.try_again": "próbáld újra",
+    "results.see_all": "összes →",
+    "saved.title": "mentett helyek",
+    "saved.empty": "Még nincsenek mentett helyek.",
+    "saved.empty_sub": "Szívezz egy helyet, hogy ide kerüljön.",
+    "profile.title": "profil", "profile.language": "nyelv",
+    "profile.sign_out": "kijelentkezés", "profile.change_name": "név módosítása",
+    "profile.change_password": "jelszó módosítása", "profile.change_city": "város módosítása",
+    "profile.new_name": "Új név", "profile.new_password": "Új jelszó",
+    "profile.confirm_password": "Új jelszó megerősítése",
+    "profile.upgrade": "váltás explorer pro-ra", "profile.explorer_pro": "explorer pro",
+    "scout.my_submissions": "beküldéseim", "scout.no_submissions": "Még nincs beküldés.",
+    "scout.add_venue": "hely hozzáadása", "scout.resubmit": "✏ Szerkesztés & Újraküldés",
+    "scout.activity": "aktivitás", "scout.events": "események", "scout.venues_tab": "helyek",
+    "scout.approved": "Jóváhagyva", "scout.pending": "Várakozó",
+    "cl.pending_review": "ellenőrzésre vár", "cl.all_venues": "összes hely",
+    "cl.approve": "✓ jóváhagy", "cl.reject": "✗ elutasít",
+    "cl.request_edit": "szerkesztés kérése", "cl.send_edit": "küldés",
+    "cl.edit_placeholder": "Írd le, mi változzon...",
+    "cl.search_venues": "helyek keresése...", "cl.autofill_places": "Place ID-k automatikus kitöltése",
+    "cl.batch_filling": "kitöltés...",
+    "status.pending": "Várakozó", "status.active": "Aktív",
+    "status.rejected": "Elutasított", "status.needs_edit": "Szerkesztés szükséges",
+    "report.closed": "Zárva jelzés", "report.wrong_info": "Hibás info", "report.duplicate": "Duplikátum",
+    "toast.saved": "mentve ♥", "toast.removed": "eltávolítva",
+    "toast.submitted": "Beküldve ellenőrzésre ✓", "toast.resubmitted": "Újraküldve ellenőrzésre ✓",
+    "toast.report_sent": "Jelentés elküldve ✓ Köszönjük!", "toast.feedback": "Visszajelzés elküldve ✓",
+    "toast.event_submitted": "Esemény beküldve jóváhagyásra ✓", "toast.event_approved": "Esemény jóváhagyva ✓",
+    "toast.image_uploaded": "Kép feltöltve ✓", "toast.link_copied": "Meghívó link másolva! 🔗",
+    "toast.event_created": "Esemény létrehozva! 🎉", "toast.error": "Hiba: ",
+    "empty.no_scouts": "Még nem követsz scoutot.\nLátogass meg egy scout profilját a követéshez.",
+    "empty.no_coords": "Még nincs koordinátás hely. Futtasd az \"Place ID-k automatikus kitöltése\" funkciót.",
+    "menu.all_venues": "Összes hely", "menu.event_calendar": "Eseménynaptár",
+    "menu.scouts": "Scoutok", "menu.about": "Névjegy",
+    "menu.city_lead": t("menu.city_lead"), "menu.scout_dashboard": "Scout irányítópult",
+    "misc.or": "vagy", "misc.more": "több kerület...",
+    "misc.last_updated": "Utoljára frissítve:", "misc.enter_pin": "PIN megadása",
+  },
+  es: {
+    "nav.home": "inicio", "nav.saved": "guardados", "nav.menu": "menú",
+    "auth.login": "iniciar sesión", "auth.signup": "registrarse", "auth.signin": "iniciar sesión",
+    "auth.signing_in": "iniciando...", "auth.signing_up": "registrando...",
+    "auth.password_mismatch": "Las contraseñas no coinciden.",
+    "auth.password_short": "La contraseña debe tener al menos 6 caracteres.",
+    "auth.email": "email", "auth.password": "contraseña", "auth.confirm_password": "confirmar contraseña",
+    "auth.name": "tu nombre", "auth.dob": "fecha de nacimiento",
+    "auth.no_account": "¿No tienes cuenta?", "auth.have_account": "¿Ya tienes cuenta?",
+    "onboard.beyond": "Más allá de lo obvio.",
+    "onboard.tagline": "Los mejores lugares de Budapest — curados por locales, no algoritmos. Sin anuncios, sin trampas turísticas.",
+    "onboard.how_it_works": "Cómo funciona",
+    "onboard.discover_title": "Descubre", "onboard.discover_desc": "Dinos el ambiente, la ocasión y el distrito. Encontraremos el lugar perfecto.",
+    "onboard.save_title": "Guarda", "onboard.save_desc": "Guarda tus lugares favoritos y vuelve a ellos cuando quieras.",
+    "onboard.explore_title": "Explora", "onboard.explore_desc": "Descubre las joyas ocultas de Budapest a través de los ojos de los scouts locales.",
+    "onboard.pick_city": "Elige tu ciudad", "onboard.pick_city_desc": "Te mostraremos los mejores lugares cercanos.",
+    "onboard.scout_badge": "Tu insignia de scout", "onboard.scout_badge_desc": "Elige la que mejor te represente. Aparecerá en cada lugar que añadas.",
+    "btn.next": "siguiente →", "btn.lets_go": "¡vamos! →", "btn.saving": "guardando...",
+    "btn.loading": "cargando...", "btn.submitting": "enviando...", "btn.sending": "enviando...",
+    "btn.cancel": "cancelar", "btn.back": "volver", "btn.save": "guardar",
+    "btn.edit": "editar", "btn.delete": "eliminar", "btn.submit": "enviar",
+    "btn.approve": "aprobar", "btn.reject": "rechazar", "btn.share": "compartir",
+    "btn.report": "⚑ reportar", "btn.follow": "+ SEGUIR", "btn.following": "✓ SIGUIENDO",
+    "btn.save_changes": "GUARDAR CAMBIOS", "btn.save_profile": "guardar perfil",
+    "btn.save_name": "guardar nombre", "btn.save_password": "guardar contraseña", "btn.save_city": "guardar ciudad",
+    "btn.submit_review": "enviar para revisión", "btn.submit_approval": "enviar para aprobación →",
+    "btn.send_report": "enviar reporte", "btn.add_event": "+ añadir evento",
+    "btn.save_changes_arrow": "guardar cambios →",
+    "map.map": "🗺️ mapa", "map.list": "☰ lista",
+    "search.placeholder": "buscar...",
+    "venue.open_now": "abierto ahora", "venue.closed": "cerrado",
+    "venue.no_venues": "sin resultados",
+    "venue.dist": "Dist.", "venue.district": "Distrito",
+    "venue.near_me": "cerca de mí",
+    "venue.recently_added": "añadidos recientemente",
+    "venue.city_picks": "⭐ selecciones de la semana",
+    "home.discover_title": "Descubre", "home.discover_desc": "Dinos el ambiente, la ocasión y el distrito. Encontraremos el lugar perfecto.",
+    "home.save_title": "Guarda", "home.explore_title": "Explora",
+    "home.all_venues": "Explora la lista curada completa",
+    "home.event_calendar": "Descubre eventos locales",
+    "q.what_kind": "¿Qué tipo de lugar buscas?",
+    "q.what_occasion": "¿Cuál es la ocasión?",
+    "q.where": "¿Dónde en Budapest?",
+    "q.anywhere": "En cualquier lugar de Budapest",
+    "q.more_districts": "más distritos...",
+    "q.group_size": "¿Cuántos sois?",
+    "q.budget": "¿Cuál es el presupuesto?",
+    "q.dietary": "¿Alguna necesidad dietética?",
+    "q.skip": "saltar →",
+    "q.find_spot": "encuentra mi lugar →",
+    "q.finding": "buscando...",
+    "q.ai_placeholder": "ej. café acogedor para trabajar en el distrito 7",
+    "results.title": "aquí está tu lugar",
+    "results.no_results": "Ningún lugar coincide con tu búsqueda.",
+    "results.try_again": "intentar de nuevo",
+    "results.see_all": "ver todos →",
+    "saved.title": "lugares guardados",
+    "saved.empty": "Aún no hay lugares guardados.",
+    "saved.empty_sub": "Dale a ♡ a un lugar para guardarlo aquí.",
+    "profile.title": "perfil", "profile.language": "idioma",
+    "profile.sign_out": "cerrar sesión", "profile.change_name": "cambiar nombre",
+    "profile.change_password": "cambiar contraseña", "profile.change_city": "cambiar ciudad",
+    "profile.new_name": "Nuevo nombre", "profile.new_password": "Nueva contraseña",
+    "profile.confirm_password": "Confirmar nueva contraseña",
+    "profile.upgrade": "mejorar a explorer pro", "profile.explorer_pro": "explorer pro",
+    "scout.my_submissions": "mis envíos", "scout.no_submissions": "Sin envíos todavía.",
+    "scout.add_venue": "añadir lugar", "scout.resubmit": "✏ Editar y Reenviar",
+    "scout.activity": "actividad", "scout.events": "eventos", "scout.venues_tab": "lugares",
+    "scout.approved": "Aprobado", "scout.pending": "Pendiente",
+    "cl.pending_review": "pendiente de revisión", "cl.all_venues": "todos los lugares",
+    "cl.approve": "✓ aprobar", "cl.reject": "✗ rechazar",
+    "cl.request_edit": "solicitar edición", "cl.send_edit": "enviar",
+    "cl.edit_placeholder": "Describe qué necesita cambiarse...",
+    "cl.search_venues": "buscar lugares...", "cl.autofill_places": "auto-rellenar Place IDs",
+    "cl.batch_filling": "rellenando...",
+    "status.pending": "Pendiente", "status.active": "Activo",
+    "status.rejected": "Rechazado", "status.needs_edit": "Necesita edición",
+    "report.closed": "Reportar cerrado", "report.wrong_info": "Info incorrecta", "report.duplicate": "Duplicado",
+    "toast.saved": "guardado ♥", "toast.removed": "eliminado",
+    "toast.submitted": "Enviado para revisión ✓", "toast.resubmitted": "Reenviado para revisión ✓",
+    "toast.report_sent": "Reporte enviado ✓ ¡Gracias!", "toast.feedback": "Comentario enviado ✓",
+    "toast.event_submitted": "Evento enviado para aprobación ✓", "toast.event_approved": "Evento aprobado ✓",
+    "toast.image_uploaded": "Imagen subida ✓", "toast.link_copied": "¡Enlace de invitación copiado! 🔗",
+    "toast.event_created": "¡Evento creado! 🎉", "toast.error": "Error: ",
+    "empty.no_scouts": "Aún no sigues a ningún scout.\nVisita el perfil de un scout para seguirlo.",
+    "empty.no_coords": "Aún no hay lugares con coordenadas. Ejecuta \"auto-rellenar Place IDs\" primero.",
+    "menu.all_venues": "Todos los lugares", "menu.event_calendar": "Calendario de eventos",
+    "menu.scouts": t("menu.scouts"), "menu.about": "Acerca de",
+    "menu.city_lead": t("menu.city_lead"), "menu.scout_dashboard": "Panel de scout",
+    "misc.or": "o", "misc.more": "más distritos...",
+    "misc.last_updated": "Última actualización:", "misc.enter_pin": "Introducir PIN",
+  },
+};
 const OCCASIONS = [
   {id:"Casual dining",        label:"Casual dining",        illus:"dinner"},
   {id:"Fine dining",          label:"Fine dining",           illus:"date"},
@@ -355,7 +679,7 @@ const SCOUT_BADGES = [
 ];
 const DISTRICTS_MAIN = ["near me","V","VI","VII"];
 const ALL_DISTRICTS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"];
-function districtLabel(d){ return d==="near me"?d:"District "+d+"."; }
+function districtLabel(d){ return d==="near me"?d:t("venue.district")+" "+d+"."; }
 const BUDGETS = ["$","$$","$$$","$$$$"];
 const DIETARY_OPTIONS = ["Gluten-free","Vegan","Vegetarian","Halal","Kosher","Dairy-free","Nut-free","Pescatarian"];
 const TAGS = ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Cocktails","Wine bar","Speakeasy","Live music","Good music","Good for groups","Romantic","Lively","Upscale","Scenic","Underrated","Aesthetic","Outdoor seating","Indoor seating"];
@@ -499,7 +823,7 @@ function Hamburger({onClick}) {
 
 function StatusPill({status}) {
   const map={pending:"pill-pending",active:"pill-active",rejected:"pill-rejected",needs_edit:"pill-needs_edit"};
-  const labels={pending:"Pending",active:"Active",rejected:"Rejected",needs_edit:"Needs Edit"};
+  const labels={pending:t("status.pending"),active:t("status.active"),rejected:t("status.rejected"),needs_edit:t("status.needs_edit")};
   return <span className={`status-pill ${map[status]||""}`}>{labels[status]||status}</span>;
 }
 
@@ -606,10 +930,10 @@ function VenueCard({venue, onClick}) {
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:6,gap:8}}>
           <div className="venue-meta" style={{flex:1}}>
             <span>{venue.category||venue.cuisine}</span><span>·</span>
-            <span>Dist. {venue.district}</span><span>·</span>
+            <span>{t("venue.dist")} {venue.district}</span><span>·</span>
             <span>{venue.price_level||venue.price}</span>
             {openStatus&&<span style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:11,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"2px 7px",borderRadius:10}}>
-              {openStatus==="open"?"open now":"closed"}
+              {openStatus==="open"?t("venue.open_now"):t("venue.closed")}
             </span>}
           </div>
           <div style={{display:"flex",gap:5,flexShrink:0}}>
@@ -640,11 +964,11 @@ function NavIcon({id, active}) {
 
 function BottomNav({screen, navigate, onMenu, menuOpen}) {
   const tabs = [
-    {id:"home",       label:"home"},
+    {id:"home",       label:t("nav.home")},
     {id:"q1",         label:"discover"},
-    {id:"saved",      label:"saved"},
+    {id:"saved",      label:t("nav.saved")},
     {id:"all_venues", label:"all venues"},
-    {id:"menu",       label:"menu"},
+    {id:"menu",       label:t("nav.menu")},
   ];
   const active = (id) => {
     if(menuOpen) return id==="menu";
@@ -678,7 +1002,7 @@ function Menu({onClose, navigate, role, onSignOut}) {
     <div style={{position:"absolute",inset:0,background:"white",zIndex:101,animation:"fadeIn .22s ease",display:"flex",flexDirection:"column",padding:"0 28px 80px"}}>
       <div style={{padding:"20px 0 0"}}/>
       <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none",marginTop:8}}>LOKAL&#39;Z</div>
-      <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:40}}>Beyond the obvious.</div>
+      <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:40}}>{t("onboard.beyond")}</div>
 
       <div style={{display:"flex",flexDirection:"column",gap:0,paddingLeft:8}}>
         <div style={itemStyle} onClick={()=>{navigate("profile");onClose();}}>profile</div>
@@ -702,7 +1026,7 @@ function Menu({onClose, navigate, role, onSignOut}) {
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"var(--black)",cursor:"pointer"}} onClick={()=>{navigate("about");onClose();}}>about us</div>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"var(--black)",cursor:"pointer"}}>help</div>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"var(--black)",cursor:"pointer"}}>privacy policy</div>
-        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",cursor:"pointer",marginTop:4}} onClick={()=>{onSignOut();onClose();}}>sign out</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",cursor:"pointer",marginTop:4}} onClick={()=>{onSignOut();onClose();}}>{t("profile.sign_out")}</div>
       </div>
     </div>
   );
@@ -750,16 +1074,16 @@ function SignInScreen({navigate, onLogin}) {
     <div className="screen" style={{padding:"80px 28px 32px",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
       <div>
         <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none"}}>LOKAL&#39;Z</div>
-        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10}}>Beyond the obvious.</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10}}>{t("onboard.beyond")}</div>
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:160}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:2}}>login with...</div>
-        <input className="input-field" placeholder="e-mail" type="email" value={email} onChange={e=>{setEmail(e.target.value);setError(null);}}/>
-        <input className="input-field" placeholder="password" type="password" value={pw} onChange={e=>{setPw(e.target.value);setError(null);}} onKeyDown={e=>e.key==="Enter"&&go()}/>
+        <input className="input-field" placeholder={t("auth.email")} type="email" value={email} onChange={e=>{setEmail(e.target.value);setError(null);}}/>
+        <input className="input-field" placeholder={t("auth.password")} type="password" value={pw} onChange={e=>{setPw(e.target.value);setError(null);}} onKeyDown={e=>e.key==="Enter"&&go()}/>
         {error&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"#c00",fontWeight:400,background:"rgba(255,0,0,.08)",padding:"10px 14px",borderRadius:10}}>{error}</div>}
         <div style={{display:"flex",justifyContent:"center"}}>
           <button style={{background:"black",color:"white",border:"none",borderRadius:50,padding:"12px 0",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:"pointer",width:"60%",opacity:loading?0.6:1}} onClick={go}>
-            {loading ? "signing in..." : "login"}
+            {loading ? t("auth.signing_in") : t("auth.login")}
           </button>
         </div>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:4,marginBottom:2}}>or...</div>
@@ -805,8 +1129,8 @@ function SignUpScreen({navigate, onLogin}) {
 
   async function go() {
     if(!firstName||!lastName||!email||!pw) return setError("Please fill in all required fields.");
-    if(pw!==pw2) return setError("Passwords don't match.");
-    if(pw.length<6) return setError("Password must be at least 6 characters.");
+    if(pw!==pw2) return setError(t("auth.password_mismatch"));
+    if(pw.length<6) return setError(t("auth.password_short"));
     setLoading(true);
     setError(null);
     const fullName = firstName.trim()+" "+lastName.trim();
@@ -844,7 +1168,7 @@ function SignUpScreen({navigate, onLogin}) {
     <div className="screen" style={{padding:"80px 28px 32px",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
       <div>
         <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none"}}>LOKAL&#39;Z</div>
-        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10}}>Beyond the obvious.</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10}}>{t("onboard.beyond")}</div>
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:80}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:2}}>sign up</div>
@@ -852,9 +1176,9 @@ function SignUpScreen({navigate, onLogin}) {
           <input className="input-field" placeholder="first name" value={firstName} onChange={e=>setFirstName(e.target.value)} style={{flex:1}}/>
           <input className="input-field" placeholder="last name" value={lastName} onChange={e=>setLastName(e.target.value)} style={{flex:1}}/>
         </div>
-        <input className="input-field" placeholder="e-mail" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
-        <input className="input-field" placeholder="password" type="password" value={pw} onChange={e=>setPw(e.target.value)}/>
-        <input className="input-field" placeholder="confirm password" type="password" value={pw2} onChange={e=>setPw2(e.target.value)}/>
+        <input className="input-field" placeholder={t("auth.email")} type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
+        <input className="input-field" placeholder={t("auth.password")} type="password" value={pw} onChange={e=>setPw(e.target.value)}/>
+        <input className="input-field" placeholder={t("auth.confirm_password")} type="password" value={pw2} onChange={e=>setPw2(e.target.value)}/>
         <input className="input-field" type="date" value={dob} onChange={e=>setDob(e.target.value)}
           max={new Date().toISOString().split("T")[0]}
           lang="en-GB"
@@ -862,7 +1186,7 @@ function SignUpScreen({navigate, onLogin}) {
         {error&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"#c00",fontWeight:400,background:"rgba(255,0,0,.08)",padding:"10px 14px",borderRadius:10}}>{error}</div>}
         <div style={{display:"flex",justifyContent:"center"}}>
           <button style={{background:"black",color:"white",border:"none",borderRadius:50,padding:"12px 0",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:"pointer",width:"60%",opacity:loading?0.6:1}} onClick={go}>
-            {loading ? "signing up..." : "sign up"}
+            {loading ? t("auth.signing_up") : t("auth.signup")}
           </button>
         </div>
       </div>
@@ -927,10 +1251,10 @@ function OnboardingScreen({navigate, user, setUser}) {
         <div className="logo" style={{textAlign:"center",marginBottom:32}}>LOKAL&#39;Z</div>
         <div style={{fontSize:56,marginBottom:24}}>🗺️</div>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:24,color:"var(--black)",textAlign:"center",lineHeight:1.2,marginBottom:16}}>
-          Beyond the obvious.
+          {t("onboard.beyond")}
         </div>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:16,color:"#555",textAlign:"center",lineHeight:1.6}}>
-          The best spots in Budapest — curated by locals, not algorithms. No ads, no tourist traps.
+          {t("onboard.tagline")}
         </div>
       </div>
       <div style={{padding:"0 28px calc(48px + env(safe-area-inset-bottom))"}}>
@@ -945,11 +1269,11 @@ function OnboardingScreen({navigate, user, setUser}) {
     <div className="screen" style={{background:"var(--bg)",padding:"0",display:"flex",flexDirection:"column"}}>
       <div style={{flex:1,display:"flex",flexDirection:"column",padding:"48px 32px 24px"}}>
         <div className="logo" style={{textAlign:"center",marginBottom:32}}>LOKAL&#39;Z</div>
-        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:24,color:"var(--black)",marginBottom:28,textAlign:"center"}}>How it works</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:24,color:"var(--black)",marginBottom:28,textAlign:"center"}}>{t("onboard.how_it_works")}</div>
         {[
-          {icon:"🔍", title:"Discover", desc:"Tell us the vibe, occasion, and district. We'll find the perfect spot for you."},
-          {icon:"❤️", title:"Save", desc:"Save your favourite spots and come back to them anytime."},
-          {icon:"🧭", title:"Explore", desc:"Uncover Budapest's hidden gems through the eyes of local scouts."},
+          {icon:"🔍", title:t("onboard.discover_title"), desc:t("onboard.discover_desc")},
+          {icon:"❤️", title:t("onboard.save_title"), desc:t("onboard.save_desc")},
+          {icon:"🧭", title:t("onboard.explore_title"), desc:t("onboard.explore_desc")},
         ].map(({icon,title,desc})=>(
           <div key={title} style={{display:"flex",gap:16,marginBottom:24,alignItems:"flex-start"}}>
             <div style={{fontSize:32,flexShrink:0,width:40,textAlign:"center"}}>{icon}</div>
@@ -976,9 +1300,9 @@ function OnboardingScreen({navigate, user, setUser}) {
       <div>
         <div className="logo">LOKAL&#39;Z</div>
         <div style={{marginTop:32}}>
-          <div style={{...BODY,fontSize:22,fontWeight:700,color:"var(--black)",marginBottom:4}}>Pick your city</div>
+          <div style={{...BODY,fontSize:22,fontWeight:700,color:"var(--black)",marginBottom:4}}>{t("onboard.pick_city")}</div>
           <div style={{...BODY,fontSize:16,color:"#555",lineHeight:1.5}}>
-            We'll show you the best spots nearby.
+            {t("onboard.pick_city_desc")}
           </div>
         </div>
         <div style={{display:"flex",gap:6,marginTop:16}}>
@@ -998,7 +1322,7 @@ function OnboardingScreen({navigate, user, setUser}) {
         if(isScout){ setStep("badge"); return; }
         await saveAndNavigate(city, null);
       }} style={{opacity:city?1:.4}}>
-        {isScout ? "next →" : (saving?"saving...":"let's go →")}
+        {isScout ? t("btn.next") : (saving?t("btn.saving"):t("btn.lets_go"))}
       </button>
     </div>
   );
@@ -1009,9 +1333,9 @@ function OnboardingScreen({navigate, user, setUser}) {
       <div>
         <div className="logo">LOKAL&#39;Z</div>
         <div style={{marginTop:32}}>
-          <div style={{...BODY,fontSize:22,fontWeight:700,color:"var(--black)",marginBottom:4}}>Your scout badge</div>
+          <div style={{...BODY,fontSize:22,fontWeight:700,color:"var(--black)",marginBottom:4}}>{t("onboard.scout_badge")}</div>
           <div style={{...BODY,fontSize:16,color:"#555",lineHeight:1.5}}>
-            Pick the one that fits you best. This shows on every place you add.
+            {t("onboard.scout_badge_desc")}
           </div>
         </div>
         <Dots/>
@@ -1034,7 +1358,7 @@ function OnboardingScreen({navigate, user, setUser}) {
       <div style={{display:"flex",gap:10,flexShrink:0,paddingTop:8}}>
         <button onClick={()=>setStep("city")} style={{background:"none",border:"2px solid rgba(0,0,0,.2)",borderRadius:50,padding:"18px 22px",fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",color:"var(--black)"}}>←</button>
         <button className="btn-black" onClick={()=>saveAndNavigate(city,badge)} style={{flex:1,opacity:badge?1:.4}}>
-          {saving?"saving...":"let's go →"}
+          {saving?t("btn.saving"):t("btn.lets_go")}
         </button>
       </div>
     </div>
@@ -1128,7 +1452,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
       const VALID_OCC = ["Casual dining","Fine dining","Dinner with friends","Date night","Lunch","Breakfast and brunch","Quick bite","Coffee","Quiet work spot","Pre-drinks / drinks","Late night","Celebration","Family outing"];
       const VALID_TAGS = ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Cocktails","Wine bar","Speakeasy","Live music","Good music","Good for groups","Romantic","Lively","Upscale","Scenic","Underrated","Aesthetic","Outdoor seating","Indoor seating"];
       const VALID_CUI = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","Italian","French","Spanish","Greek","Mexican","American","Hungarian","Middle Eastern","Mediterranean"];
-      const VALID_DIS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","Anywhere in Budapest"];
+      const VALID_DIS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV",t("q.anywhere")];
       const VALID_DIE = ["Gluten-free","Vegan","Vegetarian","Halal","Kosher","Dairy-free","Nut-free","Pescatarian"];
       const VALID_BUD = ["$","$$","$$$","$$$$"];
       const VALID_GRP = ["solo","2","3-6","6-8","9+"];
@@ -1169,7 +1493,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
       </div>
       <div className="scroll" style={{padding:"8px 28px 0"}}>
         <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none"}}>LOKAL&#39;Z</div>
-        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:0}}>Beyond the obvious.</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:0}}>{t("onboard.beyond")}</div>
 
         {/* Partner badge */}
         {partner&&(
@@ -1291,7 +1615,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
                     <RecentVenueThumb venueId={v.id} category={v.category}/>
                     <div style={{padding:"10px 12px 12px"}}>
                       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"white",lineHeight:1.2,marginBottom:3,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{v.name}</div>
-                      <div style={{fontFamily:"var(--body)",fontSize:11,color:"rgba(255,255,255,.7)",fontWeight:400}}>{v.category} · Dist. {v.district}</div>
+                      <div style={{fontFamily:"var(--body)",fontSize:11,color:"rgba(255,255,255,.7)",fontWeight:400}}>{v.category} · {t("venue.dist")} {v.district}</div>
                     </div>
                   </div>
                 ))}
@@ -1401,7 +1725,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
           <div/>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("onboard.beyond")}</div>
           </div>
         </div>
       </div>
@@ -1499,7 +1823,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
           <button onClick={()=>navigate("q1")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("onboard.beyond")}</div>
           </div>
         </div>
       </div>
@@ -1599,7 +1923,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
           <button onClick={()=>navigate("q2")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("onboard.beyond")}</div>
           </div>
         </div>
       </div>
@@ -1609,11 +1933,11 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
       </div>
       <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
         <button onClick={detectLocation}
-          style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&!["Anywhere in Budapest"].includes(sel[0])&&sel.length===1?"var(--black)":"white",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&!["Anywhere in Budapest"].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid black"}}>
+          style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--black)":"white",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid black"}}>
           <span>{locLoading?"📍 locating...":"📍 detect my location"}</span>
           {!locLoading&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,background:"var(--bg)",color:"var(--black)",padding:"2px 8px",borderRadius:20}}>GPS</span>}
         </button>
-        {DISTRICTS_MAIN.filter(d=>d!=="near me").map(d=>(
+        {DISTRICTS_MAIN.filter(d=>d!==t("venue.near_me")).map(d=>(
           <button key={d} style={{...PILL,background:sel.includes(d)?"var(--black)":"white",color:sel.includes(d)?"white":"var(--black)"}} onClick={()=>toggle(d)}>
             <span>{districtLabel(d)}</span>{sel.includes(d)&&<span>✓</span>}
           </button>
@@ -1626,8 +1950,8 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
             <span>{districtLabel(d)}</span>{sel.includes(d)&&<span>✓</span>}
           </button>
         ))}
-        <button style={{...PILL,background:sel.includes("Anywhere in Budapest")?"var(--black)":"white",color:sel.includes("Anywhere in Budapest")?"white":"var(--black)",fontWeight:700}} onClick={()=>toggle("Anywhere in Budapest")}>
-          <span>surprise me</span>{sel.includes("Anywhere in Budapest")&&<span>✓</span>}
+        <button style={{...PILL,background:sel.includes(t("q.anywhere"))?"var(--black)":"white",color:sel.includes(t("q.anywhere"))?"white":"var(--black)",fontWeight:700}} onClick={()=>toggle(t("q.anywhere"))}>
+          <span>surprise me</span>{sel.includes(t("q.anywhere"))&&<span>✓</span>}
         </button>
       </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
@@ -1684,7 +2008,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
           <button onClick={()=>navigate("q3")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
               <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("onboard.beyond")}</div>
             </div>
         </div>
       </div>
@@ -1718,7 +2042,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
           <button onClick={()=>navigate("q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
               <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("onboard.beyond")}</div>
             </div>
         </div>
       </div>
@@ -1751,7 +2075,7 @@ function Q6Screen({navigate, onMenu, answers, setAnswers}) {
           <button onClick={()=>navigate(answers.category==="Restaurant"?"q5":"q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
               <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("onboard.beyond")}</div>
             </div>
         </div>
       </div>
@@ -1811,7 +2135,7 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
     if(answers.group && !capacityMatches(v.capacity, answers.group)) return false;
 
     // 6. District/location — normalizált összehasonlítás (pl. "District V." == district "V")
-    if(answers.locations?.length>0 && !answers.locations.includes("Anywhere in Budapest") && !answers.locations.includes("near me")) {
+    if(answers.locations?.length>0 && !answers.locations.includes(t("q.anywhere")) && !answers.locations.includes("near me")) {
       if(!answers.locations.some(l=>String(l).trim()===String(v.district).trim())) return false;
     }
     // 7. Dietary
@@ -1907,7 +2231,7 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
           <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>Beyond the obvious.</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("onboard.beyond")}</div>
           </div>
         </div>
       </div>
@@ -1916,7 +2240,7 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
         {(()=>{
           const pills = [];
           if(answers.category) pills.push(answers.category);
-          if(answers.locations?.length>0&&!answers.locations.includes("Anywhere in Budapest")) pills.push(...answers.locations.map(l=>`Dist. ${l}`));
+          if(answers.locations?.length>0&&!answers.locations.includes(t("q.anywhere"))) pills.push(...answers.locations.map(l=>`${t("venue.dist")} ${l}`));
           if(answers.budgets?.length>0) pills.push(...answers.budgets);
           if(answers.occasions?.length>0) pills.push(answers.occasions[0]);
           if(pills.length===0) return null;
@@ -1941,15 +2265,15 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
           <div className="empty">
             <div className="empty-icon">😕</div>
             <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:700,color:"var(--black)",marginBottom:8}}>
-              No {answers.category||"venues"} found{answers.locations?.length>0&&!answers.locations.includes("Anywhere in Budapest")?" in this area":""}.
+              No {answers.category||"venues"} found{answers.locations?.length>0&&!answers.locations.includes(t("q.anywhere"))?" in this area":""}.
             </div>
             <div style={{fontFamily:"var(--body)",fontSize:13,color:"#888",textAlign:"center",marginBottom:16,lineHeight:1.5}}>
               Try relaxing your filters.
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8,width:"100%",marginBottom:16,alignItems:"center"}}>
-              {answers.locations?.length>0&&!answers.locations.includes("Anywhere in Budapest")&&(
+              {answers.locations?.length>0&&!answers.locations.includes(t("q.anywhere"))&&(
                 <button style={{background:"white",border:"1.5px solid black",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer"}}
-                  onClick={()=>{setAnswers(a=>({...a,locations:["Anywhere in Budapest"]}));setShownCount(BATCH);}}>
+                  onClick={()=>{setAnswers(a=>({...a,locations:[t("q.anywhere")]}));setShownCount(BATCH);}}>
                   🗺️ try anywhere in Budapest
                 </button>
               )}
@@ -2036,7 +2360,7 @@ function ScoutFeedbackSection({venue, user, showToast}) {
       }
     }
     setSubmitting(false);
-    showToast("Feedback submitted ✓");
+    showToast(t("toast.feedback"));
   }
 
   const options = [
@@ -2146,7 +2470,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
     }
     setShowReport(false);
     setReportType("");
-    showToast("Report sent ✓ Thank you!");
+    showToast(t("toast.report_sent"));
   }
 
   useEffect(()=>{
@@ -2210,7 +2534,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           </div>
         )}
         <button className="back-btn" style={{position:"absolute",top:16,left:16,background:"rgba(0,0,0,.4)",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:22}} onClick={()=>navigate(-1)}>‹</button>
-        <button onClick={()=>{haptic("medium");toggleSave(venue.id);showToast(saved?"removed":"saved ♥");}}
+        <button onClick={()=>{haptic("medium");toggleSave(venue.id);showToast(saved?t("toast.removed"):t("toast.saved"));}}
           style={{position:"absolute",top:16,right:16,background:"rgba(0,0,0,.4)",border:"none",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,color:saved?"#F97B30":"white"}}>
           {saved?"♥":"♡"}
         </button>
@@ -2221,14 +2545,14 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",marginBottom:6}}>
           <div style={{fontFamily:"var(--display)",fontSize:"36px",color:"var(--red)",lineHeight:1,letterSpacing:0}}>{venue.name}</div>
           {openStatus&&<span style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:12,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"3px 10px",borderRadius:12,flexShrink:0}}>
-            {openStatus==="open"?"open now":"closed"}
+            {openStatus==="open"?t("venue.open_now"):t("venue.closed")}
           </span>}
         </div>
 
         {/* 2. Category pills */}
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
           <span className="venue-tag">{venue.subcategory||venue.category||venue.cuisine}</span>
-          <span className="venue-tag">Dist. {venue.district}</span>
+          <span className="venue-tag">{t("venue.dist")} {venue.district}</span>
           <span className="venue-tag">{venue.price_level||venue.price}</span>
           {venue.is_city_pick&&(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&<span className="venue-tag" style={{background:"#FFF3CD",color:"#856404"}}>⭐ City pick</span>}
         </div>
@@ -2330,11 +2654,11 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           <button style={{flex:1,background:"var(--black)",color:"white",border:"none",borderRadius:12,padding:"13px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}
             onClick={()=>{if(navigator.share){navigator.share({title:venue.name,text:`Check out ${venue.name} on LOKAL'Z`,url:window.location.href});}else{navigator.clipboard?.writeText(window.location.href);showToast("link copied!");}}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            share
+            {t("btn.share")}
           </button>
           <button style={{flex:1,background:"transparent",color:"#888",border:"1.5px solid #ddd",borderRadius:12,padding:"13px",fontFamily:"var(--body)",fontWeight:400,fontSize:13,cursor:"pointer"}}
             onClick={()=>setShowReport(true)}>
-            ⚑ report
+            {t("btn.report")}
           </button>
         </div>
         {showReport&&(
@@ -2349,7 +2673,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
             <div style={{display:"flex",gap:8,marginTop:4}}>
               <button onClick={submitReport} disabled={!reportType||reportSubmitting}
                 style={{flex:1,background:"#58151C",color:"white",border:"none",borderRadius:10,padding:"11px",fontFamily:"var(--body)",fontWeight:400,fontSize:13,cursor:reportType?"pointer":"default",opacity:reportType?1:.5}}>
-                {reportSubmitting?"sending...":"send report"}
+                {reportSubmitting?t("btn.sending"):t("btn.send_report")}
               </button>
               <button onClick={()=>{setShowReport(false);setReportType("");}}
                 style={{background:"#eee",border:"none",borderRadius:10,padding:"11px 16px",fontFamily:"var(--body)",fontWeight:400,fontSize:13,cursor:"pointer"}}>
@@ -2506,7 +2830,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
                     </div>
                     <div style={{flex:1}}>
                       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)"}}>{s.name}</div>
-                      <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:600,color:"#888",marginTop:2}}>{s.badge||(s.role==="city_lead"?"City Lead":"Local Scout")}</div>
+                      <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:600,color:"#888",marginTop:2}}>{s.badge||(s.role==="city_lead"?t("menu.city_lead"):"Local Scout")}</div>
                     </div>
                     <span style={{color:"var(--red)",fontSize:20}}>›</span>
                   </div>
@@ -2583,7 +2907,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         }
       });
       const infoDiv = document.createElement("div");
-      infoDiv.innerHTML = `<div style="font-family:sans-serif;padding:6px 4px;min-width:160px"><strong style="font-size:14px">${v.name}</strong><br/><span style="color:#666;font-size:12px">${v.category} · Dist. ${v.district}</span><br/><button id="info-btn-${v.id}" style="margin-top:8px;background:#DC2626;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:sans-serif">view →</button></div>`;
+      infoDiv.innerHTML = `<div style="font-family:sans-serif;padding:6px 4px;min-width:160px"><strong style="font-size:14px">${v.name}</strong><br/><span style="color:#666;font-size:12px">${v.category} · ${t("venue.dist")} ${v.district}</span><br/><button id="info-btn-${v.id}" style="margin-top:8px;background:#DC2626;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:sans-serif">view →</button></div>`;
       const info = new window.google.maps.InfoWindow({ content: infoDiv });
       marker.addListener("click",()=>{
         if(activeInfoRef.current) activeInfoRef.current.close();
@@ -2639,7 +2963,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         </div>
         <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
           <span style={{color:"rgba(255,255,255,.6)",fontSize:13}}>🔍</span>
-          <input placeholder="search..." value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
+          <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
           {CATEGORIES.map(c=>{
@@ -2691,7 +3015,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           {(allVenues||[]).filter(v=>v.status==="active"&&v.latitude&&v.longitude).length===0&&(
             <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,background:"white"}}>
               <div style={{fontSize:40}}>🗺️</div>
-              <div style={{fontFamily:"var(--body)",fontSize:14,color:"#888",textAlign:"center",padding:"0 32px"}}>No venues with coordinates yet. Run "auto-fill Place IDs" in City Lead first.</div>
+              <div style={{fontFamily:"var(--body)",fontSize:14,color:"#888",textAlign:"center",padding:"0 32px"}}>No venues with coordinates yet. Run t("cl.autofill_places") in City Lead first.</div>
             </div>
           )}
       </div>
@@ -2784,7 +3108,7 @@ function ScoutEventsTab({user, allVenues, showToast}) {
     setVenueSearch("");
     setImgFile(null);
     setShowCreate(false);
-    showToast("Event submitted for approval ✓");
+    showToast(t("toast.event_submitted"));
     setSaving(false);
   }
 
@@ -2801,7 +3125,7 @@ function ScoutEventsTab({user, allVenues, showToast}) {
   return (
     <div className="scroll" style={{padding:"14px 20px 80px"}}>
       <button className="btn-black" style={{marginBottom:16}} onClick={()=>setShowCreate(v=>!v)}>
-        {showCreate?"cancel":"+ add event"}
+        {showCreate?t("btn.cancel"):t("btn.add_event")}
       </button>
 
       {showCreate&&(
@@ -2840,7 +3164,7 @@ function ScoutEventsTab({user, allVenues, showToast}) {
             <span style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"#888"}}>{imgFile?imgFile.name:"Add cover photo"}</span>
           </label>
           <button className="btn-black" onClick={submitEvent} style={{opacity:saving||!form.title.trim()||!form.venue_id||!form.event_date||!form.event_time?0.5:1}}>
-            {saving?"submitting...":"submit for approval →"}
+            {saving?t("btn.submitting"):t("btn.submit_approval")}
           </button>
         </div>
       )}
@@ -3080,9 +3404,9 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       }
     }
     setAllVenues(p=>p.map(v=>v.id===editingVenue.id?{...v,...editForm,status:"pending",edit_comment:null,price:editForm.price_level}:v));
-    showToast("Resubmitted for review ✓");
+    showToast(t("toast.resubmitted"));
     setEditingVenue(null);
-    setTab("activity");
+    setTab(t("scout.activity"));
   }
 
   // Add Venue form state
@@ -3342,8 +3666,8 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       setCustomOccasion("");
       setImgFiles([]);
       setImgPreviews([]);
-      showToast("Submitted for review ✓");
-      setTab("activity");
+      showToast(t("toast.submitted"));
+      setTab(t("scout.activity"));
     } catch(e){
       setFormError(e.message||"Submit failed. Try again.");
     } finally {
@@ -3536,7 +3860,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         </div>
       </div>
       <div className="tabs" style={{background:"var(--black)",borderBottom:"1px solid rgba(255,255,255,.15)"}}>
-        {[["add","add venue"],["events","events"],["activity","my activity"]].map(([k,l])=>(
+        {[["add","add venue"],["events","events"],[t("scout.activity"),"my activity"]].map(([k,l])=>(
           <button key={k} style={{flex:1,padding:"14px 6px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:tab===k?"white":"rgba(255,255,255,.4)",background:"none",border:"none",cursor:"pointer",borderBottom:tab===k?"2.5px solid white":"2.5px solid transparent",marginBottom:-1,transition:"all .15s"}} onClick={()=>setTab(k)}>{l}</button>
         ))}
       </div>
@@ -3699,18 +4023,18 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
             />
           </div>
           <button className="btn-black" style={{opacity:submitting?0.6:1,marginTop:8}} onClick={submitVenue}>
-            {submitting?"submitting...":"submit for review"}
+            {submitting?t("btn.submitting"):t("btn.submit_review")}
           </button>
         </div>
       )}
       {tab==="events"&&(
         <ScoutEventsTab user={user} allVenues={allVenues} showToast={showToast}/>
       )}
-      {tab==="activity"&&(
+      {tab===t("scout.activity")&&(
         <div className="scroll" style={{padding:"14px 20px 80px"}} ref={scoutScrollRef}
           onScroll={e=>saveScroll("scout",e.currentTarget)}>
           <div style={{display:"flex",gap:12,marginBottom:20}}>
-            {[["✅","Approved",myVenues.filter(v=>v.status==="active").length],["⏳","Pending",myVenues.filter(v=>v.status==="pending").length]].map(([ico,label,count])=>(
+            {[["✅",t("scout.approved"),myVenues.filter(v=>v.status==="active").length],["⏳",t("status.pending"),myVenues.filter(v=>v.status==="pending").length]].map(([ico,label,count])=>(
               <div key={label} style={{flex:1,background:"var(--white)",borderRadius:16,padding:"16px",textAlign:"center"}}>
                 <div style={{fontSize:28}}>{ico}</div>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:28,color:"var(--red)"}}>{count}</div>
@@ -3776,7 +4100,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
   async function approveEvent(id){
     await supabase.from("events").update({status:"active"}).eq("id",id);
     setPendingEvents(p=>p.filter(e=>e.id!==id));
-    showToast("Event approved ✓");
+    showToast(t("toast.event_approved"));
   }
   async function rejectEvent(id){
     if(!window.confirm("Reject and delete this event?")) return;
@@ -3942,7 +4266,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
     if(error){showToast("Upload error: "+error.message);setUploadingImg(false);return;}
     const {data} = supabase.storage.from("venue-images").getPublicUrl(path);
     await supabase.from("venue_images").insert({venue_id:venueId, url:data.publicUrl, is_primary:true});
-    showToast("Image uploaded ✓");
+    showToast(t("toast.image_uploaded"));
     setUploadingImg(false);
   }
 
@@ -4171,7 +4495,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
 
         <button className="btn-blue" style={{borderRadius:14,opacity:saving?0.6:1}} onClick={saveEdit}>
-          {saving?"saving...":"SAVE CHANGES"}
+          {saving?t("btn.saving"):t("btn.save_changes")}
         </button>
       </div>
     </div>
@@ -4233,7 +4557,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
                     <textarea
                       value={editComment[v.id]||""}
                       onChange={e=>setEditComment(prev=>({...prev,[v.id]:e.target.value}))}
-                      placeholder="Describe what needs to be changed..."
+                      placeholder=t("cl.edit_placeholder")
                       rows={3}
                       style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"10px 12px",fontFamily:"var(--body)",fontSize:13,fontWeight:600,resize:"none",outline:"none",marginBottom:6}}
                     />
@@ -4491,7 +4815,7 @@ function PartnerManageTab({showToast, cityId}) {
   );
 }
 
-function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
+function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang, changeLang}) {
   const [editing, setEditing] = useState(null);
   const [newName, setNewName] = useState(user?.name||"");
   const [newPassword, setNewPassword] = useState("");
@@ -4536,8 +4860,8 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
   }
 
   async function savePassword(){
-    if(newPassword.length<6) return showMsg("Password must be at least 6 characters.",true);
-    if(newPassword!==newPassword2) return showMsg("Passwords don't match.",true);
+    if(newPassword.length<6) return showMsg(t("auth.password_short"),true);
+    if(newPassword!==newPassword2) return showMsg(t("auth.password_mismatch"),true);
     setSaving(true);
     const {error} = await supabase.auth.updateUser({password: newPassword});
     setSaving(false);
@@ -4611,7 +4935,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
           <div style={{flex:1}}>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"white"}}>{user?.name||"name"}</div>
             <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"rgba(255,255,255,.7)",marginTop:2}}>
-              {user?.role==="explorer"?"Explorer":user?.role==="explorer_pro"?"Explorer Pro":user?.role==="scout"?"Local Scout":user?.role==="city_lead"?"City Lead":"Explorer"}
+              {user?.role==="explorer"?"Explorer":user?.role==="explorer_pro"?"Explorer Pro":user?.role==="scout"?"Local Scout":user?.role==="city_lead"?t("menu.city_lead"):"Explorer"}
             </div>
           </div>
         </div>
@@ -4636,7 +4960,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
                 <input placeholder="instagram" value={newInstagram} onChange={e=>setNewInstagram(e.target.value)}
                   style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
                 <button onClick={saveProfile} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
-                  {saving?"saving...":"save profile"}
+                  {saving?t("btn.saving"):t("btn.save_profile")}
                 </button>
               </div>
             )}
@@ -4686,7 +5010,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
               <input
                 value={newName}
                 onChange={e=>setNewName(e.target.value)}
-                placeholder="New name"
+                placeholder={t("profile.new_name")}
                 style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
               <button onClick={async()=>{
                 if(!newName.trim()) return showMsg("Name cannot be empty.",true);
@@ -4698,7 +5022,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
                 setEditing(null);
                 showMsg("Name updated ✓");
               }} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
-                {saving?"saving...":"save name"}
+                {saving?t("btn.saving"):t("btn.save_name")}
               </button>
             </div>
           )}
@@ -4721,12 +5045,12 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
           </div>
           {editing==="password"&&(
             <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
-              <input type="password" placeholder="New password" value={newPassword} onChange={e=>setNewPassword(e.target.value)}
+              <input type="password" placeholder={t("profile.new_password")} value={newPassword} onChange={e=>setNewPassword(e.target.value)}
                 style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:8,outline:"none"}}/>
-              <input type="password" placeholder="Confirm password" value={newPassword2} onChange={e=>setNewPassword2(e.target.value)}
+              <input type="password" placeholder={t("profile.confirm_password")} value={newPassword2} onChange={e=>setNewPassword2(e.target.value)}
                 style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
               <button onClick={savePassword} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
-                {saving?"saving...":"save password"}
+                {saving?t("btn.saving"):t("btn.save_password")}
               </button>
             </div>
           )}
@@ -4748,7 +5072,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
                 {(cities&&cities.length>0?cities.map(c=>c.name):["Budapest"]).map(c=><option key={c} value={c}>{c}</option>)}
               </select>
               <button onClick={saveCity} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
-                {saving?"saving...":"save city"}
+                {saving?t("btn.saving"):t("btn.save_city")}
               </button>
             </div>
           )}
@@ -4757,6 +5081,19 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
         {msg&&<div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:msg.isErr?"#c00":"#0a3622",background:msg.isErr?"rgba(255,0,0,.08)":"#D1E7DD",padding:"10px 14px",borderRadius:10,marginBottom:10,textAlign:"center"}}>{msg.text}</div>}
 
         <div style={{height:20}}/>
+
+        {/* Language */}
+        <div style={{background:"white",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:10,textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.language")}</div>
+          <div style={{display:"flex",gap:8}}>
+            {[{code:"en",label:"🇬🇧 EN"},{code:"hu",label:"🇭🇺 HU"},{code:"es",label:"🇪🇸 ES"}].map(({code,label})=>(
+              <button key={code} onClick={()=>changeLang(code)}
+                style={{flex:1,padding:"10px 0",borderRadius:50,border:lang===code?"none":"1.5px solid #eee",background:lang===code?"var(--black)":"white",color:lang===code?"white":"var(--black)",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",transition:"all .15s"}}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Delete account */}
         {!showDelete
@@ -5010,7 +5347,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
             <div style={{flex:1}}>
               <div style={{fontFamily:"var(--body)",fontWeight:600,fontSize:22,color:"white",lineHeight:1.2}}>{scout?.name||"Scout"}</div>
               <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"rgba(255,255,255,.5)",marginTop:4,letterSpacing:".04em",textTransform:"uppercase"}}>
-                {scout?.badge||(scout?.role==="city_lead"?"City Lead":"Local Scout")}
+                {scout?.badge||(scout?.role==="city_lead"?t("menu.city_lead"):"Local Scout")}
               </div>
               {igHandle&&(
                 <a href={`https://instagram.com/${igHandle}`} target="_blank" rel="noreferrer"
@@ -5044,7 +5381,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
           {!isOwnProfile&&(
             <button onClick={toggleFollow} disabled={followLoading}
               style={{width:"100%",background:isFollowing?"transparent":"white",border:isFollowing?"2px solid rgba(255,255,255,.25)":"none",borderRadius:50,padding:"13px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,color:isFollowing?"white":"var(--black)",cursor:"pointer",opacity:followLoading?0.6:1,transition:"all .2s"}}>
-              {followLoading?"...":(isFollowing?"✓ FOLLOWING":"+ FOLLOW")}
+              {followLoading?"...":(isFollowing?t("btn.following"):t("btn.follow"))}
             </button>
           )}
         </div>
@@ -5235,7 +5572,7 @@ function PartnerActivateScreen({partner, navigate, user, onActivate, showToast})
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",letterSpacing:0,marginBottom:8}}>PIN CODE</div>
           <input
             className="input-field"
-            placeholder="Enter PIN"
+            placeholder=t("misc.enter_pin")
             value={pin}
             onChange={e=>{setPin(e.target.value);setError(null);}}
             maxLength={8}
@@ -5607,7 +5944,7 @@ function CreatePlanModal({onClose, onCreate, user, allVenues, showToast}) {
     setSaving(false);
     if(error){ showToast("Error: "+error.message); return; }
     onCreate(data);
-    showToast("Event created! 🎉");
+    showToast(t("toast.event_created"));
   }
 
   const inputStyle = {width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,outline:"none",background:"white",color:"var(--black)",marginBottom:10};
@@ -5729,7 +6066,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
     navigator.clipboard?.writeText(link);
     setCopied(true);
     setTimeout(()=>setCopied(false),2000);
-    showToast("Invite link copied! 🔗");
+    showToast(t("toast.link_copied"));
   }
 
   function openEdit(){
@@ -5894,7 +6231,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
               )}
             </div>
             <button className="btn-black" onClick={saveEdit} style={{opacity:saving||!editForm.title.trim()?0.5:1}}>
-              {saving?"saving...":"save changes →"}
+              {saving?t("btn.saving"):t("btn.save_changes_arrow")}
             </button>
           </div>
         </div>
@@ -5921,8 +6258,8 @@ function UpgradeScreen({navigate, user}) {
     {icon:"🎉", label:"Event planning",   desc:"Plan nights out & invite friends"},
   ];
   const FREE_FEATURES = [
-    {icon:"📋", label:"All venues",       desc:"Browse the full curated list"},
-    {icon:"🗓", label:"Event calendar",   desc:"Discover local events"},
+    {icon:"📋", label:t("menu.all_venues"),       desc:t("home.all_venues")},
+    {icon:"🗓", label:t("menu.event_calendar"),   desc:t("home.event_calendar")},
   ];
 
   function startCheckout(){
@@ -6027,6 +6364,8 @@ function UpgradeScreen({navigate, user}) {
 function App() {
   const [screen, setScreen] = useState("signin");
   const [appLoading, setAppLoading] = useState(true);
+  const [lang, setLangState] = useState(_lang);
+  const changeLang = (l) => { setLang(l); setLangState(l); };
   const [history, setHistory] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [selectedScout, setSelectedScout] = useState(null);
@@ -6320,7 +6659,7 @@ function App() {
     all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)}/>,
     scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user} cities={cities}/>,
     city_lead: <CityLeadScreen navigate={navigate} allVenues={allVenues} setAllVenues={setAllVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} user={user}/>,
-    profile: <ProfileScreen navigate={navigate} user={user} setUser={setUser} onMenu={()=>setShowMenu(true)} onSignOut={signOut} cities={cities}/>,
+    profile: <ProfileScreen navigate={navigate} user={user} setUser={setUser} onMenu={()=>setShowMenu(true)} onSignOut={signOut} cities={cities} lang={lang} changeLang={changeLang}/>,
     about: <AboutScreen navigate={navigate}/>,
     upgrade: <UpgradeScreen navigate={navigate} user={user}/>,
     event_calendar: <EventCalendarScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
