@@ -551,6 +551,13 @@ const TRANSLATIONS = {
     "results.try_anywhere": "🗺️ try anywhere in Budapest",
     "results.remove_budget": "💸 remove budget filter",
     "results.start_over": "start over",
+    "saved.places": "places",
+    "saved.scouts": "scouts",
+    "saved.title2": "saved",
+    "saved.nothing": "Nothing saved yet.",
+    "saved.explore": "Start exploring and save the spots you love.",
+    "saved.pro_feature": "Explorer Pro feature",
+    "saved.upgrade": "upgrade to pro →",
     "results.refreshing": "refreshing...",
     "results.release": "↓ release to refresh",
     "results.show_more": "SHOW ME MORE ↻",
@@ -849,6 +856,13 @@ const TRANSLATIONS = {
     "results.try_anywhere": "🗺️ próbáld bárhol Budapesten",
     "results.remove_budget": "💸 büdzsé szűrő eltávolítása",
     "results.start_over": "kezdj újra",
+    "saved.places": "helyek",
+    "saved.scouts": "scoutok",
+    "saved.title2": "mentett",
+    "saved.nothing": "Még nincs mentett hely.",
+    "saved.explore": "Fedezz fel helyeket és mentsd el a kedvenceidet.",
+    "saved.pro_feature": "Explorer Pro funkció",
+    "saved.upgrade": "váltás pro-ra →",
     "results.refreshing": "frissítés...",
     "results.release": "↓ engedd el a frissítéshez",
     "results.show_more": "MUTASS TÖBBET ↻",
@@ -1145,6 +1159,13 @@ const TRANSLATIONS = {
     "results.try_anywhere": "🗺️ probar en cualquier lugar de Budapest",
     "results.remove_budget": "💸 eliminar filtro de presupuesto",
     "results.start_over": "empezar de nuevo",
+    "saved.places": "lugares",
+    "saved.scouts": "scouts",
+    "saved.title2": "guardados",
+    "saved.nothing": "Aún no hay nada guardado.",
+    "saved.explore": "Explora y guarda los lugares que te gusten.",
+    "saved.pro_feature": "Función Explorer Pro",
+    "saved.upgrade": "mejorar a pro →",
     "results.refreshing": "actualizando...",
     "results.release": "↓ suelta para actualizar",
     "results.show_more": "MOSTRAR MÁS ↻",
@@ -3400,13 +3421,13 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
           <div/>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>saved</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("saved.title2")}</div>
           </div>
         </div>
       </div>
 
       <div className="tabs" style={{background:"var(--black)",borderBottom:"1px solid rgba(255,255,255,.15)",flexShrink:0}}>
-        {[["places","places"],["scouts","scouts"]].map(([k,l])=>(
+        {[["places",t("saved.places")],["scouts",t("saved.scouts")]].map(([k,l])=>(
           <button key={k} style={{flex:1,padding:"14px 6px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:tab===k?"white":"rgba(255,255,255,.4)",background:"none",border:"none",cursor:"pointer",borderBottom:tab===k?"2.5px solid white":"2.5px solid transparent",marginBottom:-1,transition:"all .15s"}} onClick={()=>setTab(k)}>{l}</button>
         ))}
       </div>
@@ -3416,8 +3437,8 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
           {saved.length===0
             ?<div className="empty">
                 <div className="empty-icon">🤍</div>
-                <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:700,color:"var(--black)",marginBottom:8}}>Nothing saved yet.</div>
-                <div style={{fontFamily:"var(--body)",fontSize:13,color:"#888",marginBottom:20}}>Start exploring and save the spots you love.</div>
+                <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:700,color:"var(--black)",marginBottom:8}}>{t("saved.nothing")}</div>
+                <div style={{fontFamily:"var(--body)",fontSize:13,color:"#888",marginBottom:20}}>{t("saved.explore")}</div>
                 <button className="btn-black" style={{width:"auto",padding:"14px 28px"}} onClick={()=>navigate("q1")}>{t("results.start_over")}</button>
               </div>
             :saved.map((v,i)=>(
@@ -3434,9 +3455,9 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
           {!isPremium
             ?<div style={{textAlign:"center",padding:"48px 20px"}}>
                 <div style={{fontSize:44,marginBottom:12}}>👤</div>
-                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:8}}>Explorer Pro feature</div>
+                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:8}}>{t("saved.pro_feature")}</div>
                 <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#777",marginBottom:24,lineHeight:1.6}}>{t("venue.follow_pro")}</div>
-                <button className="btn-black" onClick={()=>navigate("upgrade")}>upgrade to pro →</button>
+                <button className="btn-black" onClick={()=>navigate("upgrade")}>{t("saved.upgrade")}</button>
               </div>
             :scoutsLoading
               ?<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>
@@ -6009,7 +6030,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
             <div style={{width:1,background:"rgba(255,255,255,.1)"}}/>
             <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:"rgba(255,255,255,.08)"}}>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"white"}}>{(venues.saved||[]).length}</div>
-              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"rgba(255,255,255,.5)",marginTop:2}}>saved</div>
+              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"rgba(255,255,255,.5)",marginTop:2}}>{t("saved.title2")}</div>
             </div>
           </div>
 
