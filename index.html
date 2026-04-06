@@ -48,6 +48,13 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 
 /* DARK MODE OVERRIDES via [data-dark] attribute */
 [data-dark="true"] { color-scheme: dark; --surface: #1e1e1e; --surface2: #252525; --surface3: #2a2a2a; --border-col: #2a2a2a; }
+[data-dark="true"] .btn-black { background: #2a2a2a !important; color: #ffffff !important; border: 1.5px solid #3a3a3a !important; }
+[data-dark="true"] .btn-black-half { background: #2a2a2a !important; color: #ffffff !important; border: 1.5px solid #3a3a3a !important; }
+[data-dark="true"] .back-btn { background: #2a2a2a !important; border: 1px solid #3a3a3a !important; }
+[data-dark="true"] .q-next-btn { background: #2a2a2a !important; color: #ffffff !important; border: 1.5px solid #3a3a3a !important; }
+[data-dark="true"] .tabs { background: #1a1a1a !important; border-bottom-color: #2a2a2a !important; }
+[data-dark="true"] .tab { color: rgba(255,255,255,.4) !important; }
+[data-dark="true"] .tab.on { color: #ffffff !important; border-bottom-color: #ffffff !important; }
 [data-dark="true"] .screen { background: #0d0d0d !important; }
 [data-dark="true"] .admin-card { background: #1c1c1c !important; border: 1.5px solid #2a2a2a !important; box-shadow: none !important; }
 [data-dark="true"] .input-wrap-light { background: #1c1c1c !important; border-color: #2a2a2a !important; }
@@ -332,6 +339,8 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
 .back-btn{background:var(--black);border:none;cursor:pointer;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;line-height:1;flex-shrink:0;}
 .back-btn:active{opacity:.7;}
+.q-next-btn{background:#000;color:#fff;border:none;border-radius:50px;padding:14px 48px;font-family:var(--body);font-weight:400;font-size:16px;cursor:pointer;white-space:nowrap;transition:opacity .12s;}
+.q-next-btn:active{opacity:.7;}
 .text-link{font-family:var(--body);font-size:14px;font-weight:700;color:var(--black);text-decoration:underline;cursor:pointer;}
 .text-link-blue{color:var(--red);}
 .divider{height:1px;background:rgba(0,0,0,.1);margin:4px 0;}
@@ -2710,7 +2719,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
       </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel&&next()}
-          style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel?"pointer":"default",opacity:sel?1:.4,whiteSpace:"nowrap"}}>
+          className="q-next-btn" style={{opacity:sel?1:.4,cursor:sel?"pointer":"default"}}>
           {t("q1.next")}
         </button>
       </div>
@@ -2753,7 +2762,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
     fontWeight:600,
     fontSize:13,
     cursor:"pointer",
-    background:sel?"var(--black)":"var(--surface)",
+    background:sel?"var(--red)":"var(--surface)",
     color:sel?"white":"var(--black)",
     borderColor:sel?"var(--black)":"rgba(0,0,0,.2)",
     transition:"all .15s",
@@ -2802,7 +2811,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
 
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>selOcc.length>0&&next()}
-          style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:selOcc.length>0?"pointer":"default",whiteSpace:"nowrap",opacity:selOcc.length>0?1:.4}}>
+          className="q-next-btn" style={{opacity:selOcc.length>0?1:.4,cursor:selOcc.length>0?"pointer":"default"}}>
           {t("q2.next")}
         </button>
       </div>
@@ -2868,7 +2877,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
   }
 
   function next(){setAnswers(a=>({...a,locations:sel}));navigate("q4");}
-  const PILL = {border:"1.5px solid var(--black)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
+  const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -2886,29 +2895,29 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
       </div>
       <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
         <button onClick={detectLocation}
-          style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--black)":"var(--surface)",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid var(--black)"}}>
+          style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--red)":"var(--surface)",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid var(--border-col)"}}>
           <span>{locLoading?t("q.locating"):t("q.detect_location")}</span>
           {!locLoading&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,background:"var(--bg)",color:"var(--black)",padding:"2px 8px",borderRadius:20}}>GPS</span>}
         </button>
         {DISTRICTS_MAIN.filter(d=>d!=="near me").map(d=>(
-          <button key={d} style={{...PILL,background:sel.includes(d)?"var(--black)":"var(--surface)",color:sel.includes(d)?"white":"var(--black)"}} onClick={()=>toggle(d)}>
+          <button key={d} style={{...PILL,background:sel.includes(d)?"var(--red)":"var(--surface)",color:sel.includes(d)?"white":"var(--black)"}} onClick={()=>toggle(d)}>
             <span>{districtLabel(d)}</span>{sel.includes(d)&&<span>✓</span>}
           </button>
         ))}
-        <button style={{...PILL,background:showMore?"var(--black)":"var(--surface)",color:showMore?"white":"var(--black)"}} onClick={()=>setShowMore(v=>!v)}>
+        <button style={{...PILL,background:showMore?"var(--red)":"var(--surface)",color:showMore?"white":"var(--black)"}} onClick={()=>setShowMore(v=>!v)}>
           <span>{t("misc.more_toggle")}</span><span>{showMore?"▲":"▼"}</span>
         </button>
         {showMore&&ALL_DISTRICTS.filter(d=>!DISTRICTS_MAIN.includes(d)).map(d=>(
-          <button key={d} style={{...PILL,background:sel.includes(d)?"var(--black)":"var(--surface)",color:sel.includes(d)?"white":"var(--black)"}} onClick={()=>toggle(d)}>
+          <button key={d} style={{...PILL,background:sel.includes(d)?"var(--red)":"var(--surface)",color:sel.includes(d)?"white":"var(--black)"}} onClick={()=>toggle(d)}>
             <span>{districtLabel(d)}</span>{sel.includes(d)&&<span>✓</span>}
           </button>
         ))}
-        <button style={{...PILL,background:sel.includes(t("q.anywhere"))?"var(--black)":"var(--surface)",color:sel.includes(t("q.anywhere"))?"white":"var(--black)",fontWeight:700}} onClick={()=>toggle(t("q.anywhere"))}>
+        <button style={{...PILL,background:sel.includes(t("q.anywhere"))?"var(--red)":"var(--surface)",color:sel.includes(t("q.anywhere"))?"white":"var(--black)",fontWeight:700}} onClick={()=>toggle(t("q.anywhere"))}>
           <span>{t("q3.surprise")}</span>{sel.includes(t("q.anywhere"))&&<span>✓</span>}
         </button>
       </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
-        <button onClick={()=>sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel.length>0?"pointer":"default",opacity:sel.length>0?1:.4,whiteSpace:"nowrap"}}>next</button>
+        <button onClick={()=>sel.length>0&&next()} className="q-next-btn" style={{opacity:sel.length>0?1:.4,cursor:sel.length>0?"pointer":"default"}}>next</button>
       </div>
     </div>
   );
@@ -2953,7 +2962,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
   const [sel, setSel] = useState(answers.budgets||[]);
   function toggle(b){setSel(prev=>prev.includes(b)?prev.filter(x=>x!==b):[...prev,b]);}
   function next(){setAnswers(a=>({...a,budgets:sel}));navigate(answers.category==="Restaurant"?"q5":"q6");}
-  const PILL = {border:"1.5px solid var(--black)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
+  const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -2971,13 +2980,13 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
       </div>
       <div style={{padding:"0 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
         {BUDGETS.map(b=>(
-          <button key={b} style={{...PILL,background:sel.includes(b)?"var(--black)":"var(--surface)",color:sel.includes(b)?"white":"var(--black)"}} onClick={()=>toggle(b)}>
+          <button key={b} style={{...PILL,background:sel.includes(b)?"var(--red)":"var(--surface)",color:sel.includes(b)?"white":"var(--black)"}} onClick={()=>toggle(b)}>
             <span>{b}</span>{sel.includes(b)&&<span>✓</span>}
           </button>
         ))}
       </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
-        <button onClick={()=>sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel.length>0?"pointer":"default",whiteSpace:"nowrap",opacity:sel.length>0?1:.4}}>next</button>
+        <button onClick={()=>sel.length>0&&next()} className="q-next-btn" style={{opacity:sel.length>0?1:.4,cursor:sel.length>0?"pointer":"default"}}>next</button>
       </div>
     </div>
   );
@@ -2987,7 +2996,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
   const [sel,setSel]=useState(answers.cuisines||[]);
   function toggle(x){setSel(prev=>prev.includes(x)?prev.filter(v=>v!==x):[...prev,x]);}
   function next(){setAnswers(a=>({...a,cuisines:sel}));navigate("q6");}
-  const PILL = {border:"1.5px solid var(--black)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
+  const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -3005,14 +3014,14 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
       </div>
       <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
         {CUISINES.map(x=>(
-          <button key={x} style={{...PILL,background:sel.includes(x)?"var(--black)":"var(--surface)",color:sel.includes(x)?"white":"var(--black)"}} onClick={()=>toggle(x)}>
+          <button key={x} style={{...PILL,background:sel.includes(x)?"var(--red)":"var(--surface)",color:sel.includes(x)?"white":"var(--black)"}} onClick={()=>toggle(x)}>
             <span>{tCui(x)}</span>{sel.includes(x)&&<span>✓</span>}
           </button>
         ))}
         <button style={{...PILL,background:"var(--surface)",color:"var(--text-muted)",borderColor:"var(--border-col)",justifyContent:"center"}} onClick={()=>{setAnswers(a=>({...a,cuisines:[]}));navigate("q6");}}>{t("q4.not_sure")}</button>
       </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
-        <button onClick={()=>sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel.length>0?"pointer":"default",whiteSpace:"nowrap",opacity:sel.length>0?1:.4}}>{t("q5.next")}</button>
+        <button onClick={()=>sel.length>0&&next()} className="q-next-btn" style={{opacity:sel.length>0?1:.4,cursor:sel.length>0?"pointer":"default"}}>{t("q5.next")}</button>
       </div>
     </div>
   );
@@ -3020,7 +3029,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
 
 function Q6Screen({navigate, onMenu, answers, setAnswers}) {
   function select(g){setAnswers(a=>({...a,group:g}));setTimeout(()=>navigate("results"),200);}
-  const PILL = {border:"1.5px solid var(--black)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",width:"100%",transition:"transform .1s ease"};
+  const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -3818,15 +3827,31 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
     if(!window.google?.maps) return;
 
     if(!mapInstanceRef.current){
+      const darkStyles = [
+        {elementType:"geometry",stylers:[{color:"#1a1a1a"}]},
+        {elementType:"labels.text.fill",stylers:[{color:"#757575"}]},
+        {elementType:"labels.text.stroke",stylers:[{color:"#1a1a1a"}]},
+        {featureType:"road",elementType:"geometry",stylers:[{color:"#2c2c2c"}]},
+        {featureType:"road",elementType:"geometry.stroke",stylers:[{color:"#212121"}]},
+        {featureType:"road",elementType:"labels.text.fill",stylers:[{color:"#8a8a8a"}]},
+        {featureType:"road.highway",elementType:"geometry",stylers:[{color:"#3c3c3c"}]},
+        {featureType:"water",elementType:"geometry",stylers:[{color:"#000000"}]},
+        {featureType:"water",elementType:"labels.text.fill",stylers:[{color:"#3d3d3d"}]},
+        {featureType:"poi",elementType:"all",stylers:[{visibility:"off"}]},
+        {featureType:"transit",elementType:"all",stylers:[{visibility:"off"}]},
+        {featureType:"administrative",elementType:"geometry",stylers:[{color:"#2a2a2a"}]},
+        {featureType:"landscape",elementType:"geometry",stylers:[{color:"#1a1a1a"}]},
+      ];
+      const lightStyles = [
+        {featureType:"poi",elementType:"all",stylers:[{visibility:"off"}]},
+        {featureType:"transit",elementType:"all",stylers:[{visibility:"off"}]},
+      ];
       mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
         center:{lat:47.4979,lng:19.0402},
         zoom:13,
         disableDefaultUI:true,
         zoomControl:false,
-        styles:[
-          {featureType:"poi",elementType:"all",stylers:[{visibility:"off"}]},
-          {featureType:"transit",elementType:"all",stylers:[{visibility:"off"}]},
-        ],
+        styles: _dark ? darkStyles : lightStyles,
       });
     }
 
@@ -3951,8 +3976,8 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           {/* Zoom + locate */}
           <div style={{position:"absolute",bottom:100,right:16,display:"flex",flexDirection:"column",gap:8}}>
             <div style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:20,boxShadow:"0 2px 8px rgba(0,0,0,.2)",display:"flex",flexDirection:"column",overflow:"hidden"}}>
-              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)+1)} style={{background:"none",border:"none",borderBottom:"1px solid #eee",cursor:"pointer",width:40,height:40,fontSize:20,color:"var(--black)",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
-              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)-1)} style={{background:"none",border:"none",cursor:"pointer",width:40,height:40,fontSize:20,color:"var(--black)",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)+1)} style={{background:"rgba(30,30,30,.85)",border:"none",borderBottom:"1px solid #333",cursor:"pointer",width:40,height:40,fontSize:20,color:"white",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)-1)} style={{background:"rgba(30,30,30,.85)",border:"none",cursor:"pointer",width:40,height:40,fontSize:20,color:"white",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
             </div>
             <button onClick={()=>{
               if(!navigator.geolocation||!mapInstanceRef.current) return;
@@ -4895,7 +4920,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
               {getTagsForCategory(form.category, categoryCustomTags[form.category]||[]).map(t=>{
                 const sel=(form.tags||[]).includes(t);
                 return <button key={t} type="button" onClick={()=>setF("tags",sel?(form.tags||[]).filter(x=>x!==t):[...(form.tags||[]),t])}
-                  style={{background:sel?"var(--black)":"var(--surface)",color:sel?"white":"var(--black)",border:"1.5px solid",borderColor:sel?"var(--black)":"var(--border-col)",borderRadius:20,padding:"7px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,cursor:"pointer"}}>{t}</button>;
+                  style={{background:sel?"var(--red)":"var(--surface)",color:sel?"white":"var(--black)",border:"1.5px solid",borderColor:sel?"var(--black)":"var(--border-col)",borderRadius:20,padding:"7px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,cursor:"pointer"}}>{t}</button>;
               })}
             </div>
             {/* Custom tags — max 3 */}
