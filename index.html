@@ -32,6 +32,10 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
   --blue-dark: #CC0000;
   --black: #000000;
   --white: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --input-bg: #f5f5f5;
+  --border: #eeeeee;
+  --text-muted: rgba(0,0,0,.5);
   --display: 'Climate Crisis', sans-serif;
   --body: 'Bricolage Grotesque', sans-serif;
 }
@@ -104,7 +108,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
   cursor:text;
   display:block;
 }
-.input-field::placeholder{color:rgba(0,0,0,.4);font-weight:400;}
+.input-field::placeholder{color:var(--text-muted);font-weight:400;}
 
 /* BUTTONS */
 .btn-black{
@@ -265,7 +269,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 
 /* VENUE CARDS */
 .venue-card{
-  background:#FFFFFF;
+  background:var(--white);
   border-radius:20px;
   overflow:hidden;
   cursor:pointer;
@@ -277,12 +281,12 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .venue-img{width:100%;height:200px;background:var(--black);display:flex;align-items:center;justify-content:center;font-size:60px;position:relative;}
 .venue-body{padding:16px 18px;}
 .venue-name{font-family:var(--body);font-weight:700;font-size:20px;color:var(--black);margin-bottom:5px;}
-.venue-meta{font-family:var(--body);font-size:13px;color:#666;font-weight:400;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.venue-meta{font-family:var(--body);font-size:13px;color:var(--text-muted);font-weight:400;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 .venue-tag{display:inline-block;background:#F0D8EC;color:#000;font-size:11px;font-weight:600;padding:3px 10px;border-radius:8px;}
 
 /* TABS */
 .tabs{display:flex;background:var(--bg);border-bottom:1.5px solid rgba(0,0,0,.15);flex-shrink:0;}
-.tab{flex:1;padding:14px 6px;font-family:var(--body);font-size:13px;font-weight:600;color:rgba(0,0,0,.35);background:none;border:none;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;text-transform:uppercase;letter-spacing:.04em;transition:all .15s;}
+.tab{flex:1;padding:14px 6px;font-family:var(--body);font-size:13px;font-weight:600;color:var(--text-muted);background:none;border:none;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;text-transform:uppercase;letter-spacing:.04em;transition:all .15s;}
 .tab.on{color:var(--black);border-bottom-color:var(--black);}
 
 /* MISC */
@@ -326,6 +330,41 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ── i18n ───────────────────────────────────────
 let _lang = localStorage.getItem("lokalz_lang") || "en";
 function setLang(l){ _lang = l; localStorage.setItem("lokalz_lang", l); }
+
+// Dark mode
+let _dark = localStorage.getItem("lokalz_dark") === "1";
+function setDarkMode(v){
+  _dark = v;
+  localStorage.setItem("lokalz_dark", v?"1":"0");
+  applyDarkMode(v);
+}
+function applyDarkMode(dark){
+  const r = document.documentElement.style;
+  if(dark){
+    r.setProperty("--bg","#0a0a0a");
+    r.setProperty("--black","#ffffff");
+    r.setProperty("--white","#1a1a1a");
+    r.setProperty("--card-bg","#1a1a1a");
+    r.setProperty("--input-bg","#222222");
+    r.setProperty("--border","#333333");
+    r.setProperty("--text-muted","rgba(255,255,255,.5)");
+    document.getElementById("root").style.background = "#0a0a0a";
+  } else {
+    r.setProperty("--bg","#F5B8EC");
+    r.setProperty("--black","#000000");
+    r.setProperty("--white","#FFFFFF");
+    r.setProperty("--card-bg","#FFFFFF");
+    r.setProperty("--input-bg","#f5f5f5");
+    r.setProperty("--border","#eeeeee");
+    r.setProperty("--text-muted","rgba(0,0,0,.5)");
+    document.getElementById("root").style.background = "#F5B8EC";
+  }
+}
+
+// Location memory
+const LOC_KEY = "lokalz_loc_granted";
+function getStoredLocation(){ return localStorage.getItem(LOC_KEY); }
+function setLocationGranted(v){ localStorage.setItem(LOC_KEY, v?"1":"0"); }
 
 const TRANSLATIONS = {
   en: {
@@ -438,6 +477,8 @@ const TRANSLATIONS = {
     "profile.type_delete_placeholder": "Type DELETE",
     "profile.delete_confirm": "delete",
     "profile.redirecting": "redirecting...", "profile.get_pro": "get explorer pro →",
+    "profile.dark_mode": "appearance", "profile.light": "light", "profile.dark": "dark",
+    "q.locating": "📍 locating...", "q.detect_location": "📍 detect my location",
     "scout.no_events": "No events yet.",
     "scout.event_deleted": "Event deleted",
     "scout.select_venue": "Please select a venue",
@@ -472,6 +513,95 @@ const TRANSLATIONS = {
     "err.type_delete": "Type DELETE to confirm.",
     "err.no_scout": "⚠ No scout assigned — email not sent",
     "pin.generated": "PIN generated: ",
+    "occ.casual_dining": "Casual dining",
+    "occ.fine_dining": "Fine dining",
+    "occ.dinner_with_friends": "Dinner with friends",
+    "occ.date_night": "Date night",
+    "occ.lunch": "Lunch",
+    "occ.breakfast_and_brunch": "Breakfast & brunch",
+    "occ.quick_bite": "Quick bite",
+    "occ.coffee": "Coffee",
+    "occ.quiet_work_spot": "Quiet work spot",
+    "occ.pre_drinks__drinks": "Pre-drinks / drinks",
+    "occ.late_night": "Late night",
+    "occ.celebration": "Celebration",
+    "occ.family_outing": "Family outing",
+    "cat.restaurant": "Restaurant",
+    "cat.café": "Café",
+    "cat.bar": "Bar",
+    "cat.bakery": "Bakery",
+    "cat.patisserie": "Patisserie",
+    "cat.street_food": "Street food",
+    "cat.other": "Other",
+    "cat.cocktail_bar": "Cocktail bar",
+    "cat.wine_bar": "Wine bar",
+    "cat.pub": "Pub",
+    "cat.night_club": "Night club",
+    "cat.speakeasy": "Speakeasy",
+    "diet.gluten_free": "Gluten-free",
+    "diet.vegan": "Vegan",
+    "diet.vegetarian": "Vegetarian",
+    "diet.halal": "Halal",
+    "diet.kosher": "Kosher",
+    "diet.dairy_free": "Dairy-free",
+    "diet.nut_free": "Nut-free",
+    "diet.pescatarian": "Pescatarian",
+    "cui.japanese": "Japanese",
+    "cui.chinese": "Chinese",
+    "cui.korean": "Korean",
+    "cui.thai": "Thai",
+    "cui.vietnamese": "Vietnamese",
+    "cui.indian": "Indian",
+    "cui.italian": "Italian",
+    "cui.french": "French",
+    "cui.spanish": "Spanish",
+    "cui.greek": "Greek",
+    "cui.mexican": "Mexican",
+    "cui.american": "American",
+    "cui.hungarian": "Hungarian",
+    "cui.middle_eastern": "Middle Eastern",
+    "cui.mediterranean": "Mediterranean",
+    "cui.other": "Other",
+    "badge.the_one_who_started_it_all": "The one who started it all",
+    "badge.wine__drinks_specialist": "Wine & drinks specialist",
+    "badge.food__restaurant_expert": "Food & restaurant expert",
+    "badge.late_night__bar_scene": "Late night & bar scene",
+    "badge.café__specialty_coffee": "Café & specialty coffee",
+    "badge.atmosphere__hidden_gems": "Atmosphere & hidden gems",
+    "badge.morning__brunch_spots": "Morning & brunch spots",
+    "badge.off_the_beaten_path_finds": "Off-the-beaten-path finds",
+    "badge.international_cuisine": "International cuisine",
+    "badge.true_neighbourhood_insider": "True neighbourhood insider",
+    "grp.solo": "solo",
+    "grp.2": "2",
+    "grp.3_6": "3-6",
+    "grp.6_8": "6-8",
+    "grp.9plus": "9+",
+    "budget.d": "$",
+    "budget.dd": "$$",
+    "budget.ddd": "$$$",
+    "budget.dddd": "$$$$",
+    "sc.all_venues": "All venues",
+    "sc.event_calendar": "Event calendar",
+    "sc.ai_assistant": "AI Assistant",
+    "sc.scout_profiles": "Scout profiles",
+    "sc.city_picks": "City picks",
+    "sc.event_planning": "Event planning",
+    "scd.browse_the_full_cura": "Browse the full curated list",
+    "scd.discover_local_event": "Discover local events",
+    "scd.describe_what_you_wa": "Describe what you want in plain text",
+    "scd.follow_scouts__see_": "Follow scouts & see their curated picks",
+    "scd.exclusive_top_picks_": "Exclusive top picks from our city leads",
+    "scd.plan_nights_out__in": "Plan nights out & invite friends",
+    "venue.near_me_label": "near me",
+    "ui.search_ai": "e.g. cozy café to work from in the 7th district",
+    "ui.no_image": "No venues with coordinates yet.",
+    "ui.choose_badge": "choose your badge",
+    "ui.not_sure": "Not sure yet",
+    "ui.results": "here's your spot",
+    "ui.week_picks": "this week's ⭐ city picks",
+    "ui.or": "or...",
+    "ui.login_with": "login with...",
   },
   hu: {
     "nav.home": "főoldal", "nav.saved": "mentett", "nav.menu": "menü",
@@ -587,6 +717,8 @@ const TRANSLATIONS = {
     "profile.type_delete_placeholder": "Írd: DELETE",
     "profile.delete_confirm": "törlés",
     "profile.redirecting": "átirányítás...", "profile.get_pro": "explorer pro →",
+    "profile.dark_mode": "megjelenés", "profile.light": "világos", "profile.dark": "sötét",
+    "q.locating": "📍 helymeghatározás...", "q.detect_location": "📍 helyzetérzékelés",
     "scout.no_events": "Még nincsenek események.",
     "scout.event_deleted": "Esemény törölve",
     "scout.select_venue": "Kérlek válassz helyszínt",
@@ -621,6 +753,95 @@ const TRANSLATIONS = {
     "err.type_delete": "Írd be a DELETE szót a megerősítéshez.",
     "err.no_scout": "⚠ Nincs scout hozzárendelve — email nem lett elküldve",
     "pin.generated": "PIN létrehozva: ",
+    "occ.casual_dining": "Laza vacsora",
+    "occ.fine_dining": "Elegáns étkezés",
+    "occ.dinner_with_friends": "Vacsi barátokkal",
+    "occ.date_night": "Randievening",
+    "occ.lunch": "Ebéd",
+    "occ.breakfast_and_brunch": "Reggeli & brunch",
+    "occ.quick_bite": "Gyors falat",
+    "occ.coffee": "Kávé",
+    "occ.quiet_work_spot": "Csendes munkahely",
+    "occ.pre_drinks__drinks": "Előital / italozás",
+    "occ.late_night": "Késő este",
+    "occ.celebration": "Ünneplés",
+    "occ.family_outing": "Családi kirándulás",
+    "cat.restaurant": "Étterem",
+    "cat.café": "Kávézó",
+    "cat.bar": "Bár",
+    "cat.bakery": "Pékség",
+    "cat.patisserie": "Cukrászda",
+    "cat.street_food": "Street food",
+    "cat.other": "Egyéb",
+    "cat.cocktail_bar": "Koktélbár",
+    "cat.wine_bar": "Borbár",
+    "cat.pub": "Pub",
+    "cat.night_club": "Éjszakai klub",
+    "cat.speakeasy": "Speakeasy",
+    "diet.gluten_free": "Gluténmentes",
+    "diet.vegan": "Vegán",
+    "diet.vegetarian": "Vegetáriánus",
+    "diet.halal": "Halal",
+    "diet.kosher": "Kóser",
+    "diet.dairy_free": "Laktózmentes",
+    "diet.nut_free": "Diómentes",
+    "diet.pescatarian": "Pescatáriánus",
+    "cui.japanese": "Japán",
+    "cui.chinese": "Kínai",
+    "cui.korean": "Koreai",
+    "cui.thai": "Thai",
+    "cui.vietnamese": "Vietnámi",
+    "cui.indian": "Indiai",
+    "cui.italian": "Olasz",
+    "cui.french": "Francia",
+    "cui.spanish": "Spanyol",
+    "cui.greek": "Görög",
+    "cui.mexican": "Mexikói",
+    "cui.american": "Amerikai",
+    "cui.hungarian": "Magyar",
+    "cui.middle_eastern": "Közel-keleti",
+    "cui.mediterranean": "Mediterrán",
+    "cui.other": "Egyéb",
+    "badge.the_one_who_started_it_all": "Az, aki mindent elkezdett",
+    "badge.wine__drinks_specialist": "Bor & ital specialista",
+    "badge.food__restaurant_expert": "Étel & étterem szakértő",
+    "badge.late_night__bar_scene": "Késő esti & bár jelenet",
+    "badge.café__specialty_coffee": "Kávézó & specialty kávé",
+    "badge.atmosphere__hidden_gems": "Hangulat & rejtett kincsek",
+    "badge.morning__brunch_spots": "Reggeli & brunch helyek",
+    "badge.off_the_beaten_path_finds": "Felfedezetlen helyek",
+    "badge.international_cuisine": "Nemzetközi konyha",
+    "badge.true_neighbourhood_insider": "Igazi szomszédsági bennfentes",
+    "grp.solo": "egyedül",
+    "grp.2": "2",
+    "grp.3_6": "3-6",
+    "grp.6_8": "6-8",
+    "grp.9plus": "9+",
+    "budget.d": "$",
+    "budget.dd": "$$",
+    "budget.ddd": "$$$",
+    "budget.dddd": "$$$$",
+    "sc.all_venues": "Összes hely",
+    "sc.event_calendar": "Eseménynaptár",
+    "sc.ai_assistant": "AI Asszisztens",
+    "sc.scout_profiles": "Scout profilok",
+    "sc.city_picks": "Városi kiválasztottak",
+    "sc.event_planning": "Eseménytervezés",
+    "scd.browse_the_full_cura": "Böngészd a teljes válogatott listát",
+    "scd.discover_local_event": "Fedezd fel a helyi eseményeket",
+    "scd.describe_what_you_wa": "Írd le egyszerű szöveggel, mit szeretnél",
+    "scd.follow_scouts__see_": "Kövesd a scoutokat és lásd a válogatásaikat",
+    "scd.exclusive_top_picks_": "Exkluzív top helyek a city leadektől",
+    "scd.plan_nights_out__in": "Tervezz este összejövetelt és hívj barátokat",
+    "venue.near_me_label": "közel hozzám",
+    "ui.search_ai": "pl. hangulatos kávézó a 7. kerületben",
+    "ui.no_image": "Még nincs koordinátás hely.",
+    "ui.choose_badge": "válassz jelvényt",
+    "ui.not_sure": "Még nem tudom",
+    "ui.results": "íme a helyed",
+    "ui.week_picks": "a hét ⭐ city pickjei",
+    "ui.or": "vagy...",
+    "ui.login_with": "bejelentkezés...",
   },
   es: {
     "nav.home": "inicio", "nav.saved": "guardados", "nav.menu": "menú",
@@ -736,6 +957,8 @@ const TRANSLATIONS = {
     "profile.type_delete_placeholder": "Escribe DELETE",
     "profile.delete_confirm": "eliminar",
     "profile.redirecting": "redirigiendo...", "profile.get_pro": "obtener explorer pro →",
+    "profile.dark_mode": "apariencia", "profile.light": "claro", "profile.dark": "oscuro",
+    "q.locating": "📍 localizando...", "q.detect_location": "📍 detectar ubicación",
     "scout.no_events": "Aún no hay eventos.",
     "scout.event_deleted": "Evento eliminado",
     "scout.select_venue": "Por favor selecciona un lugar",
@@ -770,9 +993,105 @@ const TRANSLATIONS = {
     "err.type_delete": "Escribe DELETE para confirmar.",
     "err.no_scout": "⚠ Sin scout asignado — email no enviado",
     "pin.generated": "PIN generado: ",
+    "occ.casual_dining": "Cena informal",
+    "occ.fine_dining": "Cena de lujo",
+    "occ.dinner_with_friends": "Cena con amigos",
+    "occ.date_night": "Noche de cita",
+    "occ.lunch": "Almuerzo",
+    "occ.breakfast_and_brunch": "Desayuno & brunch",
+    "occ.quick_bite": "Picoteo rápido",
+    "occ.coffee": "Café",
+    "occ.quiet_work_spot": "Lugar tranquilo para trabajar",
+    "occ.pre_drinks__drinks": "Copas previas / bebidas",
+    "occ.late_night": "Noche tardía",
+    "occ.celebration": "Celebración",
+    "occ.family_outing": "Salida familiar",
+    "cat.restaurant": "Restaurante",
+    "cat.café": "Cafetería",
+    "cat.bar": "Bar",
+    "cat.bakery": "Panadería",
+    "cat.patisserie": "Pastelería",
+    "cat.street_food": "Comida callejera",
+    "cat.other": "Otro",
+    "cat.cocktail_bar": "Bar de cócteles",
+    "cat.wine_bar": "Bar de vinos",
+    "cat.pub": "Pub",
+    "cat.night_club": "Club nocturno",
+    "cat.speakeasy": "Speakeasy",
+    "diet.gluten_free": "Sin gluten",
+    "diet.vegan": "Vegano",
+    "diet.vegetarian": "Vegetariano",
+    "diet.halal": "Halal",
+    "diet.kosher": "Kosher",
+    "diet.dairy_free": "Sin lácteos",
+    "diet.nut_free": "Sin frutos secos",
+    "diet.pescatarian": "Pescatariano",
+    "cui.japanese": "Japonesa",
+    "cui.chinese": "China",
+    "cui.korean": "Coreana",
+    "cui.thai": "Tailandesa",
+    "cui.vietnamese": "Vietnamita",
+    "cui.indian": "India",
+    "cui.italian": "Italiana",
+    "cui.french": "Francesa",
+    "cui.spanish": "Española",
+    "cui.greek": "Griega",
+    "cui.mexican": "Mexicana",
+    "cui.american": "Americana",
+    "cui.hungarian": "Húngara",
+    "cui.middle_eastern": "Oriente Medio",
+    "cui.mediterranean": "Mediterránea",
+    "cui.other": "Otra",
+    "badge.the_one_who_started_it_all": "El que empezó todo",
+    "badge.wine__drinks_specialist": "Especialista en vinos y bebidas",
+    "badge.food__restaurant_expert": "Experto en comida y restaurantes",
+    "badge.late_night__bar_scene": "Noche tardía y bares",
+    "badge.café__specialty_coffee": "Cafetería y café de especialidad",
+    "badge.atmosphere__hidden_gems": "Ambiente y joyas ocultas",
+    "badge.morning__brunch_spots": "Lugares de mañana y brunch",
+    "badge.off_the_beaten_path_finds": "Hallazgos fuera de lo común",
+    "badge.international_cuisine": "Cocina internacional",
+    "badge.true_neighbourhood_insider": "Insider del barrio de verdad",
+    "grp.solo": "solo",
+    "grp.2": "2",
+    "grp.3_6": "3-6",
+    "grp.6_8": "6-8",
+    "grp.9plus": "9+",
+    "budget.d": "$",
+    "budget.dd": "$$",
+    "budget.ddd": "$$$",
+    "budget.dddd": "$$$$",
+    "sc.all_venues": "Todos los lugares",
+    "sc.event_calendar": "Calendario de eventos",
+    "sc.ai_assistant": "Asistente IA",
+    "sc.scout_profiles": "Perfiles de scouts",
+    "sc.city_picks": "Selecciones de la ciudad",
+    "sc.event_planning": "Planificación de eventos",
+    "scd.browse_the_full_cura": "Explora la lista curada completa",
+    "scd.discover_local_event": "Descubre eventos locales",
+    "scd.describe_what_you_wa": "Describe lo que quieres en texto simple",
+    "scd.follow_scouts__see_": "Sigue a scouts y ve sus selecciones",
+    "scd.exclusive_top_picks_": "Mejores selecciones exclusivas de city leads",
+    "scd.plan_nights_out__in": "Planifica salidas nocturnas e invita amigos",
+    "venue.near_me_label": "cerca de mí",
+    "ui.search_ai": "ej. café acogedor en el distrito 7",
+    "ui.no_image": "Aún no hay lugares con coordenadas.",
+    "ui.choose_badge": "elige tu insignia",
+    "ui.not_sure": "Aún no lo sé",
+    "ui.results": "aquí está tu lugar",
+    "ui.week_picks": "⭐ selecciones de la semana",
+    "ui.or": "o...",
+    "ui.login_with": "iniciar sesión...",
   },
 };
 function t(key){ return (TRANSLATIONS[_lang]||TRANSLATIONS.en)[key] || TRANSLATIONS.en[key] || key; }
+
+// Translated label helpers
+function tOcc(id){ return t("occ."+id.toLowerCase().replace(/ /g,"_").replace(/\//g,"").replace(/-/g,"_").replace(/&/g,"").replace(/\s+/g,"_")) || id; }
+function tCat(cat){ return t("cat."+cat.toLowerCase().replace(/ /g,"_").replace(/-/g,"_")) || cat; }
+function tDiet(d){ return t("diet."+d.toLowerCase().replace(/-/g,"_")) || d; }
+function tCui(c){ return t("cui."+c.toLowerCase().replace(/ /g,"_").replace(/-/g,"_")) || c; }
+function tNearMe(){ return t("venue.near_me_label"); }
 const OCCASIONS = [
   {id:"Casual dining",        label:"Casual dining",        illus:"dinner"},
   {id:"Fine dining",          label:"Fine dining",           illus:"date"},
@@ -1054,7 +1373,7 @@ function VenueCard({venue, onClick}) {
         <div className="venue-name">{venue.name}</div>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:6,gap:8}}>
           <div className="venue-meta" style={{flex:1}}>
-            <span>{venue.category||venue.cuisine}</span><span>·</span>
+            <span>{tCat(venue.category)||tCui(venue.cuisine)}</span><span>·</span>
             <span>{t("venue.dist")} {venue.district}</span><span>·</span>
             <span>{venue.price_level||venue.price}</span>
             {openStatus&&<span style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:11,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"2px 7px",borderRadius:10}}>
@@ -1473,7 +1792,7 @@ function OnboardingScreen({navigate, user, setUser}) {
               <span style={{fontSize:24}}>{b.emoji}</span>
               <div>
                 <div style={{...BODY,fontWeight:700,fontSize:16}}>{b.id}</div>
-                <div style={{...BODY,fontSize:12,opacity:.65,marginTop:1}}>{b.desc}</div>
+                <div style={{...BODY,fontSize:12,opacity:.65,marginTop:1}}>{t("badge."+b.desc.toLowerCase().replace(/ /g,"_").replace(/&/g,"").replace(/-/g,"_"))}</div>
               </div>
             </div>
             <div className={`opt-check${badge===b.id?" on":""}`}/>
@@ -1663,9 +1982,9 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
                     onChange={e=>isPremium&&setQuery(e.target.value)}
                     onKeyDown={e=>{if(isPremium&&e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleAISearch();}}}
                     placeholder={[
-                      "e.g. cozy café to work from in the 7th district",
+                      t("ui.search_ai"),
                       "e.g. date night spot, something special, not too pricey",
-                      "e.g. quick lunch near me, local vibes",
+                      t("ui.search_ai"),
                       "e.g. hidden gem bar for drinks with friends",
                     ][Math.floor(Date.now()/10000)%4]}
                     rows={4}
@@ -1960,7 +2279,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
           <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
             {[...occList,{id:t("q.not_sure"),label:t("q.not_sure")}].map(o=>(
               <button key={o.id} type="button" onClick={()=>toggleOcc(o.id)} style={pillStyle(selOcc.includes(o.id))}>
-                {o.label}
+                {tOcc(o.id)}
               </button>
             ))}
           </div>
@@ -1999,6 +2318,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
     setLocLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos)=>{
+        setLocationGranted(true); // remember user granted location
         const {latitude:lat, longitude:lng} = pos.coords;
         function runGeocode(){
           if(!window.google?.maps) return false;
@@ -2026,13 +2346,20 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
           return true;
         }
         if(!runGeocode()){
-          const t=setInterval(()=>{ if(runGeocode()) clearInterval(t); },300);
+          const _t=setInterval(()=>{ if(runGeocode()) clearInterval(_t); },300);
         }
       },
-      ()=>setLocLoading(false),
+      ()=>{ setLocationGranted(false); setLocLoading(false); },
       {enableHighAccuracy:true, timeout:10000, maximumAge:0}
     );
   }
+
+  // Auto-detect location if user previously granted permission
+  React.useEffect(()=>{
+    if(getStoredLocation()==="1" && !sel.length){
+      detectLocation();
+    }
+  },[]);
 
   function toggle(d){
     haptic("light");
@@ -2059,7 +2386,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
       <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
         <button onClick={detectLocation}
           style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--black)":"white",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid black"}}>
-          <span>{locLoading?"📍 locating...":"📍 detect my location"}</span>
+          <span>{locLoading?t("q.locating"):t("q.detect_location")}</span>
           {!locLoading&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,background:"var(--bg)",color:"var(--black)",padding:"2px 8px",borderRadius:20}}>GPS</span>}
         </button>
         {DISTRICTS_MAIN.filter(d=>d!=="near me").map(d=>(
@@ -2350,7 +2677,7 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
   }
 
   return (
-    <div className="screen" style={{background:"white"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -2505,7 +2832,7 @@ function ScoutFeedbackSection({venue, user, showToast}) {
             border:"1.5px solid",
             borderColor:existing?.feedback_type===o.type?"var(--red)":"#ddd",
             borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:700,cursor:"pointer",marginBottom:8,transition:"all .15s"}}>
-          <span>{o.icon} {o.label}</span>
+          <span>{o.icon} {tOcc(o.id)}</span>
           <span style={{background:existing?.feedback_type===o.type?"rgba(255,255,255,.25)":"#e0e0e0",borderRadius:20,padding:"2px 10px",fontSize:13,fontWeight:800,color:existing?.feedback_type===o.type?"white":"#555"}}>
             {counts[o.type]}
           </span>
@@ -2896,7 +3223,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
   },[user?.id]);
 
   return (
-    <div className="screen" style={{background:"white"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <div/>
@@ -2946,7 +3273,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
                 ?<div className="empty"><div className="empty-icon">👤</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>{t("empty.no_scouts").split("\n")[0]}<br/>{t("empty.no_scouts").split("\n")[1]}</div></div>
                 :scouts.map(s=>(
                   <div key={s.id} onClick={()=>navigate("scout_profile", s.id)}
-                    style={{background:"white",borderRadius:16,padding:"16px",marginBottom:12,cursor:"pointer",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
+                    style={{background:"var(--white)",borderRadius:16,padding:"16px",marginBottom:12,cursor:"pointer",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
                     <div style={{width:48,height:48,borderRadius:"50%",background:"var(--red)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
                       {s.profile_image
                         ?<ShimmerImg src={s.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
@@ -3829,18 +4156,18 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         </select>
         <select style={selectStyle} value={editForm.category} onChange={e=>{setEditForm(f=>({...f,category:e.target.value,subcategory:""}));loadCustomTagsForCategory(e.target.value);}}>
           <option value="">{t("opt.select_category")}</option>
-          {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
+          {CATEGORIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
         </select>
         {editForm.category==="Bar"&&(
           <select style={selectStyle} value={editForm.subcategory||""} onChange={e=>setEditForm(f=>({...f,subcategory:e.target.value}))}>
             <option value="">{t("opt.select_bar_type")}</option>
-            {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=><option key={s} value={s}>{s}</option>)}
+            {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=><option key={s} value={s}>{tCat(s)}</option>)}
           </select>
         )}
         {editForm.category==="Restaurant"&&(
           <select style={{...selectStyle,borderColor:!editForm.cuisine?"var(--red)":"#ddd"}} value={editForm.cuisine} onChange={e=>setEditForm(f=>({...f,cuisine:e.target.value}))}>
             <option value="">{t("opt.select_cuisine")}</option>
-            {CUISINES_FILTER.map(c=><option key={c} value={c}>{c}</option>)}
+            {CUISINES_FILTER.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
           </select>
         )}
         <select style={selectStyle} value={editForm.price_level} onChange={e=>setEditForm(f=>({...f,price_level:e.target.value}))}>
@@ -3849,7 +4176,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         </select>
         <select style={selectStyle} value={editForm.capacity} onChange={e=>setEditForm(f=>({...f,capacity:e.target.value}))}>
           <option value="">{t("opt.select_capacity")}</option>
-          {CAPACITIES.map(c=><option key={c} value={c}>{c}</option>)}
+          {CAPACITIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
         </select>
 
         <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",background:"#FFFFFF",border:"1.5px solid #ddd",borderRadius:12,marginBottom:10,cursor:"pointer"}} onClick={()=>setEditForm(f=>({...f,is_city_pick:!f.is_city_pick}))}>
@@ -3974,7 +4301,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   );
 
   return (
-    <div className="screen" style={{background:"white"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -4024,18 +4351,18 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </select>
           <select style={selectStyle} value={form.category} onChange={e=>{setF("category",e.target.value);setF("subcategory","");if(e.target.value!=="Restaurant")setF("cuisine","");loadCustomTagsForCategory(e.target.value);}}>
             <option value="">{t("opt.select_category_req")}</option>
-            {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
+            {CATEGORIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
           </select>
           {form.category==="Bar"&&(
             <select style={selectStyle} value={form.subcategory||""} onChange={e=>setF("subcategory",e.target.value)}>
               <option value="">{t("opt.select_bar_type")}</option>
-              {BAR_SUBCATEGORIES.map(s=><option key={s} value={s}>{s}</option>)}
+              {BAR_SUBCATEGORIES.map(s=><option key={s} value={s}>{tCat(s)}</option>)}
             </select>
           )}
           {form.category==="Restaurant"&&(
             <select style={{...selectStyle,borderColor:!form.cuisine?"var(--red)":"#ddd"}} value={form.cuisine} onChange={e=>setF("cuisine",e.target.value)}>
               <option value="">{t("opt.select_cuisine")}</option>
-              {CUISINES_FILTER.map(c=><option key={c} value={c}>{c}</option>)}
+              {CUISINES_FILTER.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
             </select>
           )}
           <select style={selectStyle} value={form.price_level} onChange={e=>setF("price_level",e.target.value)}>
@@ -4044,7 +4371,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </select>
           <select style={selectStyle} value={form.capacity} onChange={e=>setF("capacity",e.target.value)}>
             <option value="">{t("opt.select_capacity")}</option>
-            {CAPACITIES.map(c=><option key={c} value={c}>{c}</option>)}
+            {CAPACITIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
           </select>
 
           <div style={{marginBottom:10}}>
@@ -4114,7 +4441,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
               {DIETARY_OPTIONS.map(d=>{
                 const sel=(form.dietary||[]).includes(d);
                 return <button key={d} type="button" onClick={()=>setF("dietary",sel?(form.dietary||[]).filter(x=>x!==d):[...(form.dietary||[]),d])}
-                  style={{background:sel?"var(--red)":"var(--white)",color:sel?"white":"#555",border:"1.5px solid",borderColor:sel?"var(--red)":"#ddd",borderRadius:20,padding:"7px 14px",fontFamily:"var(--body)",fontWeight:700,fontSize:12,cursor:"pointer"}}>{d}</button>;
+                  style={{background:sel?"var(--red)":"var(--white)",color:sel?"white":"#555",border:"1.5px solid",borderColor:sel?"var(--red)":"#ddd",borderRadius:20,padding:"7px 14px",fontFamily:"var(--body)",fontWeight:700,fontSize:12,cursor:"pointer"}}>{tDiet(d)}</button>;
               })}
             </div>
           </div>
@@ -4484,18 +4811,18 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </select>
         <select style={selectStyle} value={editForm.category||""} onChange={e=>setEditForm(f=>({...f,category:e.target.value,subcategory:""}))}>
           <option value="">{t("opt.select_category")}</option>
-          {CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}
+          {CATEGORIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
         </select>
         {editForm.category==="Bar"&&(
           <select style={selectStyle} value={editForm.subcategory||""} onChange={e=>setEditForm(f=>({...f,subcategory:e.target.value}))}>
             <option value="">{t("opt.select_bar_type")}</option>
-            {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=><option key={s} value={s}>{s}</option>)}
+            {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=><option key={s} value={s}>{tCat(s)}</option>)}
           </select>
         )}
         {editForm.category==="Restaurant"&&(
           <select style={{...selectStyle,borderColor:!editForm.cuisine?"var(--red)":"#ddd"}} value={editForm.cuisine||""} onChange={e=>setEditForm(f=>({...f,cuisine:e.target.value}))}>
             <option value="">{t("opt.select_cuisine")}</option>
-            {CUISINES_FILTER.map(c=><option key={c} value={c}>{c}</option>)}
+            {CUISINES_FILTER.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
           </select>
         )}
         <select style={selectStyle} value={editForm.price_level||""} onChange={e=>setEditForm(f=>({...f,price_level:e.target.value}))}>
@@ -4504,7 +4831,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </select>
         <select style={selectStyle} value={editForm.capacity||""} onChange={e=>setEditForm(f=>({...f,capacity:e.target.value}))}>
           <option value="">{t("opt.select_capacity")}</option>
-          {CAPACITIES.map(c=><option key={c} value={c}>{c}</option>)}
+          {CAPACITIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
         </select>
 
         <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",background:"#FFFFFF",border:"1.5px solid #ddd",borderRadius:12,marginBottom:10,cursor:"pointer"}} onClick={()=>setEditForm(f=>({...f,is_city_pick:!f.is_city_pick}))}>
@@ -4537,7 +4864,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
                 style={{padding:"7px 14px",borderRadius:20,border:"2px solid",fontFamily:"var(--body)",fontWeight:700,fontSize:12,cursor:"pointer",
                   background:sel?"var(--red)":"transparent",color:sel?"var(--white)":"var(--red)",borderColor:"var(--red)"}}
                 onClick={()=>setEditForm(f=>{const cur=f.dietary||[];return{...f,dietary:sel?cur.filter(x=>x!==d):[...cur,d]};})}
-              >{d}</button>;
+              >{tDiet(d)}</button>;
             })}
           </div>
         </div>
@@ -4627,7 +4954,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
   );
 
   return (
-    <div className="screen" style={{background:"white"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -4940,7 +5267,7 @@ function PartnerManageTab({showToast, cityId}) {
   );
 }
 
-function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang, changeLang}) {
+function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang, changeLang, dark, changeDark}) {
   const [editing, setEditing] = useState(null);
   const [newName, setNewName] = useState(user?.name||"");
   const [newPassword, setNewPassword] = useState("");
@@ -5099,7 +5426,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
               <div>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>badge</div>
                 <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>
-                  {user?.badge ? SCOUT_BADGES.find(b=>b.id===user.badge)?.emoji+" "+user.badge : <span style={{color:"#bbb"}}>choose your badge</span>}
+                  {user?.badge ? SCOUT_BADGES.find(b=>b.id===user.badge)?.emoji+" "+user.badge : <span style={{color:"#bbb"}}>{t("ui.choose_badge")}</span>}
                 </div>
               </div>
               <span style={{color:"var(--red)",fontSize:20}}>{editing==="badge"?"∨":"›"}</span>
@@ -5112,7 +5439,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
                     <span style={{fontSize:20}}>{b.emoji}</span>
                     <div>
                       <div style={{fontWeight:700}}>{b.id}</div>
-                      <div style={{fontSize:12,color:user?.badge===b.id?"rgba(255,255,255,.7)":"#888"}}>{b.desc}</div>
+                      <div style={{fontSize:12,color:user?.badge===b.id?"rgba(255,255,255,.7)":"#888"}}>{t("badge."+b.desc.toLowerCase().replace(/ /g,"_").replace(/&/g,"").replace(/-/g,"_"))}</div>
                     </div>
                   </button>
                 ))}
@@ -5194,7 +5521,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
             <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
               <select value={newCity} onChange={e=>setNewCity(e.target.value)}
                 style={{width:"100%",border:"1.5px solid #ddd",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,marginBottom:10,outline:"none",background:"white"}}>
-                {(cities&&cities.length>0?cities.map(c=>c.name):["Budapest"]).map(c=><option key={c} value={c}>{c}</option>)}
+                {(cities&&cities.length>0?cities.map(c=>c.name):["Budapest"]).map(c=><option key={c} value={c}>{tCui(c)}</option>)}
               </select>
               <button onClick={saveCity} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
                 {saving?t("btn.saving"):t("btn.save_city")}
@@ -5207,13 +5534,26 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
 
         <div style={{height:20}}/>
 
+        {/* Dark mode */}
+        <div style={{background:"var(--white)",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:10,textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.dark_mode")}</div>
+          <div style={{display:"flex",gap:8}}>
+            {[{v:false,label:"☀️ "+t("profile.light")},{v:true,label:"🌙 "+t("profile.dark")}].map(({v,label})=>(
+              <button key={String(v)} onClick={()=>changeDark(v)}
+                style={{flex:1,padding:"10px 0",borderRadius:50,border:dark===v?"none":"1.5px solid var(--border)",background:dark===v?"var(--black)":"transparent",color:dark===v?"white":"var(--black)",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",transition:"all .15s"}}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Language */}
-        <div style={{background:"white",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
+        <div style={{background:"var(--white)",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:10,textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.language")}</div>
           <div style={{display:"flex",gap:8}}>
             {[{code:"en",label:"🇬🇧 EN"},{code:"hu",label:"🇭🇺 HU"},{code:"es",label:"🇪🇸 ES"}].map(({code,label})=>(
               <button key={code} onClick={()=>changeLang(code)}
-                style={{flex:1,padding:"10px 0",borderRadius:50,border:lang===code?"none":"1.5px solid #eee",background:lang===code?"var(--black)":"white",color:lang===code?"white":"var(--black)",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",transition:"all .15s"}}>
+                style={{flex:1,padding:"10px 0",borderRadius:50,border:lang===code?"none":"1.5px solid var(--border)",background:lang===code?"var(--black)":"transparent",color:lang===code?"white":"var(--black)",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",transition:"all .15s"}}>
                 {label}
               </button>
             ))}
@@ -5446,7 +5786,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
   const isOwnProfile = user?.id===scoutId;
 
   return (
-    <div className="screen" style={{background:"white"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
       {/* Header — rózsaszín + fekete, mint Scouts screen */}
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -5545,7 +5885,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
 // ── ABOUT SCREEN ─────────────────────────────
 function AboutScreen({navigate}) {
   return (
-    <div className="screen" style={{background:"white"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <Hamburger onClick={()=>navigate("home")}/>
@@ -5778,7 +6118,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
   const displayEvents = tab==="my" ? myEvents : events;
 
   return (
-    <div className="screen" style={{background:"white"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -6377,10 +6717,10 @@ function UpgradeScreen({navigate, user}) {
   };
 
   const FEATURES = [
-    {icon:"🤖", label:"AI Assistant",     desc:"Describe what you want in plain text"},
-    {icon:"👤", label:"Scout profiles",   desc:"Follow scouts & see their curated picks"},
-    {icon:"⭐", label:"City picks",        desc:"Exclusive top picks from our city leads"},
-    {icon:"🎉", label:"Event planning",   desc:"Plan nights out & invite friends"},
+    {icon:"🤖", label:t("sc.ai_assistant"), desc:t("scd.describe_what_you_want_in")},
+    {icon:"👤", label:t("sc.scout_profiles"), desc:t("scd.follow_scouts__see_their")},
+    {icon:"⭐", label:t("sc.city_picks"), desc:t("scd.exclusive_top_picks_from_ou")},
+    {icon:"🎉", label:t("sc.event_planning"), desc:t("scd.plan_nights_out__invite_f")},
   ];
   const FREE_FEATURES = [
     {icon:"📋", label:t("menu.all_venues"),       desc:t("home.all_venues")},
@@ -6490,7 +6830,10 @@ function App() {
   const [screen, setScreen] = useState("signin");
   const [appLoading, setAppLoading] = useState(true);
   const [lang, setLangState] = useState(_lang);
+  const [dark, setDarkState] = useState(_dark);
   const changeLang = (l) => { setLang(l); setLangState(l); };
+  const changeDark = (v) => { setDarkMode(v); setDarkState(v); };
+  React.useEffect(()=>{ applyDarkMode(_dark); }, []);
   const [history, setHistory] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [selectedScout, setSelectedScout] = useState(null);
@@ -6784,7 +7127,7 @@ function App() {
     all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)}/>,
     scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user} cities={cities}/>,
     city_lead: <CityLeadScreen navigate={navigate} allVenues={allVenues} setAllVenues={setAllVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} user={user}/>,
-    profile: <ProfileScreen navigate={navigate} user={user} setUser={setUser} onMenu={()=>setShowMenu(true)} onSignOut={signOut} cities={cities} lang={lang} changeLang={changeLang}/>,
+    profile: <ProfileScreen navigate={navigate} user={user} setUser={setUser} onMenu={()=>setShowMenu(true)} onSignOut={signOut} cities={cities} lang={lang} changeLang={changeLang} dark={dark} changeDark={changeDark}/>,
     about: <AboutScreen navigate={navigate}/>,
     upgrade: <UpgradeScreen navigate={navigate} user={user}/>,
     event_calendar: <EventCalendarScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
