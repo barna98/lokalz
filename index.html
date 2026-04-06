@@ -60,6 +60,9 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 [data-dark="true"] .tab { color: rgba(255,255,255,.4) !important; }
 [data-dark="true"] .tab.on { color: #ffffff !important; border-bottom-color: #ffffff !important; }
 [data-dark="true"] .venue-name { color: #ffffff !important; }
+[data-dark="true"] .venue-card { background: #1c1c1c !important; border: 1.5px solid #2a2a2a !important; }
+[data-dark="true"] .venue-tag { background: #2a1a2a !important; color: #ddaadd !important; }
+[data-dark="true"] .venue-body { background: #1c1c1c !important; }
 [data-dark="true"] .occ-card { background: #1c1c1c !important; }
 [data-dark="true"] .dm-surface { background: #1c1c1c !important; border-color: #2a2a2a !important; color: #ffffff !important; }
 [data-dark="true"] .dm-surface2 { background: #252525 !important; border-color: #333 !important; }
@@ -1807,7 +1810,7 @@ function ShimmerImg({src, style, fallback=null}) {
   if(!src) return fallback;
   return (
     <>
-      {!loaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear",zIndex:1}}/>}
+      {!loaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear",zIndex:1}}/>}
       <img src={src} onLoad={()=>setLoaded(true)} style={{...style,opacity:loaded?1:0,transition:"opacity .3s ease"}}/>
     </>
   );
@@ -1848,12 +1851,12 @@ function VenueCard({venue, onClick}) {
 
   return (
     <div className="venue-card" onClick={onClick}>
-      <div className="venue-img" style={{background:!imgFetched||imgUrl?(imgLoaded?"#111":"#e8e8e8"):grads[venue.cuisine]||grads.default,padding:0}}>
+      <div className="venue-img" style={{background:!imgFetched||imgUrl?(imgLoaded?"#111":"var(--surface2)"):grads[venue.cuisine]||grads.default,padding:0}}>
         {!imgFetched
-          ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
+          ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
           :imgUrl
             ?<>
-              {!imgLoaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>}
+              {!imgLoaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>}
               <img src={imgUrl} onLoad={()=>setImgLoaded(true)} style={{width:"100%",height:"100%",objectFit:"cover",transition:"opacity .35s ease",opacity:imgLoaded?1:0}}/>
             </>
             :<span style={{fontSize:52}}>🍽</span>
@@ -2603,12 +2606,12 @@ function RecentVenueThumb({venueId, category}) {
   },[venueId]);
   const catEmoji = {Restaurant:"🍽️","Street food":"🌮",Bakery:"🥐",Café:"☕",Patisserie:"🍰",Bar:"🍸"};
   return (
-    <div style={{width:"100%",height:110,background:"#e8e8e8",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,flexShrink:0,position:"relative",overflow:"hidden"}}>
+    <div style={{width:"100%",height:110,background:"var(--surface2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,flexShrink:0,position:"relative",overflow:"hidden"}}>
       {!imgFetched
-        ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
+        ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
         :imgUrl
           ?<>
-            {!heroLoaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>}
+            {!heroLoaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>}
             <img src={imgUrl} onLoad={()=>setHeroLoaded(true)} style={{width:"100%",height:"100%",objectFit:"cover",opacity:heroLoaded?1:0,transition:"opacity .35s ease"}}/>
           </>
           :<span>{catEmoji[category]||"🍽️"}</span>
@@ -2675,7 +2678,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
               onTouchEnd={e=>e.currentTarget.style.transform=""}
               style={{
                 background:sel===c.id?"var(--black)":"var(--surface)",
-                border:"1.5px solid black",
+                border:"1.5px solid var(--black)",
                 borderRadius:20,
                 padding:"20px 12px",
                 cursor:"pointer",
@@ -2857,7 +2860,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
   }
 
   function next(){setAnswers(a=>({...a,locations:sel}));navigate("q4");}
-  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
+  const PILL = {border:"1.5px solid var(--black)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -2875,7 +2878,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
       </div>
       <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
         <button onClick={detectLocation}
-          style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--black)":"var(--surface)",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid black"}}>
+          style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--black)":"var(--surface)",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid var(--black)"}}>
           <span>{locLoading?t("q.locating"):t("q.detect_location")}</span>
           {!locLoading&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,background:"var(--bg)",color:"var(--black)",padding:"2px 8px",borderRadius:20}}>GPS</span>}
         </button>
@@ -2942,7 +2945,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
   const [sel, setSel] = useState(answers.budgets||[]);
   function toggle(b){setSel(prev=>prev.includes(b)?prev.filter(x=>x!==b):[...prev,b]);}
   function next(){setAnswers(a=>({...a,budgets:sel}));navigate(answers.category==="Restaurant"?"q5":"q6");}
-  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
+  const PILL = {border:"1.5px solid var(--black)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -2976,7 +2979,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
   const [sel,setSel]=useState(answers.cuisines||[]);
   function toggle(x){setSel(prev=>prev.includes(x)?prev.filter(v=>v!==x):[...prev,x]);}
   function next(){setAnswers(a=>({...a,cuisines:sel}));navigate("q6");}
-  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
+  const PILL = {border:"1.5px solid var(--black)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -3009,7 +3012,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
 
 function Q6Screen({navigate, onMenu, answers, setAnswers}) {
   function select(g){setAnswers(a=>({...a,group:g}));setTimeout(()=>navigate("results"),200);}
-  const PILL = {border:"1.5px solid black",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",width:"100%",transition:"transform .1s ease"};
+  const PILL = {border:"1.5px solid var(--black)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
@@ -3214,13 +3217,13 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8,width:"100%",marginBottom:16,alignItems:"center"}}>
               {answers.locations?.length>0&&!answers.locations.includes(t("q.anywhere"))&&(
-                <button style={{background:"var(--surface)",border:"1.5px solid black",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer"}}
+                <button style={{background:"var(--surface)",border:"1.5px solid var(--black)",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer",color:"var(--black)"}}
                   onClick={()=>{setAnswers(a=>({...a,locations:[t("q.anywhere")]}));setShownCount(BATCH);}}>
                   🗺️ try anywhere in Budapest
                 </button>
               )}
               {answers.budgets?.length>0&&(
-                <button style={{background:"var(--surface)",border:"1.5px solid black",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer"}}
+                <button style={{background:"var(--surface)",border:"1.5px solid var(--black)",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer",color:"var(--black)"}}
                   onClick={()=>{setAnswers(a=>({...a,budgets:[],budget:null}));setShownCount(BATCH);}}>
                   💸 remove budget filter
                 </button>
@@ -3312,23 +3315,23 @@ function ScoutFeedbackSection({venue, user, showToast}) {
   ];
 
   return (
-    <div style={{background:"#F5F5F5",borderRadius:16,padding:16,marginTop:4}}>
+    <div style={{background:"var(--surface2)",border:"1.5px solid var(--border-col)",borderRadius:16,padding:16,marginTop:4}}>
       <div style={{fontFamily:"var(--display)",fontSize:13,fontWeight:800,color:"var(--red)",letterSpacing:".06em",marginBottom:10}}>{t("scout.feedback_title")}</div>
       {options.map(o=>(
         <button key={o.type} onClick={()=>!submitting&&submitFeedback(o.type)}
           style={{display:"flex",width:"100%",alignItems:"center",justifyContent:"space-between",
-            background:existing?.feedback_type===o.type?"var(--red)":"none",
+            background:existing?.feedback_type===o.type?"var(--red)":"var(--surface)",
             color:existing?.feedback_type===o.type?"white":"var(--black)",
             border:"1.5px solid",
             borderColor:existing?.feedback_type===o.type?"var(--red)":"var(--border-col)",
             borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:700,cursor:"pointer",marginBottom:8,transition:"all .15s"}}>
           <span>{o.icon} {o.label}</span>
-          <span style={{background:existing?.feedback_type===o.type?"rgba(255,255,255,.25)":"#e0e0e0",borderRadius:20,padding:"2px 10px",fontSize:13,fontWeight:800,color:existing?.feedback_type===o.type?"white":"#555"}}>
+          <span style={{background:existing?.feedback_type===o.type?"rgba(255,255,255,.25)":"var(--surface3)",borderRadius:20,padding:"2px 10px",fontSize:13,fontWeight:800,color:existing?.feedback_type===o.type?"white":"var(--text-muted)"}}>
             {counts[o.type]}
           </span>
         </button>
       ))}
-      {existing&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600,marginTop:4}}>{t("misc.last_updated")} {new Date(existing.created_at).toLocaleDateString()}</div>}
+      {existing&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",fontWeight:600,marginTop:4}}>{t("misc.last_updated")} {new Date(existing.created_at).toLocaleDateString()}</div>}
     </div>
   );
 }
@@ -3451,7 +3454,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
 
   return (
     <div className="screen">
-      <div style={{width:"100%",aspectRatio:"1/1",background:"#e8e8e8",flexShrink:0,position:"relative",display:"flex",alignItems:"center",justifyContent:"center",fontSize:72,overflow:"hidden"}}
+      <div style={{width:"100%",aspectRatio:"1/1",background:"var(--surface2)",flexShrink:0,position:"relative",display:"flex",alignItems:"center",justifyContent:"center",fontSize:72,overflow:"hidden"}}
         onTouchStart={e=>{ touchStartX.current = e.touches[0].clientX; }}
         onTouchEnd={e=>{
           if(touchStartX.current===null||images.length<=1) return;
@@ -3460,10 +3463,10 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           touchStartX.current = null;
         }}>
         {!imagesFetched
-          ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
+          ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
           :images.length>0
             ?<>
-              {!galleryLoaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear",zIndex:1}}/>}
+              {!galleryLoaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear",zIndex:1}}/>}
               <img src={images[imgIdx]} className="img-fade" onLoad={()=>setGalleryLoaded(true)} style={{width:"100%",height:"100%",objectFit:"cover",...swingStyle}}/>
             </>
             :<span>🍽</span>
@@ -3559,7 +3562,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
 
         {/* 7. Why locals go here */}
         <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:10}}>{t("vd.why_title")}</div>
-        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"#222",lineHeight:1.8,marginBottom:12}}>{venue.why}</div>
+        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"var(--black)",lineHeight:1.8,marginBottom:12}}>{venue.why}</div>
         <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>
           <span>—</span>
           <span
@@ -3573,7 +3576,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
             {venue.scout_alias}
           </span>
           {(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&venue.submitted_by&&
-            <span style={{fontSize:11,color:"#bbb"}}>{t("vd.view_picks")}</span>}
+            <span style={{fontSize:11,color:"var(--text-muted)"}}>{t("vd.view_picks")}</span>}
         </div>
 
         <div style={{height:1,background:"var(--surface2)",marginBottom:20}}/>
@@ -3585,7 +3588,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
             <button key={type} onClick={()=>submitVote(type)} disabled={!user?.id||votingLoading}
               style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"10px 6px",borderRadius:12,border:"1.5px solid",borderColor:myVote===type?"var(--black)":"var(--border-col)",background:myVote===type?"var(--black)":"var(--surface)",cursor:user?.id?"pointer":"default",transition:"all .15s"}}>
               <span style={{fontSize:18}}>{icon}</span>
-              <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:myVote===type?"white":"#888"}}>{label}</span>
+              <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:myVote===type?"white":"var(--text-muted)"}}>{label}</span>
               <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:myVote===type?"white":"var(--black)"}}>{votes[type]}</span>
             </button>
           ))}
@@ -3676,12 +3679,12 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
                     style={{display:"flex",alignItems:"center",gap:12,background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:14,padding:"12px 14px",cursor:"pointer",textAlign:"left",width:"100%"}}>
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",marginBottom:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{v.name}</div>
-                      <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#888"}}>
+                      <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"var(--text-muted)"}}>
                         {v.cuisine&&<span>{tCui(v.cuisine)} · </span>}{t("venue.dist_label")} {v.district} · {v.price_level||v.price||""}
                         {v.is_city_pick&&<span style={{marginLeft:6}}>⭐</span>}
                       </div>
                     </div>
-                    <span style={{color:"#ccc",fontSize:18,flexShrink:0}}>›</span>
+                    <span style={{color:"var(--text-muted)",fontSize:18,flexShrink:0}}>›</span>
                   </button>
                 ))}
               </div>
@@ -3890,16 +3893,16 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
     return true;
   });
   const sorted=[...filtered].sort((a,b)=>a.name.localeCompare(b.name));
-  const selectStyle={background:"var(--surface)",color:"var(--black)",border:"1.5px solid black",borderRadius:50,padding:"10px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",outline:"none",width:"100%",marginBottom:10};
+  const selectStyle={background:"var(--surface)",color:"var(--black)",border:"1.5px solid var(--black)",borderRadius:50,padding:"10px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",outline:"none",width:"100%",marginBottom:10};
 
   return (
     <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
       <div style={{position:"absolute",top:0,left:0,right:0,zIndex:10,padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",display:"flex",flexDirection:"column",gap:8,alignItems:"center"}}>
         <div className="av-ctrl" style={{display:"flex",gap:8,width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4}}>
-          <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:viewMode==="map"?"white":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.6)",transition:"all .2s"}}>
+          <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:viewMode==="map"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.6)",transition:"all .2s"}}>
             {t("map.map")}
           </button>
-          <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:viewMode==="list"?"white":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.6)",transition:"all .2s"}}>
+          <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:viewMode==="list"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.6)",transition:"all .2s"}}>
             {t("map.list")}
           </button>
         </div>
@@ -3912,7 +3915,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
             const sel = category===c;
             return (
               <button key={c} onClick={()=>{setCategory(sel?"":c);setCuisine("");setSubcategory("");}}
-                style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.9)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>
+                style={{background:sel?"var(--surface)":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"1px solid var(--border-col)":"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.9)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>
                 {tCat(c)}
               </button>
             );
@@ -3922,7 +3925,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
             {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=>{
               const sel=subcategory===s;
-              return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{tCat(s)}</button>;
+              return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"var(--surface)":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"1px solid var(--border-col)":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{tCat(s)}</button>;
             })}
           </div>
         )}
@@ -3930,7 +3933,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
             {CUISINES_FILTER.map(c=>{
               const sel=cuisine===c;
-              return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{tCui(c)}</button>;
+              return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"var(--surface)":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"1px solid var(--border-col)":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{tCui(c)}</button>;
             })}
           </div>
         )}
@@ -3940,8 +3943,8 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           {/* Zoom + locate */}
           <div style={{position:"absolute",bottom:100,right:16,display:"flex",flexDirection:"column",gap:8}}>
             <div style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:20,boxShadow:"0 2px 8px rgba(0,0,0,.2)",display:"flex",flexDirection:"column",overflow:"hidden"}}>
-              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)+1)} style={{background:"none",border:"none",borderBottom:"1px solid #eee",cursor:"pointer",width:40,height:40,fontSize:20,color:"#333",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
-              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)-1)} style={{background:"none",border:"none",cursor:"pointer",width:40,height:40,fontSize:20,color:"#333",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)+1)} style={{background:"none",border:"none",borderBottom:"1px solid #eee",cursor:"pointer",width:40,height:40,fontSize:20,color:"var(--black)",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)-1)} style={{background:"none",border:"none",cursor:"pointer",width:40,height:40,fontSize:20,color:"var(--black)",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
             </div>
             <button onClick={()=>{
               if(!navigator.geolocation||!mapInstanceRef.current) return;
@@ -4094,7 +4097,7 @@ function ScoutEventsTab({user, allVenues, showToast}) {
                     style={{padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",cursor:"pointer",borderBottom:"1px solid #f5f5f5"}}
                     onMouseEnter={e=>e.currentTarget.style.background="#f9f6f0"}
                     onMouseLeave={e=>e.currentTarget.style.background="var(--surface)"}>
-                    {v.name} <span style={{color:"#888",fontSize:12}}>· Dist. {v.district}</span>
+                    {v.name} <span style={{color:"var(--text-muted)",fontSize:12}}>· Dist. {v.district}</span>
                   </div>
                 ))}
               </div>
@@ -4103,7 +4106,7 @@ function ScoutEventsTab({user, allVenues, showToast}) {
           <label style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",border:"1.5px dashed #ddd",borderRadius:10,cursor:"pointer",marginBottom:10}}>
             <input type="file" accept="image/*" style={{display:"none"}} onChange={e=>setImgFile(e.target.files[0]||null)}/>
             <span style={{fontSize:20}}>📷</span>
-            <span style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"#888"}}>{imgFile?imgFile.name:"Add cover photo"}</span>
+            <span style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"var(--text-muted)"}}>{imgFile?imgFile.name:"Add cover photo"}</span>
           </label>
           <button className="btn-black" onClick={submitEvent} style={{opacity:saving||!form.title.trim()||!form.venue_id||!form.event_date||!form.event_time?0.5:1}}>
             {saving?t("btn.submitting"):t("btn.submit_approval")}
@@ -4192,7 +4195,7 @@ function DraggableImageGrid({previews, onMove, onRemove, onAdd, maxPhotos=5}) {
           <label style={{aspectRatio:"1",borderRadius:10,border:"2px dashed #ddd",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexDirection:"column",gap:4}}>
             <input type="file" accept="image/*" multiple style={{display:"none"}} onChange={onAdd}/>
             <span style={{fontSize:24}}>📷</span>
-            <span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#888"}}>Add</span>
+            <span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--text-muted)"}}>Add</span>
           </label>
         )}
       </div>
@@ -4814,7 +4817,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
             <div key={k}>
               <div className="input-wrap-light" style={{marginBottom:k==="name"&&duplicates.length>0?6:10}}>
                 <input placeholder={p} value={form[k]} onChange={e=>setF(k,e.target.value)}/>
-                {k==="name"&&checkingDupe&&<span style={{fontSize:12,color:"#888"}}>...</span>}
+                {k==="name"&&checkingDupe&&<span style={{fontSize:12,color:"var(--text-muted)"}}>...</span>}
               </div>
               {k==="name"&&duplicates.length>0&&(
                 <div style={{background:"#FFF3CD",border:"1.5px solid #FFD966",borderRadius:10,padding:"10px 14px",marginBottom:10,animation:"fadeUp .2s ease both"}}>
@@ -4980,7 +4983,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
               <div key={label} style={{flex:1,background:"var(--white)",borderRadius:16,padding:"16px",textAlign:"center"}}>
                 <div style={{fontSize:28}}>{ico}</div>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:28,color:"var(--red)"}}>{count}</div>
-                <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"#888"}}>{label}</div>
+                <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"var(--text-muted)"}}>{label}</div>
               </div>
             ))}
           </div>
@@ -5474,7 +5477,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
                   </div>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
                     <StatusPill status={v.status}/>
-                    <span style={{color:"#aaa",fontSize:16}}>{expandedVenue===v.id?"▲":"▼"}</span>
+                    <span style={{color:"var(--text-muted)",fontSize:16}}>{expandedVenue===v.id?"▲":"▼"}</span>
                   </div>
                 </div>
                 {expandedVenue===v.id&&(
@@ -5580,10 +5583,10 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
             </button>
           </div>
           <div className="input-wrap-light" style={{marginBottom:8}}>
-            <span style={{color:"#888",fontSize:16}}>🔍</span>
+            <span style={{color:"var(--text-muted)",fontSize:16}}>🔍</span>
             <input placeholder="Search venue..." value={clSearch} onChange={e=>setClSearch(e.target.value)}
               style={{border:"none",outline:"none",background:"transparent",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",flex:1}}/>
-            {clSearch&&<button onClick={()=>setClSearch("")} style={{background:"none",border:"none",cursor:"pointer",color:"#888",fontSize:16}}>✕</button>}
+            {clSearch&&<button onClick={()=>setClSearch("")} style={{background:"none",border:"none",cursor:"pointer",color:"var(--text-muted)",fontSize:16}}>✕</button>}
           </div>
           <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}}>
             {["","Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"].map(cat=>(
@@ -5846,7 +5849,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
     onSignOut();
   }
 
-  const rowStyle={background:"var(--surface)",border:"1.5px solid var(--black)",borderRadius:50,padding:"10px 22px",marginBottom:10,cursor:"pointer"};
+  const rowStyle={background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:50,padding:"10px 22px",marginBottom:10,cursor:"pointer"};
 
   return (
     <div className="screen">
@@ -5891,7 +5894,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
             </div>
             {editing!=="profile"&&(
               <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"#666",marginTop:4}}>
-                {user?.bio||<span style={{color:"#bbb"}}>{t("profile.add_bio")}</span>}
+                {user?.bio||<span style={{color:"var(--text-muted)"}}>{t("profile.add_bio")}</span>}
                 {user?.instagram_url&&<span style={{marginLeft:8,color:"var(--red)"}}>@{user.instagram_url.replace("https://instagram.com/","").replace("@","")}</span>}
               </div>
             )}
@@ -5916,7 +5919,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
               <div>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>{t("profile.badge_label")}</div>
                 <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>
-                  {user?.badge ? SCOUT_BADGES.find(b=>b.id===user.badge)?.emoji+" "+user.badge : <span style={{color:"#bbb"}}>{t("ui.choose_badge")}</span>}
+                  {user?.badge ? SCOUT_BADGES.find(b=>b.id===user.badge)?.emoji+" "+user.badge : <span style={{color:"var(--text-muted)"}}>{t("ui.choose_badge")}</span>}
                 </div>
               </div>
               <span style={{color:"var(--red)",fontSize:20}}>{editing==="badge"?"∨":"›"}</span>
@@ -6150,7 +6153,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
       </div>
       <div className="scroll" style={{padding:"12px 20px 80px"}}>
         {loading&&<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>}
-        {!loading&&filtered.length===0&&<div style={{textAlign:"center",padding:32,fontFamily:"var(--body)",fontSize:14,color:"#888"}}>{t("sc.no_scouts")}</div>}
+        {!loading&&filtered.length===0&&<div style={{textAlign:"center",padding:32,fontFamily:"var(--body)",fontSize:14,color:"var(--text-muted)"}}>{t("sc.no_scouts")}</div>}
         {filtered.map(s=>(
           <div key={s.id} onClick={()=>navigate("scout_profile",s.id)}
             style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:16,marginBottom:10,cursor:"pointer"}}>
@@ -6166,7 +6169,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
               </div>
               {s.bio&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"#666",marginTop:4,lineHeight:1.4}}>{s.bio}</div>}
             </div>
-            <span style={{color:"#ccc",fontSize:20}}>›</span>
+            <span style={{color:"var(--text-muted)",fontSize:20}}>›</span>
           </div>
         ))}
       </div>
@@ -6261,7 +6264,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
   if(loading) return (
     <div className="screen" style={{alignItems:"center",justifyContent:"center",gap:16}}>
       <div style={{width:36,height:36,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
-      <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"#888"}}>{t("sc.loading")}</div>
+      <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--text-muted)"}}>{t("sc.loading")}</div>
     </div>
   );
 
@@ -6748,7 +6751,7 @@ function EventDetailScreen({navigate, event, user, showToast}) {
             ))}
           </div>
           {!isPremium&&(
-            <div style={{marginTop:10,textAlign:"center",fontFamily:"var(--body)",fontSize:12,fontWeight:600,color:"#888"}}>
+            <div style={{marginTop:10,textAlign:"center",fontFamily:"var(--body)",fontSize:12,fontWeight:600,color:"var(--text-muted)"}}>
               <span style={{color:"var(--red)",cursor:"pointer",fontWeight:700}} onClick={()=>navigate("upgrade")}>{t("ev.upgrade_premium")}</span> to RSVP
             </div>
           )}
@@ -6852,7 +6855,7 @@ function PlanCard({plan, navigate, isOwner}) {
         {isOwner&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--red)",marginLeft:8,flexShrink:0}}>{t("ev.your_event")}</span>}
       </div>
       <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"#888",marginBottom:4}}>📅 {formatDate(plan.event_date)}</div>
-      {plan.venues&&<div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"#888"}}>📍 {plan.venues.name} · Dist. {plan.venues.district}</div>}
+      {plan.venues&&<div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"var(--text-muted)"}}>📍 {plan.venues.name} · Dist. {plan.venues.district}</div>}
     </div>
   );
 }
@@ -6909,7 +6912,7 @@ function CreatePlanModal({onClose, onCreate, user, allVenues, showToast}) {
       <div style={{background:"var(--bg)",borderRadius:"24px 24px 0 0",padding:"24px 24px 40px",width:"100%",animation:"slideInUp .3s ease both"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
           <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:20,color:"var(--black)"}}>{t("ev.new_event")}</div>
-          <button onClick={onClose} style={{background:"none",border:"none",fontSize:24,cursor:"pointer",color:"#888"}}>✕</button>
+          <button onClick={onClose} style={{background:"none",border:"none",fontSize:24,cursor:"pointer",color:"var(--text-muted)"}}>✕</button>
         </div>
         <input placeholder="Event name *" value={title} onChange={e=>setTitle(e.target.value)} style={inputStyle}/>
         <textarea placeholder="Description (optional)" value={desc} onChange={e=>setDesc(e.target.value)} rows={2}
@@ -6932,7 +6935,7 @@ function CreatePlanModal({onClose, onCreate, user, allVenues, showToast}) {
                   style={{padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",cursor:"pointer",borderBottom:"1px solid #f5f5f5"}}
                   onMouseEnter={e=>e.currentTarget.style.background="#f9f6f0"}
                   onMouseLeave={e=>e.currentTarget.style.background="var(--surface)"}>
-                  {v.name} <span style={{color:"#888",fontSize:12}}>· Dist. {v.district}</span>
+                  {v.name} <span style={{color:"var(--text-muted)",fontSize:12}}>· Dist. {v.district}</span>
                 </div>
               ))}
             </div>
@@ -7096,7 +7099,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
         {isOwner&&(
           <div style={{display:"flex",gap:8,marginBottom:16}}>
             <button onClick={openEdit}
-              style={{flex:1,background:"#EDE8E0",border:"none",borderRadius:12,padding:"12px",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"var(--black)",cursor:"pointer",letterSpacing:".04em"}}>
+              style={{flex:1,background:"var(--surface2)",border:"none",borderRadius:12,padding:"12px",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"var(--black)",cursor:"pointer",letterSpacing:".04em"}}>
               ✏️ EDIT
             </button>
             <button onClick={deletePlan} disabled={deleting}
@@ -7140,7 +7143,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
             GUEST LIST · {going.length} going{maybe.length>0?`, ${maybe.length} maybe`:""}
           </div>
           {loading
-            ?<div style={{fontFamily:"var(--body)",fontSize:13,color:"#888"}}>{t("ev.loading")}</div>
+            ?<div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)"}}>{t("ev.loading")}</div>
             :rsvps.length===0
               ?<div style={{fontFamily:"var(--body)",fontSize:13,color:"#888",fontWeight:600}}>{t("ev.no_rsvps")}</div>
               :rsvps.map(r=>(
@@ -7162,7 +7165,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
           <div style={{background:"var(--bg)",borderRadius:"24px 24px 0 0",padding:"24px 24px 40px",width:"100%",animation:"slideInUp .3s ease both"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)"}}>{t("ev.edit_event")}</div>
-              <button onClick={()=>setShowEdit(false)} style={{background:"none",border:"none",fontSize:24,cursor:"pointer",color:"#888"}}>✕</button>
+              <button onClick={()=>setShowEdit(false)} style={{background:"none",border:"none",fontSize:24,cursor:"pointer",color:"var(--text-muted)"}}>✕</button>
             </div>
             <input placeholder="Title *" value={editForm.title} onChange={e=>setEditForm(f=>({...f,title:e.target.value}))} style={inputStyle}/>
             <textarea placeholder="Description" value={editForm.description} onChange={e=>setEditForm(f=>({...f,description:e.target.value}))} rows={2} style={{...inputStyle,resize:"none"}}/>
@@ -7179,7 +7182,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
                   {venueSuggestions.map(v=>(
                     <div key={v.id} onClick={()=>{setEditForm(f=>({...f,venue_id:v.id}));setVenueSearch(v.name+" · Dist. "+v.district);setVenueSuggestions([]);}}
                       style={{padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",cursor:"pointer",borderBottom:"1px solid #f5f5f5"}}>
-                      {v.name} <span style={{color:"#888",fontSize:12}}>· Dist. {v.district}</span>
+                      {v.name} <span style={{color:"var(--text-muted)",fontSize:12}}>· Dist. {v.district}</span>
                     </div>
                   ))}
                 </div>
@@ -7253,7 +7256,7 @@ function UpgradeScreen({navigate, user}) {
         </div>
 
         {/* Plan toggle */}
-        <div style={{display:"flex",background:"#EDE8E0",borderRadius:16,padding:4,marginBottom:24}}>
+        <div style={{display:"flex",background:"var(--surface2)",borderRadius:16,padding:4,marginBottom:24}}>
           {["monthly","yearly"].map(p=>(
             <button key={p} onClick={()=>setPlan(p)}
               style={{flex:1,padding:"12px 8px",border:"none",borderRadius:13,cursor:"pointer",transition:"all .2s",
@@ -7308,7 +7311,7 @@ function UpgradeScreen({navigate, user}) {
         <button className="btn-black" onClick={startCheckout} style={{opacity:loading?0.6:1,marginBottom:10}}>
           {loading?t("profile.redirecting"):t("profile.get_pro")}
         </button>
-        <div style={{textAlign:"center",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"#888"}}>
+        <div style={{textAlign:"center",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"var(--text-muted)"}}>
           Secure payment via Stripe · Cancel anytime
         </div>
       </div>
