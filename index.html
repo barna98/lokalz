@@ -558,6 +558,29 @@ const TRANSLATIONS = {
     "saved.explore": "Start exploring and save the spots you love.",
     "saved.pro_feature": "Explorer Pro feature",
     "saved.upgrade": "upgrade to pro →",
+    "vd.directions": "directions",
+    "vd.reserve": "🍽 Reserve",
+    "vd.website": "🌐 Website",
+    "vd.why_title": "why locals go here",
+    "vd.view_picks": "{t("vd.view_picks")}",
+    "vd.been_here": "been here?",
+    "vd.love_it": "love it",
+    "vd.its_ok": "it's ok",
+    "vd.not_for_me": "not for me",
+    "vd.report_title": "report this venue",
+    "vd.report_closed": "This place is closed",
+    "vd.report_wrong_addr": "Wrong address",
+    "vd.report_photos": "Photos are outdated",
+    "vd.report_other": "Other issue",
+    "vd.cancel": "Cancel",
+    "vd.more_like": "more places like this",
+    "vd.open_now": "Open now",
+    "vd.closed": "Closed",
+    "vd.city_pick": "⭐ City pick",
+    "scout.feedback_title": "SCOUT FEEDBACK",
+    "scout.still_rec": "Still recommended",
+    "scout.needs_review": "Needs review",
+    "scout.rep_closed": "Report closed",
     "results.refreshing": "refreshing...",
     "results.release": "↓ release to refresh",
     "results.show_more": "SHOW ME MORE ↻",
@@ -863,6 +886,29 @@ const TRANSLATIONS = {
     "saved.explore": "Fedezz fel helyeket és mentsd el a kedvenceidet.",
     "saved.pro_feature": "Explorer Pro funkció",
     "saved.upgrade": "váltás pro-ra →",
+    "vd.directions": "útvonal",
+    "vd.reserve": "🍽 Foglalás",
+    "vd.website": "🌐 Weboldal",
+    "vd.why_title": "miért járnak ide a helyiek",
+    "vd.view_picks": "· ajánlások ›",
+    "vd.been_here": "Jártál már itt?",
+    "vd.love_it": "imádom",
+    "vd.its_ok": "oké",
+    "vd.not_for_me": "nem az igazi",
+    "vd.report_title": "hely bejelentése",
+    "vd.report_closed": "Ez a hely bezárt",
+    "vd.report_wrong_addr": "Hibás cím",
+    "vd.report_photos": "Elavult fotók",
+    "vd.report_other": "Egyéb probléma",
+    "vd.cancel": "Mégse",
+    "vd.more_like": "hasonló helyek",
+    "vd.open_now": "Nyitva",
+    "vd.closed": "Zárva",
+    "vd.city_pick": "⭐ City pick",
+    "scout.feedback_title": "SCOUT VISSZAJELZÉS",
+    "scout.still_rec": "Még ajánlom",
+    "scout.needs_review": "Felülvizsgálat szükséges",
+    "scout.rep_closed": "Bezárva jelzés",
     "results.refreshing": "frissítés...",
     "results.release": "↓ engedd el a frissítéshez",
     "results.show_more": "MUTASS TÖBBET ↻",
@@ -1166,6 +1212,29 @@ const TRANSLATIONS = {
     "saved.explore": "Explora y guarda los lugares que te gusten.",
     "saved.pro_feature": "Función Explorer Pro",
     "saved.upgrade": "mejorar a pro →",
+    "vd.directions": "cómo llegar",
+    "vd.reserve": "🍽 Reservar",
+    "vd.website": "🌐 Web",
+    "vd.why_title": "por qué van los locales",
+    "vd.view_picks": "· ver selecciones ›",
+    "vd.been_here": "¿Has estado aquí?",
+    "vd.love_it": "me encanta",
+    "vd.its_ok": "está bien",
+    "vd.not_for_me": "no es para mí",
+    "vd.report_title": "reportar este lugar",
+    "vd.report_closed": "Este lugar está cerrado",
+    "vd.report_wrong_addr": "Dirección incorrecta",
+    "vd.report_photos": "Fotos desactualizadas",
+    "vd.report_other": "Otro problema",
+    "vd.cancel": "Cancelar",
+    "vd.more_like": "lugares similares",
+    "vd.open_now": "Abierto ahora",
+    "vd.closed": "Cerrado",
+    "vd.city_pick": "⭐ City pick",
+    "scout.feedback_title": "FEEDBACK DE SCOUT",
+    "scout.still_rec": "Sigo recomendando",
+    "scout.needs_review": "Necesita revisión",
+    "scout.rep_closed": "Reportar cerrado",
     "results.refreshing": "actualizando...",
     "results.release": "↓ suelta para actualizar",
     "results.show_more": "MOSTRAR MÁS ↻",
@@ -3008,14 +3077,14 @@ function ScoutFeedbackSection({venue, user, showToast}) {
   }
 
   const options = [
-    {type:"still_recommended", label:"Still recommended", icon:"✅"},
-    {type:"needs_review", label:"Needs review", icon:"⚠️"},
-    {type:"report_closed", label:"Report closed", icon:"🚫"},
+    {type:"still_recommended", label:t("scout.still_rec"), icon:"✅"},
+    {type:"needs_review", label:t("scout.needs_review"), icon:"⚠️"},
+    {type:"report_closed", label:t("scout.rep_closed"), icon:"🚫"},
   ];
 
   return (
     <div style={{background:"#F5F5F5",borderRadius:16,padding:16,marginTop:4}}>
-      <div style={{fontFamily:"var(--display)",fontSize:13,fontWeight:800,color:"var(--red)",letterSpacing:".06em",marginBottom:10}}>SCOUT FEEDBACK</div>
+      <div style={{fontFamily:"var(--display)",fontSize:13,fontWeight:800,color:"var(--red)",letterSpacing:".06em",marginBottom:10}}>{t("scout.feedback_title")}</div>
       {options.map(o=>(
         <button key={o.type} onClick={()=>!submitting&&submitFeedback(o.type)}
           style={{display:"flex",width:"100%",alignItems:"center",justifyContent:"space-between",
@@ -3030,7 +3099,7 @@ function ScoutFeedbackSection({venue, user, showToast}) {
           </span>
         </button>
       ))}
-      {existing&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600,marginTop:4}}>Last updated: {new Date(existing.created_at).toLocaleDateString()}</div>}
+      {existing&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600,marginTop:4}}>{t("misc.last_updated")} {new Date(existing.created_at).toLocaleDateString()}</div>}
     </div>
   );
 }
@@ -3195,16 +3264,16 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
 
         {/* 2. Category pills */}
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
-          <span className="venue-tag">{venue.subcategory||venue.category||venue.cuisine}</span>
+          <span className="venue-tag">{tCat(venue.subcategory||venue.category)||tCui(venue.cuisine)}</span>
           <span className="venue-tag">{t("venue.dist")} {venue.district}</span>
           <span className="venue-tag">{venue.price_level||venue.price}</span>
-          {venue.is_city_pick&&(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&<span className="venue-tag" style={{background:"#FFF3CD",color:"#856404"}}>⭐ City pick</span>}
+          {venue.is_city_pick&&(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&<span className="venue-tag" style={{background:"#FFF3CD",color:"#856404"}}>{t("vd.city_pick")}</span>}
         </div>
 
         {/* 3. Tags */}
         {venue.tags&&venue.tags.length>0&&(
           <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
-            {venue.tags.map(t=><span key={t} style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"#555",background:"#f0f0f0",borderRadius:20,padding:"4px 10px"}}>{t}</span>)}
+            {venue.tags.map(tag=><span key={tag} style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"#555",background:"#f0f0f0",borderRadius:20,padding:"4px 10px"}}>{tTag(tag)}</span>)}
           </div>
         )}
 
@@ -3213,7 +3282,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           <a href={venue.google_maps_url||`https://maps.google.com/?q=${encodeURIComponent(venue.address||venue.name)}`} target="_blank" rel="noreferrer"
             style={{display:"flex",alignItems:"center",gap:6,background:"var(--red)",color:"white",borderRadius:10,padding:"9px 14px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,textDecoration:"none"}}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-            directions
+            {t("vd.directions")}
           </a>
           {venue.instagram_url&&<a href={venue.instagram_url} target="_blank" rel="noreferrer"
             style={{display:"flex",alignItems:"center",gap:6,background:"white",border:"1.5px solid #ddd",color:"var(--black)",borderRadius:10,padding:"9px 14px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,textDecoration:"none"}}>
@@ -3221,11 +3290,11 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           </a>}
           {venue.reservation_url&&<a href={venue.reservation_url} target="_blank" rel="noreferrer"
             style={{display:"flex",alignItems:"center",gap:6,background:"white",border:"1.5px solid #ddd",color:"var(--black)",borderRadius:10,padding:"9px 14px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,textDecoration:"none"}}>
-            🍽 Reserve
+            {t("vd.reserve")}
           </a>}
           {venue.website_url&&<a href={venue.website_url} target="_blank" rel="noreferrer"
             style={{display:"flex",alignItems:"center",gap:6,background:"white",border:"1.5px solid #ddd",color:"var(--black)",borderRadius:10,padding:"9px 14px",fontFamily:"var(--body)",fontWeight:600,fontSize:13,textDecoration:"none"}}>
-            🌐 Website
+            {t("vd.website")}
           </a>}
         </div>
 
@@ -3236,7 +3305,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           <span style={{fontSize:16,flexShrink:0,marginTop:1}}>📍</span>
           <div>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"#444",lineHeight:1.5}}>{venue.address}</div>
-            <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>Budapest, District {venue.district}</div>
+            <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>Budapest, {t("venue.dist_label")} {venue.district}</div>
           </div>
         </div>
 
@@ -3247,8 +3316,8 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
             <div>
               <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"var(--black)",marginBottom:4}}>
                 {openStatus==="open"
-                  ?<span style={{color:"#16a34a"}}>Open now</span>
-                  :<span style={{color:"#dc2626"}}>Closed</span>}
+                  ?<span style={{color:"#16a34a"}}>{t("vd.open_now")}</span>
+                  :<span style={{color:"#dc2626"}}>{t("vd.closed")}</span>}
               </div>
               {openHours.map((h,i)=>(
                 <div key={i} style={{fontFamily:"var(--body)",fontSize:12,color:"#666",lineHeight:1.7}}>{h}</div>
@@ -3260,7 +3329,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         <div style={{height:1,background:"#f0f0f0",marginBottom:20}}/>
 
         {/* 7. Why locals go here */}
-        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:10}}>why locals go here</div>
+        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:10}}>{t("vd.why_title")}</div>
         <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"#222",lineHeight:1.8,marginBottom:12}}>{venue.why}</div>
         <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>
           <span>—</span>
@@ -3275,15 +3344,15 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
             {venue.scout_alias}
           </span>
           {(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&venue.submitted_by&&
-            <span style={{fontSize:11,color:"#bbb"}}>· view picks ›</span>}
+            <span style={{fontSize:11,color:"#bbb"}}>{t("vd.view_picks")}</span>}
         </div>
 
         <div style={{height:1,background:"#f0f0f0",marginBottom:20}}/>
 
         {/* 8. Rate this spot */}
-        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:12}}>been here?</div>
+        <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",textTransform:"uppercase",letterSpacing:".06em",marginBottom:12}}>{t("vd.been_here")}</div>
         <div style={{display:"flex",gap:8,marginBottom:20}}>
-          {[["like","👍","love it"],["neutral","😐","it's ok"],["dislike","👎","not for me"]].map(([type,icon,label])=>(
+          {[["like","👍",t("vd.love_it")],["neutral","😐",t("vd.its_ok")],["dislike","👎",t("vd.not_for_me")]].map(([type,icon,label])=>(
             <button key={type} onClick={()=>submitVote(type)} disabled={!user?.id||votingLoading}
               style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"10px 6px",borderRadius:12,border:"1.5px solid",borderColor:myVote===type?"var(--black)":"#ddd",background:myVote===type?"var(--black)":"white",cursor:user?.id?"pointer":"default",transition:"all .15s"}}>
               <span style={{fontSize:18}}>{icon}</span>
@@ -3307,8 +3376,8 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         </div>
         {showReport&&(
           <div style={{background:"#FFF8F8",border:"1.5px solid #F8D7DA",borderRadius:16,padding:16,marginBottom:12,animation:"fadeUp .2s ease both"}}>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"#58151C",marginBottom:10}}>report this venue</div>
-            {[["closed","This place is closed"],["wrong_address","Wrong address"],["photos_outdated","Photos are outdated"],["other","Other issue"]].map(([val,label])=>(
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"#58151C",marginBottom:10}}>{t("vd.report_title")}</div>
+            {[["closed",t("vd.report_closed")],["wrong_address",t("vd.report_wrong_addr")],["photos_outdated",t("vd.report_photos")],["other",t("vd.report_other")]].map(([val,label])=>(
               <button key={val} onClick={()=>setReportType(val)}
                 style={{display:"block",width:"100%",textAlign:"left",background:reportType===val?"#F8D7DA":"none",border:"1.5px solid",borderColor:reportType===val?"#dc3545":"#ddd",borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:700,color:"var(--black)",cursor:"pointer",marginBottom:8}}>
                 {label}
@@ -3365,7 +3434,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
 
           if(similar.length===0) return null;
 
-          const label = "more places like this";
+          const label = t("vd.more_like");
 
           return (
             <div style={{marginTop:24}}>
@@ -3379,7 +3448,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",marginBottom:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{v.name}</div>
                       <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#888"}}>
-                        {v.cuisine&&<span>{v.cuisine} · </span>}{t("venue.dist_label")} {v.district} · {v.price_level||v.price||""}
+                        {v.cuisine&&<span>{tCui(v.cuisine)} · </span>}{t("venue.dist_label")} {v.district} · {v.price_level||v.price||""}
                         {v.is_city_pick&&<span style={{marginLeft:6}}>⭐</span>}
                       </div>
                     </div>
@@ -5207,7 +5276,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
                     />
                     <div style={{display:"flex",gap:8}}>
                       <button style={{flex:1,background:"#FFF3CD",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#664D03",cursor:"pointer"}} onClick={()=>sendEdit(v.id)}>{t("cl.send_to_scout")}</button>
-                      <button style={{background:"#eee",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#666",cursor:"pointer"}} onClick={()=>setShowEditFor(null)}>Cancel</button>
+                      <button style={{background:"#eee",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#666",cursor:"pointer"}} onClick={()=>setShowEditFor(null)}>{t("vd.cancel")}</button>
                     </div>
                   </div>
                 )}
