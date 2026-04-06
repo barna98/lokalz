@@ -1352,6 +1352,19 @@ function tCat(cat){ return t("cat."+cat.toLowerCase().replace(/ /g,"_").replace(
 function tDiet(d){ return t("diet."+d.toLowerCase().replace(/-/g,"_")) || d; }
 function tCui(c){ return t("cui."+c.toLowerCase().replace(/ /g,"_").replace(/-/g,"_")) || c; }
 function tNearMe(){ return t("venue.near_me_label"); }
+
+function translateOpenHours(hoursArr) {
+  if(!hoursArr || _lang === "en") return hoursArr;
+  const days_hu = {"Monday":"Hétfő","Tuesday":"Kedd","Wednesday":"Szerda","Thursday":"Csütörtök","Friday":"Péntek","Saturday":"Szombat","Sunday":"Vasárnap"};
+  const days_es = {"Monday":"Lunes","Tuesday":"Martes","Wednesday":"Miércoles","Thursday":"Jueves","Friday":"Viernes","Saturday":"Sábado","Sunday":"Domingo"};
+  const days = _lang === "hu" ? days_hu : _lang === "es" ? days_es : null;
+  if(!days) return hoursArr;
+  return hoursArr.map(h => {
+    let result = h;
+    Object.entries(days).forEach(([en, tr]) => { result = result.replace(en, tr); });
+    return result;
+  });
+}
 function tTag(tag){ return t("tag."+tag.toLowerCase().replace(/ /g,"_").replace(/&/g,"").replace(/-/g,"_")) || tag; }
 const OCCASIONS = [
   {id:"Casual dining",        label:"Casual dining",        illus:"dinner"},
@@ -3319,7 +3332,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
                   ?<span style={{color:"#16a34a"}}>{t("vd.open_now")}</span>
                   :<span style={{color:"#dc2626"}}>{t("vd.closed")}</span>}
               </div>
-              {openHours.map((h,i)=>(
+              {translateOpenHours(openHours).map((h,i)=>(
                 <div key={i} style={{fontFamily:"var(--body)",fontSize:12,color:"#666",lineHeight:1.7}}>{h}</div>
               ))}
             </div>
@@ -4712,7 +4725,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
             </div>
           ))}
           <div style={{background:"#FFFFFF",border:"1.5px solid #ddd",borderRadius:12,padding:"12px 14px",marginBottom:8}}>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--black)",marginBottom:6}}>why locals go here — tips</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--black)",marginBottom:6}}>{t("vd.why_title")} — tips</div>
             <div style={{fontFamily:"var(--body)",fontSize:12,color:"#444444",fontWeight:600,lineHeight:1.6}}>
               <span style={{display:"block",marginBottom:2}}>🎯 <b>Vibe</b> — atmosphere? (hidden courtyard, live jazz, candlelit...)</span>
               <span style={{display:"block",marginBottom:2}}>🍽 <b>Quality</b> — unmissable dish/drink? (best carbonara, wagyu...)</span>
