@@ -369,6 +369,10 @@ function setLang(l){ _lang = l; localStorage.setItem("lokalz_lang", l); }
 
 // Dark mode
 let _dark = localStorage.getItem("lokalz_dark") === "1";
+
+// Global dark context — bármely komponens használhatja
+const DarkContext = React.createContext(false);
+function useDark(){ return React.useContext(DarkContext); }
 function setDarkMode(v){
   _dark = v;
   localStorage.setItem("lokalz_dark", v?"1":"0");
@@ -1819,6 +1823,7 @@ function ShimmerImg({src, style, fallback=null}) {
 function VenueCard({venue, onClick}) {
   const [imgUrl, setImgUrl] = useState(null);
   const [imgFetched, setImgFetched] = useState(false);
+  const dark = useDark();
   const grads={
     "Wine bar":"linear-gradient(135deg,#2C1654,#000000)",
     "Hungarian":"linear-gradient(135deg,#8B0000,#000000)",
@@ -1878,7 +1883,7 @@ function VenueCard({venue, onClick}) {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
             </button>
             <button onClick={e=>{e.stopPropagation();if(navigator.share){navigator.share({title:venue.name,text:`Check out ${venue.name} on LOKAL'Z`,url:window.location.href});}else{navigator.clipboard?.writeText(`${venue.name} — ${window.location.href}`);}}}
-              style={{background:"var(--black)",border:"none",cursor:"pointer",width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8}}>
+              style={{background:dark?"#333333":"#000000",border:dark?"1.5px solid #444":"none",cursor:"pointer",width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8}}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </button>
           </div>
@@ -2304,6 +2309,7 @@ function OnboardingScreen({navigate, user, setUser}) {
 
 function CityPickBox({label, cat, venues, navigate, isPremium}) {
   const [imgs, setImgs] = React.useState([]);
+  const dark = useDark();
 
   React.useEffect(()=>{
     if(venues.length===0) return;
@@ -2321,7 +2327,7 @@ function CityPickBox({label, cat, venues, navigate, isPremium}) {
       onTouchStart={e=>isPremium&&(e.currentTarget.style.transform="scale(.96)")}
       onTouchEnd={e=>e.currentTarget.style.transform=""}
       style={{
-        background:"var(--black)",border:"none",borderRadius:20,
+        background:dark?"#1c1c1c":"#000000",border:dark?"1.5px solid #2a2a2a":"none",borderRadius:20,
         cursor:isPremium&&venues.length>0?"pointer":"default",
         aspectRatio:"1/1",overflow:"hidden",display:"flex",flexDirection:"column",
         opacity:isPremium?(venues.length>0?1:.35):.35,
@@ -2342,7 +2348,7 @@ function CityPickBox({label, cat, venues, navigate, isPremium}) {
         </div>}
       </div>
       {/* Bottom: red label strip */}
-      <div style={{padding:"10px 14px",background:"var(--black)",flexShrink:0}}>
+      <div style={{padding:"10px 14px",background:dark?"#2a2a2a":"#000000",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"white",lineHeight:1.1}}>{label}</div>
       </div>
     </div>
@@ -2638,6 +2644,7 @@ function QProgress({step}) {
 
 function Q1Screen({navigate, onMenu, answers, setAnswers}) {
   const [sel, setSel] = useState(answers.category||"");
+  const dark = useDark();
 
   function next(){
     if(!sel) return;
@@ -2677,8 +2684,8 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
               onTouchStart={e=>e.currentTarget.style.transform="scale(.96)"}
               onTouchEnd={e=>e.currentTarget.style.transform=""}
               style={{
-                background:sel===c.id?"var(--black)":"var(--surface)",
-                border:"1.5px solid var(--black)",
+                background:sel===c.id?"var(--red)":(dark?"#1c1c1c":"#ffffff"),
+                border:sel===c.id?"1.5px solid var(--red)":`1.5px solid ${dark?"#2a2a2a":"#000000"}`,
                 borderRadius:20,
                 padding:"20px 12px",
                 cursor:"pointer",
@@ -3766,7 +3773,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
                 ?<div className="empty"><div className="empty-icon">👤</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>{t("empty.no_scouts").split("\n")[0]}<br/>{t("empty.no_scouts").split("\n")[1]}</div></div>
                 :scouts.map(s=>(
                   <div key={s.id} onClick={()=>navigate("scout_profile", s.id)}
-                    style={{background:"var(--white)",borderRadius:16,padding:"16px",marginBottom:12,cursor:"pointer",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
+                    style={{background:"var(--surface)",borderRadius:16,padding:"16px",marginBottom:12,cursor:"pointer",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
                     <div style={{width:48,height:48,borderRadius:"50%",background:"var(--red)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
                       {s.profile_image
                         ?<ShimmerImg src={s.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
@@ -4623,8 +4630,8 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   const CATEGORIES = ["Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"];
   const BAR_SUBCATEGORIES = ["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"];
   const CAPACITIES = ["2","3-6","6-8","9+"];
-  const inputStyle={width:"100%",background:"var(--white)",border:"1.5px solid var(--border-col)",borderRadius:12,padding:"12px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",marginBottom:10,outline:"none"};
-  const selectStyle={width:"100%",background:"var(--white)",border:"1.5px solid var(--border-col)",borderRadius:12,padding:"13px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"#888",marginBottom:10,outline:"none"};
+  const inputStyle={width:"100%",background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:12,padding:"12px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",marginBottom:10,outline:"none"};
+  const selectStyle={width:"100%",background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:12,padding:"13px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"#888",marginBottom:10,outline:"none"};
 
   // Scout edit screen
   if(editingVenue) return (
@@ -4980,7 +4987,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           onScroll={e=>saveScroll("scout",e.currentTarget)}>
           <div style={{display:"flex",gap:12,marginBottom:20}}>
             {[["✅",t("scout.approved"),myVenues.filter(v=>v.status==="active").length],["⏳",t("status.pending"),myVenues.filter(v=>v.status==="pending").length]].map(([ico,label,count])=>(
-              <div key={label} style={{flex:1,background:"var(--white)",borderRadius:16,padding:"16px",textAlign:"center"}}>
+              <div key={label} style={{flex:1,background:"var(--surface)",borderRadius:16,padding:"16px",textAlign:"center"}}>
                 <div style={{fontSize:28}}>{ico}</div>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:28,color:"var(--red)"}}>{count}</div>
                 <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"var(--text-muted)"}}>{label}</div>
@@ -5279,7 +5286,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
     setEditingVenue(null);
   }
 
-  const inputStyle={width:"100%",background:"var(--white)",border:"1.5px solid var(--border-col)",borderRadius:12,padding:"12px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",marginBottom:10,outline:"none"};
+  const inputStyle={width:"100%",background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:12,padding:"12px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",marginBottom:10,outline:"none"};
   const selectStyle={...inputStyle,cursor:"pointer"};
 
   // Edit venue screen
@@ -5887,7 +5894,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
 
         {/* Bio + Instagram — scout/city_lead esetén szerkeszthető */}
         {(user?.role==="scout"||user?.role==="city_lead")&&(
-          <div style={{background:"var(--white)",borderRadius:14,padding:"16px",marginBottom:10,cursor:"pointer"}} onClick={()=>setEditing(editing==="profile"?null:"profile")}>
+          <div style={{background:"var(--surface)",borderRadius:14,padding:"16px",marginBottom:10,cursor:"pointer"}} onClick={()=>setEditing(editing==="profile"?null:"profile")}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)"}}>{t("profile.scout_profile")}</div>
               <span style={{color:"var(--red)",fontSize:20}}>{editing==="profile"?"∨":"›"}</span>
@@ -6028,7 +6035,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
         <div style={{height:20}}/>
 
         {/* Dark mode */}
-        <div style={{background:"var(--white)",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
+        <div style={{background:"var(--surface)",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:10,textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.dark_mode")}</div>
           <div style={{display:"flex",gap:8}}>
             {[{v:false,label:"☀️ "+t("profile.light")},{v:true,label:"🌙 "+t("profile.dark")}].map(({v,label})=>(
@@ -6041,7 +6048,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
         </div>
 
         {/* Language */}
-        <div style={{background:"var(--white)",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
+        <div style={{background:"var(--surface)",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:10,textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.language")}</div>
           <div style={{display:"flex",gap:8}}>
             {[{code:"en",label:"🇬🇧 EN"},{code:"hu",label:"🇭🇺 HU"},{code:"es",label:"🇪🇸 ES"}].map(({code,label})=>(
@@ -6185,6 +6192,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
   const [catFilter, setCatFilter] = useState("All");
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const dark = useDark();
 
   useEffect(()=>{
     async function load(){
@@ -6350,7 +6358,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
             {categories.map(c=>(
               <button key={c} onClick={()=>setCatFilter(c)}
                 style={{flexShrink:0,padding:"7px 16px",borderRadius:20,border:"1.5px solid",fontFamily:"var(--body)",fontWeight:700,fontSize:12,cursor:"pointer",whiteSpace:"nowrap",
-                  background:catFilter===c?"var(--red)":"var(--white)",
+                  background:catFilter===c?"var(--red)":(dark?"#2a2a2a":"#ffffff"),
                   color:catFilter===c?"white":"var(--red)",
                   borderColor:"var(--red)"}}>
                 {c}
@@ -6405,7 +6413,7 @@ function AboutScreen({navigate}) {
           ["📍",t("about.d2_title"),t("about.d2_desc")],
           ["✓",t("about.d3_title"),t("about.d3_desc")],
         ].map(([icon,title,text])=>(
-          <div key={title} style={{background:"var(--white)",borderRadius:16,padding:"18px",marginBottom:12}}>
+          <div key={title} style={{background:"var(--surface)",borderRadius:16,padding:"18px",marginBottom:12}}>
             <div style={{fontSize:24,marginBottom:8}}>{icon}</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:6}}>{title}</div>
             <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#666",lineHeight:1.6}}>{text}</div>
@@ -6735,7 +6743,7 @@ function EventDetailScreen({navigate, event, user, showToast}) {
         )}
 
         {/* RSVP */}
-        <div style={{background:"var(--white)",borderRadius:16,padding:"16px",marginBottom:20}}>
+        <div style={{background:"var(--surface)",borderRadius:16,padding:"16px",marginBottom:20}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",letterSpacing:".06em",marginBottom:12}}>
             {rsvpCount} {rsvpCount===1?"person is":"people are"} going
           </div>
@@ -7122,7 +7130,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
         </div>
 
         {/* RSVP */}
-        <div style={{background:"var(--white)",borderRadius:14,padding:"14px 16px",marginBottom:16}}>
+        <div style={{background:"var(--surface)",borderRadius:14,padding:"14px 16px",marginBottom:16}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",letterSpacing:".06em",marginBottom:10}}>{t("ev.your_rsvp")}</div>
           <div style={{display:"flex",gap:8}}>
             {[["going","🎉 Going"],["maybe","🤔 Maybe"],["not_going","✕ Can't go"]].map(([val,label])=>(
@@ -7138,7 +7146,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
         </div>
 
         {/* Guest list */}
-        <div style={{background:"var(--white)",borderRadius:14,padding:"14px 16px",marginBottom:16}}>
+        <div style={{background:"var(--surface)",borderRadius:14,padding:"14px 16px",marginBottom:16}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",letterSpacing:".06em",marginBottom:10}}>
             GUEST LIST · {going.length} going{maybe.length>0?`, ${maybe.length} maybe`:""}
           </div>
@@ -7282,7 +7290,7 @@ function UpgradeScreen({navigate, user}) {
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"rgba(0,0,0,.4)",letterSpacing:".08em",marginBottom:8,textTransform:"uppercase"}}>Explorer Pro</div>
         <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
           {FEATURES.map(f=>(
-            <div key={f.label} style={{display:"flex",alignItems:"center",gap:14,background:"var(--white)",borderRadius:14,padding:"14px 16px"}}>
+            <div key={f.label} style={{display:"flex",alignItems:"center",gap:14,background:"var(--surface)",borderRadius:14,padding:"14px 16px"}}>
               <span style={{fontSize:22,flexShrink:0}}>{f.icon}</span>
               <div style={{flex:1}}>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>{f.label}</div>
@@ -7659,6 +7667,7 @@ function App() {
   };
 
   return (
+    <DarkContext.Provider value={dark}>
     <>
     <div style={{width:"100%",height:"100%",position:"relative"}}>
       {appLoading
@@ -7675,6 +7684,7 @@ function App() {
       {toast&&<div className="toast">{toast}</div>}
     </div>
     </>
+    </DarkContext.Provider>
   );
 }
 
