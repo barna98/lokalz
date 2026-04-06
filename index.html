@@ -544,6 +544,17 @@ function useOpenStatus(placeId) {
   return status;
 }
 
+function ShimmerImg({src, style, fallback=null}) {
+  const [loaded, setLoaded] = useState(false);
+  if(!src) return fallback;
+  return (
+    <>
+      {!loaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear",zIndex:1}}/>}
+      <img src={src} onLoad={()=>setLoaded(true)} style={{...style,opacity:loaded?1:0,transition:"opacity .3s ease"}}/>
+    </>
+  );
+}
+
 function VenueCard({venue, onClick}) {
   const [imgUrl, setImgUrl] = useState(null);
   const [imgFetched, setImgFetched] = useState(false);
@@ -2059,6 +2070,7 @@ function ScoutFeedbackSection({venue, user, showToast}) {
 function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, isScout, user, allVenues}) {
   const [imgIdx,setImgIdx]=useState(0);
   const [images,setImages]=useState([]);
+  const [imagesFetched,setImagesFetched]=useState(false);
   const [galleryLoaded,setGalleryLoaded]=useState(false);
   React.useEffect(()=>{ setGalleryLoaded(false); },[imgIdx]);
   const openStatus = useOpenStatus(venue.google_place_id);
@@ -2138,8 +2150,10 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
   }
 
   useEffect(()=>{
+    setImagesFetched(false);
     supabase.from("venue_images").select("url").eq("venue_id",venue.id).order("sort_order").then(({data})=>{
       if(data&&data.length>0) setImages(data.map(d=>d.url));
+      setImagesFetched(true);
     });
   },[venue.id]);
 
@@ -2171,7 +2185,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
 
   return (
     <div className="screen">
-      <div style={{width:"100%",aspectRatio:"1/1",background:images.length>0?(galleryLoaded?"#111":"#e8e8e8"):grads[venue.cuisine]||grads.default,flexShrink:0,position:"relative",display:"flex",alignItems:"center",justifyContent:"center",fontSize:72,overflow:"hidden"}}
+      <div style={{width:"100%",aspectRatio:"1/1",background:"#e8e8e8",flexShrink:0,position:"relative",display:"flex",alignItems:"center",justifyContent:"center",fontSize:72,overflow:"hidden"}}
         onTouchStart={e=>{ touchStartX.current = e.touches[0].clientX; }}
         onTouchEnd={e=>{
           if(touchStartX.current===null||images.length<=1) return;
@@ -2179,12 +2193,14 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           if(Math.abs(diff)>40) swipeTo(diff>0?"left":"right");
           touchStartX.current = null;
         }}>
-        {images.length>0
-          ?<>
-            {!galleryLoaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear",zIndex:1}}/>}
-            <img src={images[imgIdx]} className="img-fade" onLoad={()=>setGalleryLoaded(true)} style={{width:"100%",height:"100%",objectFit:"cover",...swingStyle}}/>
-          </>
-          :<span>🍽</span>
+        {!imagesFetched
+          ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
+          :images.length>0
+            ?<>
+              {!galleryLoaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear",zIndex:1}}/>}
+              <img src={images[imgIdx]} className="img-fade" onLoad={()=>setGalleryLoaded(true)} style={{width:"100%",height:"100%",objectFit:"cover",...swingStyle}}/>
+            </>
+            :<span>🍽</span>
         }
         {images.length>1&&(
           <div style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",display:"flex",gap:5}}>
@@ -2482,9 +2498,9 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
                 :scouts.map(s=>(
                   <div key={s.id} onClick={()=>navigate("scout_profile", s.id)}
                     style={{background:"white",borderRadius:16,padding:"16px",marginBottom:12,cursor:"pointer",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
-                    <div style={{width:48,height:48,borderRadius:"50%",background:"var(--red)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                    <div style={{width:48,height:48,borderRadius:"50%",background:"var(--red)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
                       {s.profile_image
-                        ?<img src={s.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                        ?<ShimmerImg src={s.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                         :<span style={{fontFamily:"var(--display)",fontWeight:900,fontSize:20,color:"white"}}>{(s.name||"S")[0].toUpperCase()}</span>
                       }
                     </div>
@@ -4586,7 +4602,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities}) {
             <input type="file" accept="image/*" style={{display:"none"}} onChange={e=>e.target.files[0]&&uploadProfileImage(e.target.files[0])}/>
             <div style={{width:72,height:72,borderRadius:"50%",background:"white",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
               {user?.profile_image
-                ?<img src={user.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                ?<ShimmerImg src={user.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                 :<span style={{fontSize:32}}>📷</span>
               }
               {uploadingImg&&<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.5)",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:20,height:20,border:"2px solid white",borderTop:"2px solid transparent",borderRadius:"50%",animation:"spin .8s linear infinite"}}/></div>}
@@ -4846,9 +4862,9 @@ function ScoutsScreen({navigate, onMenu, user}) {
         {filtered.map(s=>(
           <div key={s.id} onClick={()=>navigate("scout_profile",s.id)}
             style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",background:"white",border:"1.5px solid #eee",borderRadius:16,marginBottom:10,cursor:"pointer"}}>
-            <div style={{width:52,height:52,borderRadius:"50%",background:"#f0f0f0",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>
+            <div style={{width:52,height:52,borderRadius:"50%",background:"#f0f0f0",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,position:"relative"}}>
               {s.profile_image
-                ?<img src={s.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                ?<ShimmerImg src={s.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                 :SCOUT_BADGES.find(b=>b.id===s.badge)?.emoji||"👤"}
             </div>
             <div style={{flex:1}}>
@@ -4985,9 +5001,9 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
         {/* Hero — fekete háttér */}
         <div style={{background:"var(--black)",padding:"28px 24px 24px"}}>
           <div style={{display:"flex",alignItems:"center",gap:18,marginBottom:16}}>
-            <div style={{width:80,height:80,borderRadius:"50%",background:"rgba(255,255,255,.12)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",border:"2px solid rgba(255,255,255,.2)"}}>
+            <div style={{width:80,height:80,borderRadius:"50%",background:"rgba(255,255,255,.12)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",border:"2px solid rgba(255,255,255,.2)",position:"relative"}}>
               {scout?.profile_image
-                ?<img src={scout.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                ?<ShimmerImg src={scout.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                 :<span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:32,color:"white"}}>{(scout?.name||"S")[0].toUpperCase()}</span>
               }
             </div>
@@ -5342,7 +5358,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
                     onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}>
                     <div style={{width:"100%",height:140,background:"var(--red)",position:"relative",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
                       {ev.cover_image
-                        ?<img src={ev.cover_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                        ?<ShimmerImg src={ev.cover_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                         :<span style={{fontSize:40}}>🎉</span>
                       }
                       <div style={{position:"absolute",bottom:0,left:0,right:0,background:"linear-gradient(transparent,rgba(0,0,0,.6))",padding:"20px 16px 12px"}}>
@@ -5407,7 +5423,7 @@ function EventDetailScreen({navigate, event, user, showToast}) {
     <div className="screen">
       <div style={{width:"100%",height:220,background:"var(--red)",flexShrink:0,position:"relative",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
         {event.cover_image
-          ?<img src={event.cover_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+          ?<ShimmerImg src={event.cover_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
           :<span style={{fontSize:64}}>🎉</span>
         }
         <div style={{position:"absolute",inset:0,background:"linear-gradient(transparent,rgba(0,0,0,.5))"}}/>
