@@ -3423,7 +3423,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
             return (
               <button key={c} onClick={()=>{setCategory(sel?"":c);setCuisine("");setSubcategory("");}}
                 style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.9)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>
-                {c}
+                {tCat(c)}
               </button>
             );
           })}
@@ -3432,7 +3432,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
             {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=>{
               const sel=subcategory===s;
-              return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{s}</button>;
+              return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{tCat(s)}</button>;
             })}
           </div>
         )}
@@ -3440,7 +3440,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
             {CUISINES_FILTER.map(c=>{
               const sel=cuisine===c;
-              return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{c}</button>;
+              return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"white":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"none":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{tCui(c)}</button>;
             })}
           </div>
         )}
@@ -4156,7 +4156,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         </select>
         <select style={selectStyle} value={editForm.category} onChange={e=>{setEditForm(f=>({...f,category:e.target.value,subcategory:""}));loadCustomTagsForCategory(e.target.value);}}>
           <option value="">{t("opt.select_category")}</option>
-          {CATEGORIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
+          {CATEGORIES.map(c=><option key={c} value={c}>{tCat(c)}</option>)}
         </select>
         {editForm.category==="Bar"&&(
           <select style={selectStyle} value={editForm.subcategory||""} onChange={e=>setEditForm(f=>({...f,subcategory:e.target.value}))}>
@@ -4176,7 +4176,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         </select>
         <select style={selectStyle} value={editForm.capacity} onChange={e=>setEditForm(f=>({...f,capacity:e.target.value}))}>
           <option value="">{t("opt.select_capacity")}</option>
-          {CAPACITIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
+          {CAPACITIES.map(c=><option key={c} value={c}>{c}</option>)}
         </select>
 
         <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",background:"#FFFFFF",border:"1.5px solid #ddd",borderRadius:12,marginBottom:10,cursor:"pointer"}} onClick={()=>setEditForm(f=>({...f,is_city_pick:!f.is_city_pick}))}>
@@ -4351,7 +4351,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </select>
           <select style={selectStyle} value={form.category} onChange={e=>{setF("category",e.target.value);setF("subcategory","");if(e.target.value!=="Restaurant")setF("cuisine","");loadCustomTagsForCategory(e.target.value);}}>
             <option value="">{t("opt.select_category_req")}</option>
-            {CATEGORIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
+            {CATEGORIES.map(c=><option key={c} value={c}>{tCat(c)}</option>)}
           </select>
           {form.category==="Bar"&&(
             <select style={selectStyle} value={form.subcategory||""} onChange={e=>setF("subcategory",e.target.value)}>
@@ -4371,7 +4371,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </select>
           <select style={selectStyle} value={form.capacity} onChange={e=>setF("capacity",e.target.value)}>
             <option value="">{t("opt.select_capacity")}</option>
-            {CAPACITIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
+            {CAPACITIES.map(c=><option key={c} value={c}>{c}</option>)}
           </select>
 
           <div style={{marginBottom:10}}>
@@ -4811,7 +4811,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </select>
         <select style={selectStyle} value={editForm.category||""} onChange={e=>setEditForm(f=>({...f,category:e.target.value,subcategory:""}))}>
           <option value="">{t("opt.select_category")}</option>
-          {CATEGORIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
+          {CATEGORIES.map(c=><option key={c} value={c}>{tCat(c)}</option>)}
         </select>
         {editForm.category==="Bar"&&(
           <select style={selectStyle} value={editForm.subcategory||""} onChange={e=>setEditForm(f=>({...f,subcategory:e.target.value}))}>
@@ -4831,7 +4831,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </select>
         <select style={selectStyle} value={editForm.capacity||""} onChange={e=>setEditForm(f=>({...f,capacity:e.target.value}))}>
           <option value="">{t("opt.select_capacity")}</option>
-          {CAPACITIES.map(c=><option key={c} value={c}>{tCui(c)}</option>)}
+          {CAPACITIES.map(c=><option key={c} value={c}>{c}</option>)}
         </select>
 
         <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",background:"#FFFFFF",border:"1.5px solid #ddd",borderRadius:12,marginBottom:10,cursor:"pointer"}} onClick={()=>setEditForm(f=>({...f,is_city_pick:!f.is_city_pick}))}>
