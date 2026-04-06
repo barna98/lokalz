@@ -2068,7 +2068,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
           </button>
         ))}
         <button style={{...PILL,background:showMore?"var(--black)":"white",color:showMore?"white":"var(--black)"}} onClick={()=>setShowMore(v=>!v)}>
-          <span>{t("misc.more_toggle")}<span><span>{showMore?"▲":"▼"}</span>
+          <span>{t("misc.more_toggle")}</span><span>{showMore?"▲":"▼"}</span>
         </button>
         {showMore&&ALL_DISTRICTS.filter(d=>!DISTRICTS_MAIN.includes(d)).map(d=>(
           <button key={d} style={{...PILL,background:sel.includes(d)?"var(--black)":"white",color:sel.includes(d)?"white":"var(--black)"}} onClick={()=>toggle(d)}>
