@@ -326,7 +326,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // ── i18n ───────────────────────────────────────
 let _lang = localStorage.getItem("lokalz_lang") || "en";
 function setLang(l){ _lang = l; localStorage.setItem("lokalz_lang", l); }
-function t(key){ return (TRANSLATIONS[_lang]||TRANSLATIONS.en)[key] || TRANSLATIONS.en[key] || key; }
 
 const TRANSLATIONS = {
   en: {
@@ -505,7 +504,7 @@ const TRANSLATIONS = {
     "empty.no_coords": "Még nincs koordinátás hely. Futtasd az \"Place ID-k automatikus kitöltése\" funkciót.",
     "menu.all_venues": "Összes hely", "menu.event_calendar": "Eseménynaptár",
     "menu.scouts": "Scoutok", "menu.about": "Névjegy",
-    "menu.city_lead": t("menu.city_lead"), "menu.scout_dashboard": "Scout irányítópult",
+    "menu.city_lead": "City Lead", "menu.scout_dashboard": "Scout irányítópult",
     "misc.or": "vagy", "misc.more": "több kerület...",
     "misc.last_updated": "Utoljára frissítve:", "misc.enter_pin": "PIN megadása",
   },
@@ -596,12 +595,13 @@ const TRANSLATIONS = {
     "empty.no_scouts": "Aún no sigues a ningún scout.\nVisita el perfil de un scout para seguirlo.",
     "empty.no_coords": "Aún no hay lugares con coordenadas. Ejecuta \"auto-rellenar Place IDs\" primero.",
     "menu.all_venues": "Todos los lugares", "menu.event_calendar": "Calendario de eventos",
-    "menu.scouts": t("menu.scouts"), "menu.about": "Acerca de",
-    "menu.city_lead": t("menu.city_lead"), "menu.scout_dashboard": "Panel de scout",
+    "menu.scouts": "Scouts", "menu.about": "Acerca de",
+    "menu.city_lead": "City Lead", "menu.scout_dashboard": "Panel de scout",
     "misc.or": "o", "misc.more": "más distritos...",
     "misc.last_updated": "Última actualización:", "misc.enter_pin": "Introducir PIN",
   },
 };
+function t(key){ return (TRANSLATIONS[_lang]||TRANSLATIONS.en)[key] || TRANSLATIONS.en[key] || key; }
 const OCCASIONS = [
   {id:"Casual dining",        label:"Casual dining",        illus:"dinner"},
   {id:"Fine dining",          label:"Fine dining",           illus:"date"},
