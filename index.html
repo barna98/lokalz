@@ -2508,7 +2508,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
             <span>{x}</span>{sel.includes(x)&&<span>✓</span>}
           </button>
         ))}
-        <button style={{...PILL,background:"white",color:"#aaa",borderColor:"#ddd",justifyContent:"center"}} onClick={()=>{setAnswers(a=>({...a,cuisines:[]}));navigate("q6");}}>{t("q4.not_sure")}<button>
+        <button style={{...PILL,background:"white",color:"#aaa",borderColor:"#ddd",justifyContent:"center"}} onClick={()=>{setAnswers(a=>({...a,cuisines:[]}));navigate("q6");}}>{t("q4.not_sure")}</button>
       </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel.length>0&&next()} style={{background:"var(--black)",color:"white",border:"none",borderRadius:50,padding:"14px 48px",fontFamily:"var(--body)",fontWeight:400,fontSize:16,cursor:sel.length>0?"pointer":"default",whiteSpace:"nowrap",opacity:sel.length>0?1:.4}}>next</button>
