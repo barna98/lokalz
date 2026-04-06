@@ -452,6 +452,13 @@ const TRANSLATIONS = {
     "menu.all_venues": "All venues", "menu.event_calendar": "Event calendar",
     "menu.scouts": "Scouts", "menu.about": "About",
     "menu.city_lead": "City Lead", "menu.scout_dashboard": "Scout Dashboard",
+    "menu.profile": "profile",
+    "menu.scouts2": "scouts",
+    "menu.events": "events",
+    "menu.upgrade": "✦ upgrade to pro",
+    "menu.city_lead2": "city lead",
+    "menu.help": "help",
+    "menu.privacy": "privacy policy",
     "misc.or": "or", "misc.more": "more districts...",
     "misc.last_updated": "Last updated:", "misc.enter_pin": "Enter PIN",
     "auth.login_with": "login with...", "auth.sign_up": "sign up",
@@ -780,6 +787,13 @@ const TRANSLATIONS = {
     "menu.all_venues": "Összes hely", "menu.event_calendar": "Eseménynaptár",
     "menu.scouts": "Scoutok", "menu.about": "Névjegy",
     "menu.city_lead": "City Lead", "menu.scout_dashboard": "Scout irányítópult",
+    "menu.profile": "profil",
+    "menu.scouts2": "scoutok",
+    "menu.events": "események",
+    "menu.upgrade": "✦ váltás pro-ra",
+    "menu.city_lead2": "city lead",
+    "menu.help": "segítség",
+    "menu.privacy": "adatvédelem",
     "misc.or": "vagy", "misc.more": "több kerület...",
     "misc.last_updated": "Utoljára frissítve:", "misc.enter_pin": "PIN megadása",
     "auth.login_with": "bejelentkezés...", "auth.sign_up": "regisztráció",
@@ -1106,6 +1120,13 @@ const TRANSLATIONS = {
     "menu.all_venues": "Todos los lugares", "menu.event_calendar": "Calendario de eventos",
     "menu.scouts": "Scouts", "menu.about": "Acerca de",
     "menu.city_lead": "City Lead", "menu.scout_dashboard": "Panel de scout",
+    "menu.profile": "perfil",
+    "menu.scouts2": "scouts",
+    "menu.events": "eventos",
+    "menu.upgrade": "✦ mejorar a pro",
+    "menu.city_lead2": "city lead",
+    "menu.help": "ayuda",
+    "menu.privacy": "política de privacidad",
     "misc.or": "o", "misc.more": "más distritos...",
     "misc.last_updated": "Última actualización:", "misc.enter_pin": "Introducir PIN",
     "auth.login_with": "iniciar sesión...", "auth.sign_up": "registrarse",
@@ -1723,11 +1744,11 @@ function Menu({onClose, navigate, role, onSignOut}) {
       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:40}}>{t("onboard.beyond")}</div>
 
       <div style={{display:"flex",flexDirection:"column",gap:0,paddingLeft:8}}>
-        <div style={itemStyle} onClick={()=>{navigate("profile");onClose();}}>profile</div>
-        <div style={itemStyle} onClick={()=>{navigate("scouts");onClose();}}>scouts</div>
-        <div style={itemStyle} onClick={()=>{navigate("event_calendar");onClose();}}>events</div>
+        <div style={itemStyle} onClick={()=>{navigate("profile");onClose();}}>{t("menu.profile")}</div>
+        <div style={itemStyle} onClick={()=>{navigate("scouts");onClose();}}>{t("menu.scouts2")}</div>
+        <div style={itemStyle} onClick={()=>{navigate("event_calendar");onClose();}}>{t("menu.events")}</div>
         {role==="explorer"&&(
-          <div style={{...itemStyle,color:"var(--red)",fontWeight:700}} onClick={()=>{navigate("upgrade");onClose();}}>✦ upgrade to pro</div>
+          <div style={{...itemStyle,color:"var(--red)",fontWeight:700}} onClick={()=>{navigate("upgrade");onClose();}}>{t("menu.upgrade")}</div>
         )}
       </div>
 
@@ -1735,15 +1756,15 @@ function Menu({onClose, navigate, role, onSignOut}) {
         <div style={{marginTop:24,display:"flex",flexDirection:"column",gap:0,paddingLeft:8}}>
           {(role==="scout"||role==="city_lead")&&<div style={boldStyle} onClick={()=>{navigate("scout");onClose();}}>{t("menu.scout_mode")}</div>}
           {role==="city_lead"&&(
-            <div style={boldStyle} onClick={()=>{navigate("city_lead");onClose();}}>city lead</div>
+            <div style={boldStyle} onClick={()=>{navigate("city_lead");onClose();}}>{t("menu.city_lead2")}</div>
           )}
         </div>
       )}
 
       <div style={{marginTop:"auto",display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"var(--black)",cursor:"pointer"}} onClick={()=>{navigate("about");onClose();}}>{t("about.title")}</div>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"var(--black)",cursor:"pointer"}}>help</div>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"var(--black)",cursor:"pointer"}}>privacy policy</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"var(--black)",cursor:"pointer"}}>{t("menu.help")}</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:14,color:"var(--black)",cursor:"pointer"}}>{t("menu.privacy")}</div>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",cursor:"pointer",marginTop:4}} onClick={()=>{onSignOut();onClose();}}>{t("profile.sign_out")}</div>
       </div>
     </div>
@@ -5234,7 +5255,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
           <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>city lead</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.city_lead2")}</div>
           </div>
         </div>
       </div>
@@ -5640,7 +5661,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
           <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>profile</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.profile")}</div>
           </div>
         </div>
       </div>
@@ -5896,7 +5917,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
           <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>scouts</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("menu.scouts2")}</div>
           </div>
         </div>
       </div>
@@ -5916,7 +5937,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
           <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>scouts</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("menu.scouts2")}</div>
           </div>
         </div>
       </div>
@@ -6398,7 +6419,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
           <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>events</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.events")}</div>
           </div>
         </div>
       </div>
