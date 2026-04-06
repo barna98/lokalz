@@ -524,6 +524,27 @@ const TRANSLATIONS = {
     "nav.all_venues": "all venues",
     "q5.craving": "Craving anything specific?",
     "q5.next": "next",
+    "tag.hidden_gem": "Hidden gem",
+    "tag.cozy": "Cozy",
+    "tag.chill": "Chill",
+    "tag.quiet": "Quiet",
+    "tag.lively": "Lively",
+    "tag.upscale": "Upscale",
+    "tag.good_music": "Good music",
+    "tag.scenic": "Scenic",
+    "tag.underrated": "Underrated",
+    "tag.aesthetic": "Aesthetic",
+    "tag.romantic": "Romantic",
+    "tag.good_for_groups": "Good for groups",
+    "tag.outdoor_seating": "Outdoor seating",
+    "tag.indoor_seating": "Indoor seating",
+    "tag.specialty_coffee": "Specialty coffee",
+    "tag.matcha": "Matcha",
+    "tag.grab__go": "Grab & go",
+    "tag.cocktails": "Cocktails",
+    "tag.wine_bar": "Wine bar",
+    "tag.speakeasy": "Speakeasy",
+    "tag.live_music": "Live music",
     "results.our_picks": "our picks for you",
     "results.no_cat": "venues",
     "results.relax": "Try relaxing your filters.",
@@ -801,6 +822,27 @@ const TRANSLATIONS = {
     "nav.all_venues": "összes hely",
     "q5.craving": "Van valami konkrét konyha?",
     "q5.next": "tovább",
+    "tag.hidden_gem": "Rejtett kincs",
+    "tag.cozy": "Hangulatos",
+    "tag.chill": "Laza",
+    "tag.quiet": "Csendes",
+    "tag.lively": "Élénk",
+    "tag.upscale": "Elegáns",
+    "tag.good_music": "Jó zene",
+    "tag.scenic": "Szép kilátás",
+    "tag.underrated": "Alulértékelt",
+    "tag.aesthetic": "Esztétikus",
+    "tag.romantic": "Romantikus",
+    "tag.good_for_groups": "Csoportoknak jó",
+    "tag.outdoor_seating": "Terasz",
+    "tag.indoor_seating": "Beltér",
+    "tag.specialty_coffee": "Specialty kávé",
+    "tag.matcha": "Matcha",
+    "tag.grab__go": "Elvitel",
+    "tag.cocktails": "Koktélok",
+    "tag.wine_bar": "Borbár",
+    "tag.speakeasy": "Speakeasy",
+    "tag.live_music": "Élő zene",
     "results.our_picks": "a mi tippjeink neked",
     "results.no_cat": "helyek",
     "results.relax": "Próbálj lazítani a szűrőkön.",
@@ -1076,6 +1118,27 @@ const TRANSLATIONS = {
     "nav.all_venues": "todos los lugares",
     "q5.craving": "¿Tienes ganas de algo específico?",
     "q5.next": "siguiente",
+    "tag.hidden_gem": "Joya oculta",
+    "tag.cozy": "Acogedor",
+    "tag.chill": "Tranquilo",
+    "tag.quiet": "Silencioso",
+    "tag.lively": "Animado",
+    "tag.upscale": "Elegante",
+    "tag.good_music": "Buena música",
+    "tag.scenic": "Con vistas",
+    "tag.underrated": "Infravalorado",
+    "tag.aesthetic": "Estético",
+    "tag.romantic": "Romántico",
+    "tag.good_for_groups": "Para grupos",
+    "tag.outdoor_seating": "Terraza",
+    "tag.indoor_seating": "Interior",
+    "tag.specialty_coffee": "Café de especialidad",
+    "tag.matcha": "Matcha",
+    "tag.grab__go": "Para llevar",
+    "tag.cocktails": "Cócteles",
+    "tag.wine_bar": "Bar de vinos",
+    "tag.speakeasy": "Speakeasy",
+    "tag.live_music": "Música en vivo",
     "results.our_picks": "nuestras selecciones para ti",
     "results.no_cat": "lugares",
     "results.relax": "Intenta relajar los filtros.",
@@ -1199,6 +1262,7 @@ function tCat(cat){ return t("cat."+cat.toLowerCase().replace(/ /g,"_").replace(
 function tDiet(d){ return t("diet."+d.toLowerCase().replace(/-/g,"_")) || d; }
 function tCui(c){ return t("cui."+c.toLowerCase().replace(/ /g,"_").replace(/-/g,"_")) || c; }
 function tNearMe(){ return t("venue.near_me_label"); }
+function tTag(tag){ return t("tag."+tag.toLowerCase().replace(/ /g,"_").replace(/&/g,"").replace(/-/g,"_")) || tag; }
 const OCCASIONS = [
   {id:"Casual dining",        label:"Casual dining",        illus:"dinner"},
   {id:"Fine dining",          label:"Fine dining",           illus:"date"},
@@ -2334,19 +2398,19 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
 
   function toggleOcc(id){
     haptic("light");
-    if(id===t("q.not_sure")){
-      setSelOcc(prev=>prev.includes(id)?[]:[t("q.not_sure")]);
+    if(id==="___not_sure___"){
+      setSelOcc(prev=>prev.includes(id)?[]:[id]);
       return;
     }
     setSelOcc(prev=>{
-      const without=prev.filter(x=>x!==t("q.not_sure"));
+      const without=prev.filter(x=>x!=="___not_sure___");
       return without.includes(id)?without.filter(x=>x!==id):[...without,id];
     });
   }
   function toggleTag(t){haptic("light");setSelTags(prev=>prev.includes(t)?prev.filter(x=>x!==t):[...prev,t]);}
 
   function next(){
-    const occasions = selOcc.includes(t("q.not_sure")) ? [] : selOcc;
+    const occasions = selOcc.includes("___not_sure___") ? [] : selOcc;
     setAnswers(a=>({...a,occasions,tags:selTags}));
     navigate("q3");
   }
@@ -2384,9 +2448,9 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
         <div style={{marginBottom:24}}>
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8,marginBottom:12}}>{t("q2.mood")}</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-            {[...occList,{id:t("q.not_sure"),label:t("q.not_sure")}].map(o=>(
+            {[...occList,{id:"___not_sure___",label:t("q.not_sure")}].map(o=>(
               <button key={o.id} type="button" onClick={()=>toggleOcc(o.id)} style={pillStyle(selOcc.includes(o.id))}>
-                {tOcc(o.id)}
+                {o.id==="___not_sure___"?t("q.not_sure"):tOcc(o.id)}
               </button>
             ))}
           </div>
@@ -2397,9 +2461,9 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:4}}>{t("q2.vibe")}</div>
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"rgba(0,0,0,.4)",marginBottom:12}}>{t("q2.optional")}</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-            {availableTags.map(t=>(
-              <button key={t} type="button" onClick={()=>toggleTag(t)} style={pillStyle(selTags.includes(t))}>
-                {t}
+            {availableTags.map(tag=>(
+              <button key={tag} type="button" onClick={()=>toggleTag(tag)} style={pillStyle(selTags.includes(tag))}>
+                {tTag(tag)}
               </button>
             ))}
           </div>
