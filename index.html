@@ -1891,19 +1891,19 @@ function Menu({onClose, navigate, role, onSignOut}) {
       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:40}}>{t("onboard.beyond")}</div>
 
       <div style={{display:"flex",flexDirection:"column",gap:0,paddingLeft:8}}>
-        <div style={itemStyle} onClick={()=>{navigate("profile");onClose();}}>{t("menu.profile")}</div>
-        <div style={itemStyle} onClick={()=>{navigate("scouts");onClose();}}>{t("menu.scouts2")}</div>
-        <div style={itemStyle} onClick={()=>{navigate("event_calendar");onClose();}}>{t("menu.events")}</div>
+        <div style={itemStyle} onClick={()=>{navigate("profile",null,{replace:true});onClose();}}>{t("menu.profile")}</div>
+        <div style={itemStyle} onClick={()=>{navigate("scouts",null,{replace:true});onClose();}}>{t("menu.scouts2")}</div>
+        <div style={itemStyle} onClick={()=>{navigate("event_calendar",null,{replace:true});onClose();}}>{t("menu.events")}</div>
         {role==="explorer"&&(
-          <div style={{...itemStyle,color:"var(--red)",fontWeight:700}} onClick={()=>{navigate("upgrade");onClose();}}>{t("menu.upgrade")}</div>
+          <div style={{...itemStyle,color:"var(--red)",fontWeight:700}} onClick={()=>{navigate("upgrade",null,{replace:true});onClose();}}>{t("menu.upgrade")}</div>
         )}
       </div>
 
       {(role==="scout"||role==="city_lead")&&(
         <div style={{marginTop:24,display:"flex",flexDirection:"column",gap:0,paddingLeft:8}}>
-          {(role==="scout"||role==="city_lead")&&<div style={boldStyle} onClick={()=>{navigate("scout");onClose();}}>{t("menu.scout_mode")}</div>}
+          {(role==="scout"||role==="city_lead")&&<div style={boldStyle} onClick={()=>{navigate("scout",null,{replace:true});onClose();}}>{t("menu.scout_mode")}</div>}
           {role==="city_lead"&&(
-            <div style={boldStyle} onClick={()=>{navigate("city_lead");onClose();}}>{t("menu.city_lead2")}</div>
+            <div style={boldStyle} onClick={()=>{navigate("city_lead",null,{replace:true});onClose();}}>{t("menu.city_lead2")}</div>
           )}
         </div>
       )}
@@ -2111,7 +2111,7 @@ function OnboardingScreen({navigate, user, setUser}) {
       setUser(u=>({...u, city_id: found.id, city: selectedCity, badge: selectedBadge}));
     }
     setSaving(false);
-    navigate("home");
+    navigate("home",null,{replace:true});
   }
 
   const displayCities = citiesList.length>0 ? citiesList.map(c=>c.name) : CITIES;
@@ -4746,7 +4746,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button onClick={()=>{navigate("home",null,{replace:true});setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.scout_mode")}</div>
@@ -5399,7 +5399,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button onClick={()=>{navigate("home",null,{replace:true});setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.city_lead2")}</div>
@@ -5805,7 +5805,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
       {/* Pink header */}
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button onClick={()=>{navigate("home",null,{replace:true});setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.profile")}</div>
@@ -6061,7 +6061,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button onClick={()=>{navigate("home",null,{replace:true});setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("menu.scouts2")}</div>
@@ -6330,7 +6330,7 @@ function AboutScreen({navigate}) {
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={()=>navigate("home")}/>
+          <Hamburger onClick={()=>navigate("home",null,{replace:true})}/>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("about.title")}</div>
@@ -6462,7 +6462,7 @@ function PartnerActivateScreen({partner, navigate, user, onActivate, showToast})
 
     onActivate({...user, partner_id: partner.id, partner_access_expires_at: expiresAt.toISOString()});
     showToast("Welcome to " + partner.name + "! 🎉");
-    navigate("home");
+    navigate("home",null,{replace:true});
   }
 
   return (
@@ -6563,7 +6563,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{navigate("home");setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button onClick={()=>{navigate("home",null,{replace:true});setTimeout(()=>onMenu&&onMenu(),50);}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.events")}</div>
@@ -7447,7 +7447,7 @@ function App() {
     return ()=>{ authListener?.subscription?.unsubscribe(); };
   },[]);
 
-  function navigate(target, data) {
+  function navigate(target, data, opts) {
     if(target===-1||target==="back"){
       setHistory(h=>{
         if(h.length===0){setScreen("home");return h;}
@@ -7462,7 +7462,10 @@ function App() {
       setShowMenu(false);
       return;
     }
-    setHistory(h=>[...h,{screen,venue:selectedVenue,scout:selectedScout,event:selectedEvent,plan:selectedPlan}]);
+    // replace:true → ne pusholjuk a history-ba (top-level menü screenek)
+    if(!opts?.replace){
+      setHistory(h=>[...h,{screen,venue:selectedVenue,scout:selectedScout,event:selectedEvent,plan:selectedPlan}]);
+    }
     if(target==="venue"&&data){setSelectedVenue(data);}
     if(target==="results_list"&&data){setSelectedVenue(data);}
     if(target==="scout_profile"&&data){setSelectedScout(data);}
@@ -7585,7 +7588,7 @@ function App() {
         <div className="screen" style={{background:"var(--bg)"}}>
           <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
             <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-              <button onClick={()=>navigate("home")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <button onClick={()=>navigate("home",null,{replace:true})} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
               <div style={{textAlign:"right"}}>
                 <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("home.city_picks")}</div>
