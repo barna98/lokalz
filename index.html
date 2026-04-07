@@ -3515,12 +3515,62 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
   const innerRef = React.useRef(null);
   const scrollRef = React.useRef(null);
 
-  const swingStyle = swingDir==="left"
-    ? {transform:"translateX(-60px) rotate(-8deg)",opacity:0,transition:"all .2s ease"}
-    : swingDir==="right"
-    ? {transform:"translateX(60px) rotate(8deg)",opacity:0,transition:"all .2s ease"}
-    : {transform:"translateX(0) rotate(0deg)",opacity:1,transition:"all .15s ease"};
+  // Gallery swipe refs
+  const galleryRef = React.useRef(null);
+  const galleryDragX = React.useRef(null);
+  const isGalleryDrag = React.useRef(false);
 
+  // Gallery: smooth horizontal swipe like camera roll
+  function onGalleryTouchStart(e){
+    if(isDragging.current) return;
+    galleryDragX.current = e.touches[0].clientX;
+    isGalleryDrag.current = false;
+  }
+  function onGalleryTouchMove(e){
+    if(galleryDragX.current===null||isDragging.current) return;
+    const dx = e.touches[0].clientX - galleryDragX.current;
+    const dy = Math.abs(e.touches[0].clientY - (touchStartY.current||0));
+    if(!isGalleryDrag.current){
+      if(Math.abs(dx)<6&&dy<6) return;
+      if(dy>Math.abs(dx)){galleryDragX.current=null;return;} // vertical → dismiss takes over
+      isGalleryDrag.current=true;
+    }
+    if(images.length<=1) return;
+    e.stopPropagation();
+    const w = galleryRef.current?.offsetWidth||375;
+    const totalW = w * images.length;
+    const base = -(imgIdx * (100/images.length));
+    const pct = (dx / totalW) * 100;
+    if(galleryRef.current){
+      galleryRef.current.style.transition="none";
+      galleryRef.current.style.transform=`translateX(${base+pct}%)`;
+    }
+  }
+  function onGalleryTouchEnd(e){
+    if(!isGalleryDrag.current||images.length<=1){galleryDragX.current=null;isGalleryDrag.current=false;return;}
+    const dx = e.changedTouches[0].clientX - galleryDragX.current;
+    const w = galleryRef.current?.offsetWidth||375;
+    let newIdx = imgIdx;
+    if(dx<-w*0.25&&imgIdx<images.length-1) newIdx=imgIdx+1;
+    else if(dx>w*0.25&&imgIdx>0) newIdx=imgIdx-1;
+    setImgIdx(newIdx);
+    if(galleryRef.current){
+      galleryRef.current.style.transition="transform .3s cubic-bezier(.25,.46,.45,.94)";
+      galleryRef.current.style.transform=`translateX(${-newIdx*100}%)`;
+    }
+    galleryDragX.current=null;
+    isGalleryDrag.current=false;
+  }
+
+  // Sync gallery position when imgIdx changes programmatically
+  React.useEffect(()=>{
+    if(galleryRef.current&&images.length>0){
+      galleryRef.current.style.transition="transform .3s cubic-bezier(.25,.46,.45,.94)";
+      galleryRef.current.style.transform=`translateX(${-(imgIdx*(100/images.length))}%)`;
+    }
+  },[imgIdx, images.length]);
+
+  // Dismiss swipe (vertical)
   function onScreenTouchStart(e){
     touchStartY.current = e.touches[0].clientY;
     touchStartX.current = e.touches[0].clientX;
@@ -3528,14 +3578,13 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
     dragY.current = 0;
   }
   function onScreenTouchMove(e){
-    if(touchStartY.current===null) return;
+    if(touchStartY.current===null||isGalleryDrag.current) return;
     const dy = e.touches[0].clientY - touchStartY.current;
     const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
     const scrollTop = scrollRef.current?.scrollTop||0;
     if(!isDragging.current){
-      // Decide direction on first significant move
       if(dy>8 && dy>dx && scrollTop<=0) isDragging.current=true;
-      else if(dx>8||dy<-4) return; // scrolling or swiping image
+      else if(dx>8||dy<-4) return;
     }
     if(isDragging.current && scrollTop<=0){
       e.preventDefault();
@@ -3555,14 +3604,12 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
     const y = dragY.current;
     dragY.current = 0;
     if(y > 100){
-      // Dismiss
       if(innerRef.current){
         innerRef.current.style.transition = "transform .28s cubic-bezier(.4,0,1,1)";
         innerRef.current.style.transform = `translateY(100vh)`;
       }
       setTimeout(()=>navigate(-1), 260);
     } else {
-      // Snap back
       if(innerRef.current){
         innerRef.current.style.transition = "transform .3s cubic-bezier(.2,.8,.4,1), border-radius .3s ease, box-shadow .3s ease";
         innerRef.current.style.transform = "translateY(0)";
@@ -3573,43 +3620,70 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
     touchStartY.current = null;
   }
 
+  // Parallax: image slides up as user scrolls
+  const imgHeight = React.useRef(0);
+  const imgContainerRef = React.useRef(null);
+  function onContentScroll(e){
+    const sy = e.currentTarget.scrollTop;
+    if(imgContainerRef.current){
+      // shrink image area as scroll increases
+      const maxShrink = imgContainerRef.current.offsetHeight * 0.55;
+      const shrink = Math.min(sy * 0.55, maxShrink);
+      imgContainerRef.current.style.height = `${imgContainerRef.current.offsetHeight - shrink}px`;
+      // Actually: use transform on the gallery to slide up
+    }
+  }
+
   return (
     <div className="screen" style={{background:"transparent",overflow:"hidden"}}
       onTouchStart={onScreenTouchStart}
       onTouchMove={onScreenTouchMove}
       onTouchEnd={onScreenTouchEnd}>
       <div ref={innerRef} style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",background:"var(--bg)",overflow:"hidden",willChange:"transform"}}>
-      <div style={{width:"100%",aspectRatio:"1/1",background:"var(--surface2)",flexShrink:0,position:"relative",display:"flex",alignItems:"center",justifyContent:"center",fontSize:72,overflow:"hidden"}}
-        onTouchStart={e=>{ if(!isDragging.current) touchStartX.current = e.touches[0].clientX; }}
-        onTouchEnd={e=>{
-          if(isDragging.current||touchStartX.current===null||images.length<=1) return;
-          const diff = touchStartX.current - e.changedTouches[0].clientX;
-          if(Math.abs(diff)>40) swipeTo(diff>0?"left":"right");
-          touchStartX.current = null;
-        }}>
-        {!imagesFetched
-          ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
-          :images.length>0
-            ?<>
-              {!galleryLoaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear",zIndex:1}}/>}
-              <img src={images[imgIdx]} className="img-fade" onLoad={()=>setGalleryLoaded(true)} style={{width:"100%",height:"100%",objectFit:"cover",...swingStyle}}/>
-            </>
-            :<span>🍽</span>
-        }
-        {images.length>1&&(
-          <div style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",display:"flex",gap:5}}>
-            {images.map((_,i)=>(
-              <div key={i} onClick={()=>setImgIdx(i)} style={{width:6,height:6,borderRadius:"50%",background:i===imgIdx?"white":"rgba(255,255,255,.5)",cursor:"pointer"}}/>
-            ))}
+
+      {/* ── Scrollable container: image + content together ── */}
+      <div className="scroll" style={{flex:1,position:"relative"}} ref={scrollRef}>
+
+        {/* Image gallery — sticky at top, shrinks on scroll */}
+        <div style={{position:"sticky",top:0,zIndex:10,overflow:"hidden",background:"#000"}}
+          ref={imgContainerRef}>
+          <div style={{width:"100%",paddingTop:"75%",position:"relative",overflow:"hidden"}}
+            onTouchStart={onGalleryTouchStart}
+            onTouchMove={onGalleryTouchMove}
+            onTouchEnd={onGalleryTouchEnd}>
+            {/* Gallery strip */}
+            {!imagesFetched
+              ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
+              :images.length>0
+                ?<div ref={galleryRef} style={{position:"absolute",top:0,left:0,display:"flex",height:"100%",width:`${images.length*100}%`,transform:`translateX(${-imgIdx*(100/images.length)}%)`,willChange:"transform"}}>
+                  {images.map((url,i)=>(
+                    <div key={i} style={{width:`${100/images.length}%`,height:"100%",flexShrink:0,position:"relative"}}>
+                      <img src={url} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} onLoad={i===0?()=>setGalleryLoaded(true):undefined}/>
+                    </div>
+                  ))}
+                </div>
+                :<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:72}}>🍽</div>
+            }
+            {/* Dots */}
+            {images.length>1&&(
+              <div style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",display:"flex",gap:5,zIndex:2}}>
+                {images.map((_,i)=>(
+                  <div key={i} onClick={()=>setImgIdx(i)} style={{width:i===imgIdx?18:6,height:6,borderRadius:3,background:i===imgIdx?"white":"rgba(255,255,255,.5)",cursor:"pointer",transition:"width .2s ease"}}/>
+                ))}
+              </div>
+            )}
+            {/* Back + save buttons */}
+            <button className="back-btn" style={{position:"absolute",top:16,left:16,background:"rgba(0,0,0,.4)",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:22,zIndex:3}} onClick={()=>navigate(-1)}>‹</button>
+            <button onClick={()=>{haptic("medium");toggleSave(venue.id);showToast(saved?t("toast.removed"):t("toast.saved"));}}
+              style={{position:"absolute",top:16,right:16,background:"rgba(0,0,0,.4)",border:"none",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,color:saved?"#F97B30":"white",zIndex:3}}>
+              {saved?"♥":"♡"}
+            </button>
           </div>
-        )}
-        <button className="back-btn" style={{position:"absolute",top:16,left:16,background:"rgba(0,0,0,.4)",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:22}} onClick={()=>navigate(-1)}>‹</button>
-        <button onClick={()=>{haptic("medium");toggleSave(venue.id);showToast(saved?t("toast.removed"):t("toast.saved"));}}
-          style={{position:"absolute",top:16,right:16,background:"rgba(0,0,0,.4)",border:"none",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,color:saved?"#F97B30":"white"}}>
-          {saved?"♥":"♡"}
-        </button>
-      </div>
-      <div className="scroll" style={{padding:"20px 24px 80px"}} ref={scrollRef}>
+        </div>
+
+        {/* Content */}
+        <div style={{padding:"20px 24px 80px",background:"var(--bg)"}}>
+
 
         {/* 1. Name + open status */}
         <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",marginBottom:6}}>
@@ -3817,7 +3891,8 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           );
         })()}
 
-      </div>
+      </div>{/* end content padding div */}
+      </div>{/* end scroll */}
       </div>{/* end innerRef wrapper */}
     </div>
   );
