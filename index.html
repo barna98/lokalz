@@ -3519,8 +3519,17 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
   const galleryRef = React.useRef(null);
   const galleryDragX = React.useRef(null);
   const isGalleryDrag = React.useRef(false);
+  const imgIdxRef = React.useRef(imgIdx);
+  React.useEffect(()=>{ imgIdxRef.current = imgIdx; },[imgIdx]);
 
-  // Gallery: smooth horizontal swipe like camera roll
+  function getW(){ return galleryRef.current?.parentElement?.offsetWidth || window.innerWidth; }
+
+  function setGalleryPos(idx, animate){
+    if(!galleryRef.current) return;
+    galleryRef.current.style.transition = animate ? "transform .3s cubic-bezier(.25,.46,.45,.94)" : "none";
+    galleryRef.current.style.transform = `translateX(${-idx * getW()}px)`;
+  }
+
   function onGalleryTouchStart(e){
     if(isDragging.current) return;
     galleryDragX.current = e.touches[0].clientX;
@@ -3532,43 +3541,33 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
     const dy = Math.abs(e.touches[0].clientY - (touchStartY.current||0));
     if(!isGalleryDrag.current){
       if(Math.abs(dx)<6&&dy<6) return;
-      if(dy>Math.abs(dx)){galleryDragX.current=null;return;} // vertical → dismiss takes over
+      if(dy>Math.abs(dx)){galleryDragX.current=null;return;}
       isGalleryDrag.current=true;
     }
     if(images.length<=1) return;
     e.stopPropagation();
-    const w = galleryRef.current?.offsetWidth||375;
-    const totalW = w * images.length;
-    const base = -(imgIdx * (100/images.length));
-    const pct = (dx / totalW) * 100;
     if(galleryRef.current){
       galleryRef.current.style.transition="none";
-      galleryRef.current.style.transform=`translateX(${base+pct}%)`;
+      galleryRef.current.style.transform=`translateX(${-(imgIdxRef.current * getW()) + dx}px)`;
     }
   }
   function onGalleryTouchEnd(e){
     if(!isGalleryDrag.current||images.length<=1){galleryDragX.current=null;isGalleryDrag.current=false;return;}
     const dx = e.changedTouches[0].clientX - galleryDragX.current;
-    const w = galleryRef.current?.offsetWidth||375;
-    let newIdx = imgIdx;
-    if(dx<-w*0.25&&imgIdx<images.length-1) newIdx=imgIdx+1;
-    else if(dx>w*0.25&&imgIdx>0) newIdx=imgIdx-1;
+    const w = getW();
+    let newIdx = imgIdxRef.current;
+    if(dx < -w*0.2 && newIdx < images.length-1) newIdx++;
+    else if(dx > w*0.2 && newIdx > 0) newIdx--;
+    setGalleryPos(newIdx, true);
     setImgIdx(newIdx);
-    if(galleryRef.current){
-      galleryRef.current.style.transition="transform .3s cubic-bezier(.25,.46,.45,.94)";
-      galleryRef.current.style.transform=`translateX(${-newIdx*100}%)`;
-    }
     galleryDragX.current=null;
     isGalleryDrag.current=false;
   }
 
-  // Sync gallery position when imgIdx changes programmatically
+  // Sync on imgIdx change (e.g. dot tap)
   React.useEffect(()=>{
-    if(galleryRef.current&&images.length>0){
-      galleryRef.current.style.transition="transform .3s cubic-bezier(.25,.46,.45,.94)";
-      galleryRef.current.style.transform=`translateX(${-(imgIdx*(100/images.length))}%)`;
-    }
-  },[imgIdx, images.length]);
+    setGalleryPos(imgIdx, true);
+  },[imgIdx]);
 
   // Dismiss swipe (vertical)
   function onScreenTouchStart(e){
@@ -3655,7 +3654,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
             {!imagesFetched
               ?<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>
               :images.length>0
-                ?<div ref={galleryRef} style={{position:"absolute",top:0,left:0,display:"flex",height:"100%",width:`${images.length*100}%`,transform:`translateX(${-imgIdx*(100/images.length)}%)`,willChange:"transform"}}>
+                ?<div ref={galleryRef} style={{position:"absolute",top:0,left:0,display:"flex",height:"100%",width:`${images.length*100}%`,transform:`translateX(0px)`,willChange:"transform"}}>
                   {images.map((url,i)=>(
                     <div key={i} style={{width:`${100/images.length}%`,height:"100%",flexShrink:0,position:"relative"}}>
                       <img src={url} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} onLoad={i===0?()=>setGalleryLoaded(true):undefined}/>
