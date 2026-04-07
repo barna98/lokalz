@@ -3984,7 +3984,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
                 <div className="empty-icon">🤍</div>
                 <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:700,color:"var(--black)",marginBottom:8}}>{t("saved.nothing")}</div>
                 <div style={{fontFamily:"var(--body)",fontSize:13,color:"#888",marginBottom:20}}>{t("saved.explore")}</div>
-                <button className="btn-black" style={{width:"auto",padding:"14px 28px"}} onClick={()=>navigate("q1")}>{t("results.start_over")}</button>
+                <button className="btn-black" style={{width:"auto",padding:"14px 28px"}} onClick={()=>navigate("q1")}>start discover →</button>
               </div>
             :saved.map((v,i)=>(
               <div key={v.id} style={{animation:`staggerUp .3s ${Math.min(i,8)*0.05}s cubic-bezier(.2,.8,.4,1) both`,opacity:0,animationFillMode:"forwards"}}>
@@ -5811,7 +5811,10 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       {tab==="all"&&(
         <div className="scroll" style={{padding:"14px 20px 80px"}} ref={clScrollRef}
           onScroll={e=>saveScroll("cityLead",e.currentTarget)}>
-          <div style={{marginBottom:12,display:"flex",justifyContent:"flex-end"}}>
+          <div style={{marginBottom:12,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"var(--text-muted)"}}>
+              {active.length} <span style={{fontWeight:400}}>venues</span>
+            </div>
             <button onClick={async()=>{
               const toUpdate = (allVenues||[]).filter(v=>v.status==="active"&&(!v.google_place_id?.trim()||!v.latitude||!v.longitude)&&v.name);
               if(toUpdate.length===0){showToast(t("cl.all_have_ids"));return;}
