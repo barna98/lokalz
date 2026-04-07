@@ -384,6 +384,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
 .back-btn{background:var(--black);border:none;cursor:pointer;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;line-height:1;flex-shrink:0;}
 .back-btn:active{opacity:.7;}
+.map-marker-label{background:white;padding:2px 6px;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.3);white-space:nowrap;margin-top:2px;}
 .q-next-btn{background:#000;color:#fff;border:none;border-radius:50px;padding:14px 48px;font-family:var(--body);font-weight:400;font-size:16px;cursor:pointer;white-space:nowrap;transition:opacity .12s;}
 .q-next-btn:active{opacity:.7;}
 .text-link{font-family:var(--body);font-size:14px;font-weight:700;color:var(--black);text-decoration:underline;cursor:pointer;}
@@ -683,7 +684,7 @@ const TRANSLATIONS = {
     "err.type_delete": "Type DELETE to confirm.",
     "err.no_scout": "⚠ No scout assigned — email not sent",
     "pin.generated": "PIN generated: ",
-    "home.ai_guide": "✦ AI city guide", "home.pro_only": "pro only", "home.search_btn": "search",
+    "home.ai_guide": "✨ AI city guide", "home.pro_only": "pro only", "home.search_btn": "search",
     "home.guest_of": "guest of", "home.recently_added": "recently added", "home.new": "NEW",
     "home.city_picks": "this week's ⭐ city picks", "home.ai_error": "Couldn't understand that. Try again or use Discover.",
     "q1.title": "What kind of place are we talking?", "q1.next": "next",
@@ -1067,7 +1068,7 @@ const TRANSLATIONS = {
     "err.type_delete": "Írd be a DELETE szót a megerősítéshez.",
     "err.no_scout": "⚠ Nincs scout hozzárendelve — email nem lett elküldve",
     "pin.generated": "PIN létrehozva: ",
-    "home.ai_guide": "✦ AI városvezető", "home.pro_only": "csak pro", "home.search_btn": "keresés",
+    "home.ai_guide": "✨ AI városvezető", "home.pro_only": "csak pro", "home.search_btn": "keresés",
     "home.guest_of": "vendége:", "home.recently_added": "legutóbb hozzáadva", "home.new": "ÚJ",
     "home.city_picks": "a hét ⭐ city pickjei", "home.ai_error": "Nem értettem. Próbáld újra vagy használd a Discover-t.",
     "q1.title": "Milyen helyre gondolsz?", "q1.next": "tovább",
@@ -1449,7 +1450,7 @@ const TRANSLATIONS = {
     "err.type_delete": "Escribe DELETE para confirmar.",
     "err.no_scout": "⚠ Sin scout asignado — email no enviado",
     "pin.generated": "PIN generado: ",
-    "home.ai_guide": "✦ Guía IA de ciudad", "home.pro_only": "solo pro", "home.search_btn": "buscar",
+    "home.ai_guide": "✨ Guía IA de ciudad", "home.pro_only": "solo pro", "home.search_btn": "buscar",
     "home.guest_of": "huésped de", "home.recently_added": "añadidos recientemente", "home.new": "NUEVO",
     "home.city_picks": "⭐ selecciones de la semana", "home.ai_error": "No lo entendí. Inténtalo de nuevo o usa Discover.",
     "q1.title": "¿Qué tipo de lugar buscas?", "q1.next": "siguiente",
@@ -2000,7 +2001,7 @@ function Menu({onClose, navigate, role, onSignOut}) {
   const itemStyle = {fontFamily:"var(--body)",fontWeight:400,fontSize:22,color:"var(--black)",padding:"10px 0",cursor:"pointer",lineHeight:1.2};
   const boldStyle = {fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",padding:"10px 0",cursor:"pointer",lineHeight:1.2};
   return (
-    <div style={{position:"absolute",inset:0,background:"var(--bg)",zIndex:101,animation:"fadeIn .22s ease",display:"flex",flexDirection:"column",padding:"0 28px 80px"}}>
+    <div style={{position:"absolute",inset:0,background:"var(--surface)",zIndex:101,animation:"fadeIn .22s ease",display:"flex",flexDirection:"column",padding:"0 28px 80px"}}>
       <div style={{padding:"20px 0 0"}}/>
       <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none",marginTop:8}}>LOKAL&#39;Z</div>
       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:40}}>{t("onboard.beyond")}</div>
@@ -3963,9 +3964,9 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
         </div>
       </div>
 
-      <div className="tabs" style={{background:"#111",borderBottom:"1px solid rgba(255,255,255,.15)",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"10px 20px 6px",flexShrink:0,display:"flex"}}>
         {[["places",t("saved.places")],["scouts",t("saved.scouts")]].map(([k,l])=>(
-          <button key={k} style={{flex:1,padding:"14px 6px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:tab===k?"white":"rgba(255,255,255,.4)",background:"none",border:"none",cursor:"pointer",borderBottom:tab===k?"2.5px solid white":"2.5px solid transparent",marginBottom:-1,transition:"all .15s"}} onClick={()=>setTab(k)}>{l}</button>
+          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"var(--text-muted)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
         ))}
       </div>
 
@@ -4101,7 +4102,8 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           strokeWeight:1.5,
           scale:1.8,
           anchor: new window.google.maps.Point(12,22),
-        }
+        },
+        label:{text:v.name,color:"#111",fontFamily:"sans-serif",fontSize:"11px",fontWeight:"700",className:"map-marker-label"}
       });
       const infoDiv = document.createElement("div");
       infoDiv.innerHTML = `<div style="font-family:sans-serif;padding:6px 4px;min-width:160px"><strong style="font-size:14px">${v.name}</strong><br/><span style="color:#666;font-size:12px">${v.category} · ${t("venue.dist")} ${v.district}</span><br/><button id="info-btn-${v.id}" style="margin-top:8px;background:#DC2626;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:sans-serif">view →</button></div>`;
@@ -4160,7 +4162,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
         </div>
         <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
           <span style={{color:"rgba(255,255,255,.6)",fontSize:13}}>🔍</span>
-          <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}} />
+          <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}} />
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
           {CATEGORIES.map(c=>{
@@ -5056,9 +5058,9 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </div>
         </div>
       </div>
-      <div className="tabs" style={{background:"#111",borderBottom:"1px solid rgba(255,255,255,.15)"}}>
+      <div style={{background:"var(--bg)",padding:"10px 20px 6px",flexShrink:0,display:"flex"}}>
         {[["add","add venue"],["events","events"],[t("scout.activity"),"my activity"]].map(([k,l])=>(
-          <button key={k} style={{flex:1,padding:"14px 6px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:tab===k?"white":"rgba(255,255,255,.4)",background:"none",border:"none",cursor:"pointer",borderBottom:tab===k?"2.5px solid white":"2.5px solid transparent",marginBottom:-1,transition:"all .15s"}} onClick={()=>setTab(k)}>{l}</button>
+          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"var(--text-muted)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
         ))}
       </div>
 
@@ -5709,9 +5711,9 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
           </div>
         </div>
       </div>
-      <div className="tabs" style={{background:"#111",borderBottom:"1px solid rgba(255,255,255,.15)",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"10px 20px 6px",flexShrink:0,display:"flex"}}>
         {[["pending","pending",pending.length],["all","all",active.length],["events","events",pendingEvents.length],["reports","reports",reports.length],["partners","partners",""]].map(([k,l,c])=>(
-          <button key={k} style={{flex:1,padding:"14px 6px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:tab===k?"white":"rgba(255,255,255,.4)",background:"none",border:"none",cursor:"pointer",borderBottom:tab===k?"2.5px solid white":"2.5px solid transparent",marginBottom:-1,transition:"all .15s"}} onClick={()=>setTab(k)}>
+          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"var(--text-muted)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>
             {l}
           </button>
         ))}
@@ -6391,11 +6393,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
           </div>
         </div>
       </div>
-      <div style={{padding:"8px 20px 12px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"#888",lineHeight:1.5}}>
-          Scouts are locals who know Budapest inside out — they curate every venue you see in the app.
-        </div>
-      </div>
+
       <div style={{background:"#111",padding:"12px 20px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.1)",borderRadius:50,padding:"8px 14px"}}>
           <span style={{color:"rgba(255,255,255,.5)",fontSize:13}}>🔍</span>
@@ -6876,7 +6874,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
       </div>
       <div style={{background:"#111",flexShrink:0,display:"flex",alignItems:"center"}}>
         {[["public","public events"],["my","my events"]].map(([k,l])=>(
-          <button key={k} style={{flex:1,padding:"14px 6px",fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:tab===k?"white":"rgba(255,255,255,.4)",background:"none",border:"none",cursor:"pointer",borderBottom:tab===k?"2.5px solid white":"2.5px solid transparent",marginBottom:-1,transition:"all .15s"}} onClick={()=>setTab(k)}>{l}</button>
+          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"var(--text-muted)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
         ))}
         {isPremium&&(
           <button onClick={()=>setShowCreate(true)} style={{flex:1,padding:"14px 6px",fontFamily:"var(--body)",fontSize:12,fontWeight:700,color:"white",background:"none",border:"none",borderBottom:"2.5px solid transparent",cursor:"pointer",marginBottom:-1}}>+ add event</button>
