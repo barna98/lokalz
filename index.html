@@ -1873,11 +1873,26 @@ function useOpenStatus(placeId) {
 
 function ShimmerImg({src, style, fallback=null}) {
   const [loaded, setLoaded] = useState(false);
-  if(!src) return fallback;
+  const [error, setError] = useState(false);
+  const prevSrc = React.useRef(src);
+
+  React.useEffect(()=>{
+    if(prevSrc.current !== src){
+      setLoaded(false);
+      setError(false);
+      prevSrc.current = src;
+    }
+  },[src]);
+
+  if(!src || error) return fallback;
   return (
     <>
       {!loaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear",zIndex:1}}/>}
-      <img src={src} onLoad={()=>setLoaded(true)} style={{...style,opacity:loaded?1:0,transition:"opacity .3s ease"}}/>
+      <img
+        src={src}
+        onLoad={()=>setLoaded(true)}
+        onError={()=>setError(true)}
+        style={{...style,opacity:loaded?1:0,transition:"opacity .3s ease",position:"relative",zIndex:2}}/>
     </>
   );
 }
