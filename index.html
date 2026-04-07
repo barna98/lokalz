@@ -120,8 +120,11 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 
 /* Input fields */
 [data-dark="true"] .input-wrap-light { background: #1c1c1c !important; border-color: #2a2a2a !important; }
-[data-dark="true"] .input-wrap-light input { color: #ffffff !important; }
-[data-dark="true"] input, [data-dark="true"] textarea, [data-dark="true"] select { background: #1c1c1c !important; color: #ffffff !important; border-color: #2a2a2a !important; color-scheme: dark; }
+[data-dark="true"] .input-wrap-light input { color: #ffffff !important; background: transparent !important; }
+[data-dark="true"] input:not(.search-input), 
+[data-dark="true"] textarea, 
+[data-dark="true"] select { background: #1c1c1c !important; color: #ffffff !important; border-color: #2a2a2a !important; color-scheme: dark; }
+[data-dark="true"] .search-input { background: transparent !important; border: none !important; }
 [data-dark="true"] [style*="#FFD966"] { border-color: #5a4400 !important; }
 /* Hardcoded white screen overrides */
 [data-dark="true"] [style*="background:\"var(--surface)\""][class="screen"] { background: #0d0d0d !important; }
@@ -447,7 +450,7 @@ function applyDarkMode(dark){
     r.setProperty("--card-bg","#1c1c1c");
     r.setProperty("--input-bg","#1c1c1c");
     r.setProperty("--border","#2a2a2a");
-    r.setProperty("--text-muted","rgba(255,255,255,.45)");
+    r.setProperty("--text-muted","rgba(255,255,255,.65)");
     r.setProperty("--surface","#1c1c1c");
     r.setProperty("--surface2","#252525");
     r.setProperty("--surface3","#2a2a2a");
@@ -3705,7 +3708,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
             {images.length>1&&(
               <div style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",display:"flex",gap:5,zIndex:2}}>
                 {images.map((_,i)=>(
-                  <div key={i} onClick={()=>setImgIdx(i)} style={{width:i===imgIdx?18:6,height:6,borderRadius:3,background:i===imgIdx?"white":"rgba(255,255,255,.5)",cursor:"pointer",transition:"width .2s ease"}}/>
+                  <div key={i} onClick={()=>setImgIdx(i)} style={{width:i===imgIdx?18:6,height:6,borderRadius:3,background:i===imgIdx?"white":"rgba(255,255,255,.65)",cursor:"pointer",transition:"width .2s ease"}}/>
                 ))}
               </div>
             )}
@@ -3969,7 +3972,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
       <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0}}>
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["places",t("saved.places")],["scouts",t("saved.scouts")]].map(([k,l])=>(
-          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.5)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
+          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
         ))}
         </div>
       </div>
@@ -4156,16 +4159,16 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
     <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
       <div style={{position:"absolute",top:0,left:0,right:0,zIndex:10,padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",display:"flex",flexDirection:"column",gap:8,alignItems:"center"}}>
         <div className="av-ctrl" style={{display:"flex",gap:8,width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4}}>
-          <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:viewMode==="map"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.6)",transition:"all .2s"}}>
+          <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:viewMode==="map"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
             {t("map.map")}
           </button>
-          <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:viewMode==="list"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.6)",transition:"all .2s"}}>
+          <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:viewMode==="list"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
             {t("map.list")}
           </button>
         </div>
         <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
-          <span style={{color:"rgba(255,255,255,.6)",fontSize:13}}>🔍</span>
-          <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}} />
+          <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
+          <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} className="search-input" style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}} />
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
           {CATEGORIES.map(c=>{
@@ -5064,7 +5067,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0}}>
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["add","add venue"],["events","events"],[t("scout.activity"),"my activity"]].map(([k,l])=>(
-          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.5)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
+          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
         ))}
         </div>
       </div>
@@ -5719,7 +5722,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0}}>
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["pending","pending",pending.length],["all","all",active.length],["events","events",pendingEvents.length],["reports","reports",reports.length],["partners","partners",""]].map(([k,l,c])=>(
-          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.5)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>
+          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>
             {l}
           </button>
         ))}
@@ -5846,7 +5849,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
           <div className="input-wrap-light" style={{marginBottom:8}}>
             <span style={{color:"var(--text-muted)",fontSize:16}}>🔍</span>
             <input placeholder="Search venue..." value={clSearch} onChange={e=>setClSearch(e.target.value)}
-              style={{border:"none",outline:"none",background:"transparent",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",flex:1}}/>
+              className="search-input" style={{border:"none",outline:"none",background:"transparent",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",flex:1}}/>
             {clSearch&&<button onClick={()=>setClSearch("")} style={{background:"none",border:"none",cursor:"pointer",color:"var(--text-muted)",fontSize:16}}>✕</button>}
           </div>
           <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}}>
@@ -6403,9 +6406,9 @@ function ScoutsScreen({navigate, onMenu, user}) {
 
       <div style={{padding:"0 16px 10px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px"}}>
-          <span style={{color:"rgba(255,255,255,.6)",fontSize:13}}>🔍</span>
+          <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search scouts..."
-            style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}}/>
+            className="search-input" style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}}/>
         </div>
       </div>
 
@@ -6552,23 +6555,23 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
 
       <div className="scroll" style={{padding:"0 0 80px"}}>
 
-        {/* Hero — fekete háttér */}
-        <div style={{background:"#111",padding:"28px 24px 24px"}}>
+        {/* Hero */}
+        <div style={{background:dark?"#111":"var(--bg)",padding:"28px 24px 24px"}}>
           <div style={{display:"flex",alignItems:"center",gap:18,marginBottom:16}}>
-            <div style={{width:80,height:80,borderRadius:"50%",background:"rgba(255,255,255,.12)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",border:"2px solid rgba(255,255,255,.2)",position:"relative"}}>
+            <div style={{width:80,height:80,borderRadius:"50%",background:dark?"rgba(255,255,255,.12)":"rgba(0,0,0,.08)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",border:dark?"2px solid rgba(255,255,255,.2)":"2px solid rgba(0,0,0,.12)",position:"relative"}}>
               {scout?.profile_image
                 ?<ShimmerImg src={scout.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                :<span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:32,color:"white"}}>{(scout?.name||"S")[0].toUpperCase()}</span>
+                :<span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:32,color:"var(--black)"}}>{(scout?.name||"S")[0].toUpperCase()}</span>
               }
             </div>
             <div style={{flex:1}}>
-              <div style={{fontFamily:"var(--body)",fontWeight:600,fontSize:22,color:"white",lineHeight:1.2}}>{scout?.name||"Scout"}</div>
-              <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"rgba(255,255,255,.5)",marginTop:4,letterSpacing:".04em",textTransform:"uppercase"}}>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",lineHeight:1.2}}>{scout?.name||"Scout"}</div>
+              <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"var(--text-muted)",marginTop:4,letterSpacing:".04em",textTransform:"uppercase"}}>
                 {scout?.badge||(scout?.role==="city_lead"?t("menu.city_lead"):t("venue.local_scout"))}
               </div>
               {igHandle&&(
                 <a href={`https://instagram.com/${igHandle}`} target="_blank" rel="noreferrer"
-                  style={{display:"inline-flex",alignItems:"center",gap:5,marginTop:8,fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"rgba(255,255,255,.7)",textDecoration:"none"}}>
+                  style={{display:"inline-flex",alignItems:"center",gap:5,marginTop:8,fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"var(--red)",textDecoration:"none"}}>
                   📸 @{igHandle}
                 </a>
               )}
@@ -6576,29 +6579,29 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
           </div>
 
           {scout?.bio&&(
-            <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"rgba(255,255,255,.7)",lineHeight:1.6,marginBottom:16}}>
+            <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--text-muted)",lineHeight:1.6,marginBottom:16}}>
               "{scout.bio}"
             </div>
           )}
 
           {/* Stats */}
-          <div style={{display:"flex",gap:0,marginBottom:16,borderRadius:12,overflow:"hidden"}}>
-            <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:"rgba(255,255,255,.08)"}}>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"white"}}>{(venues.added||[]).length}</div>
-              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"rgba(255,255,255,.5)",marginTop:2}}>{t("sc.added")}</div>
+          <div style={{display:"flex",gap:0,marginBottom:16,borderRadius:12,overflow:"hidden",border:"1.5px solid var(--border-col)"}}>
+            <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.04)"}}>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)"}}>{(venues.added||[]).length}</div>
+              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"var(--text-muted)",marginTop:2}}>{t("sc.added")}</div>
             </div>
-            <div style={{width:1,background:"rgba(255,255,255,.1)"}}/>
-            <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:"rgba(255,255,255,.08)"}}>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"white"}}>{(venues.saved||[]).length}</div>
-              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"rgba(255,255,255,.5)",marginTop:2}}>{t("saved.title2")}</div>
+            <div style={{width:1,background:"var(--border-col)"}}/>
+            <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.04)"}}>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)"}}>{(venues.saved||[]).length}</div>
+              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"var(--text-muted)",marginTop:2}}>{t("saved.title2")}</div>
             </div>
           </div>
 
           {/* Follow button */}
           {!isOwnProfile&&(
             <button onClick={toggleFollow} disabled={followLoading}
-              style={{width:"100%",background:isFollowing?"transparent":"var(--red)",border:isFollowing?"2px solid rgba(255,255,255,.25)":"none",borderRadius:50,padding:"13px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,color:"white",cursor:"pointer",opacity:followLoading?0.6:1,transition:"all .2s"}}>
-              {followLoading?"...":(isFollowing?t("btn.following"):t("btn.follow"))}
+              style={{width:"100%",background:isFollowing?"transparent":"var(--red)",border:isFollowing?"2px solid var(--border-col)":"none",borderRadius:50,padding:"13px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,color:isFollowing?"var(--black)":"white",cursor:"pointer",opacity:followLoading?0.6:1,transition:"all .2s"}}>
+              {followLoading?"...":(isFollowing?`✓ ${t("btn.following")}`:t("btn.follow"))}
             </button>
           )}
         </div>
@@ -6883,10 +6886,10 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
       <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0}}>
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["public","public events"],["my","my events"]].map(([k,l])=>(
-          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.5)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
+          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
         ))}
         {isPremium&&(
-          <button onClick={()=>setShowCreate(true)} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"rgba(255,255,255,.6)",background:"transparent",border:"none",cursor:"pointer",borderRadius:50}}>+ add</button>
+          <button onClick={()=>setShowCreate(true)} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"rgba(255,255,255,.75)",background:"transparent",border:"none",cursor:"pointer",borderRadius:50}}>+ add</button>
         )}
         </div>
       </div>
@@ -7505,7 +7508,7 @@ function UpgradeScreen({navigate, user}) {
         {/* Free trial banner */}
         <div style={{background:"#111",borderRadius:20,padding:"18px 20px",marginBottom:20}}>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"white",marginBottom:4}}>🎁 Try free for 1 month</div>
-          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:12}}>{t("up.card_note")}</div>
+          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"rgba(255,255,255,.75)",marginBottom:12}}>{t("up.card_note")}</div>
           <button onClick={()=>{
             const base = STRIPE_LINKS.trial;
             const url = user?.email ? base+"?prefilled_email="+encodeURIComponent(user.email) : base;
