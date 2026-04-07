@@ -384,7 +384,6 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
 .back-btn{background:var(--black);border:none;cursor:pointer;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;line-height:1;flex-shrink:0;}
 .back-btn:active{opacity:.7;}
-.map-marker-label{background:white;padding:2px 6px;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.3);white-space:nowrap;margin-top:2px;}
 .q-next-btn{background:#000;color:#fff;border:none;border-radius:50px;padding:14px 48px;font-family:var(--body);font-weight:400;font-size:16px;cursor:pointer;white-space:nowrap;transition:opacity .12s;}
 .q-next-btn:active{opacity:.7;}
 .text-link{font-family:var(--body);font-size:14px;font-weight:700;color:var(--black);text-decoration:underline;cursor:pointer;}
@@ -4102,11 +4101,10 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           strokeWeight:1.5,
           scale:1.8,
           anchor: new window.google.maps.Point(12,22),
-        },
-        label:{text:v.name,color:"#111",fontFamily:"sans-serif",fontSize:"11px",fontWeight:"700",className:"map-marker-label"}
+        }
       });
       const infoDiv = document.createElement("div");
-      infoDiv.innerHTML = `<div style="font-family:sans-serif;padding:6px 4px;min-width:160px"><strong style="font-size:14px">${v.name}</strong><br/><span style="color:#666;font-size:12px">${v.category} · ${t("venue.dist")} ${v.district}</span><br/><button id="info-btn-${v.id}" style="margin-top:8px;background:#DC2626;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:sans-serif">view →</button></div>`;
+      infoDiv.innerHTML = `<div style="font-family:sans-serif;padding:8px 6px;min-width:150px;max-width:200px"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${v.name}</div><div style="color:#666;font-size:12px;margin-bottom:8px">${v.category||v.cuisine||""} · Ker. ${v.district}</div><button id="info-btn-${v.id}" style="background:#DC2626;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:sans-serif;width:100%">megnyitás →</button></div>`;
       const info = new window.google.maps.InfoWindow({ content: infoDiv });
       marker.addListener("click",()=>{
         if(activeInfoRef.current) activeInfoRef.current.close();
@@ -6632,7 +6630,7 @@ function AboutScreen({navigate}) {
     <div className="screen" style={{background:"var(--bg)"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <Hamburger onClick={()=>navigate("home",null,{replace:true})}/>
+          <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("about.title")}</div>
@@ -6872,12 +6870,12 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
           </div>
         </div>
       </div>
-      <div style={{background:"#111",flexShrink:0,display:"flex",alignItems:"center"}}>
+      <div style={{background:"var(--bg)",padding:"6px 20px 8px",flexShrink:0,display:"flex",gap:6}}>
         {[["public","public events"],["my","my events"]].map(([k,l])=>(
           <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"var(--text-muted)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
         ))}
         {isPremium&&(
-          <button onClick={()=>setShowCreate(true)} style={{flex:1,padding:"14px 6px",fontFamily:"var(--body)",fontSize:12,fontWeight:700,color:"white",background:"none",border:"none",borderBottom:"2.5px solid transparent",cursor:"pointer",marginBottom:-1}}>+ add event</button>
+          <button onClick={()=>setShowCreate(true)} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"var(--red)",background:"transparent",border:"none",cursor:"pointer",borderRadius:50}}>+ add</button>
         )}
       </div>
 
