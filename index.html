@@ -82,6 +82,46 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 [data-dark="true"] [style*="#F8D7DA"] { border-color: #5a1a1a !important; }
 [data-dark="true"] .report-panel { background: #1e0a0a !important; border-color: #5a1a1a !important; }
 [data-dark="true"] .report-panel > div:first-child { color: #ff8888 !important; }
+
+/* Semantic status colors in dark mode */
+[data-dark="true"] [style*="#D1E7DD"] { background: #0a2a1a !important; color: #6ee7a8 !important; }
+[data-dark="true"] [style*="#0A3622"] { color: #6ee7a8 !important; }
+[data-dark="true"] [style*="#FFF3CD"] { background: #2a1e00 !important; }
+[data-dark="true"] [style*="#664D03"] { color: #ffd966 !important; }
+[data-dark="true"] [style*="#856404"] { color: #ffd966 !important; }
+[data-dark="true"] [style*="#FFD966"] { border-color: #5a4400 !important; }
+[data-dark="true"] [style*="#F8D7DA"]:not(.report-panel) { background: #2a0a0a !important; color: #ff8888 !important; }
+[data-dark="true"] [style*="#58151C"] { color: #ff8888 !important; }
+[data-dark="true"] [style*="#e67e00"] { color: #ffaa44 !important; }
+[data-dark="true"] [style*="#dcfce7"] { background: #0a2a1a !important; }
+[data-dark="true"] [style*="#fee2e2"] { background: #2a0a0a !important; }
+[data-dark="true"] [style*="#16a34a"] { color: #4ade80 !important; }
+[data-dark="true"] [style*="#dc2626"] { color: #f87171 !important; }
+
+/* Open/closed status pill */
+[data-dark="true"] .status-open { background: #0a2a1a !important; color: #4ade80 !important; }
+[data-dark="true"] .status-closed { background: #2a0a0a !important; color: #f87171 !important; }
+
+/* Spinner border in dark */
+[data-dark="true"] [style*="rgba(0,0,0,.15)"] { border-color: rgba(255,255,255,.15) !important; }
+
+/* Open/closed in venue card inline */
+[data-dark="true"] [style*="#dcfce7"][style*="16a34a"] { background: #0a2a1a !important; color: #4ade80 !important; }
+[data-dark="true"] [style*="#fee2e2"][style*="dc2626"] { background: #2a0a0a !important; color: #f87171 !important; }
+
+/* Pin/partner activate green bg */
+[data-dark="true"] [style*="D1E7DD"] { background: #0a2a1a !important; }
+
+/* Upgrade screen "start free month" button */
+[data-dark="true"] [style*="start free"] { background: #2a2a2a !important; color: white !important; }
+
+/* Admin card */
+[data-dark="true"] .admin-card { background: #1c1c1c !important; border: 1.5px solid #2a2a2a !important; box-shadow: none !important; }
+
+/* Input fields */
+[data-dark="true"] .input-wrap-light { background: #1c1c1c !important; border-color: #2a2a2a !important; }
+[data-dark="true"] .input-wrap-light input { color: #ffffff !important; }
+[data-dark="true"] input, [data-dark="true"] textarea, [data-dark="true"] select { background: #1c1c1c !important; color: #ffffff !important; border-color: #2a2a2a !important; color-scheme: dark; }
 [data-dark="true"] [style*="#FFD966"] { border-color: #5a4400 !important; }
 /* Hardcoded white screen overrides */
 [data-dark="true"] [style*="background:\"var(--surface)\""][class="screen"] { background: #0d0d0d !important; }
@@ -354,6 +394,10 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .pill-active{background:#D1E7DD;color:#0A3622;}
 .pill-rejected{background:#F8D7DA;color:#58151C;}
 .pill-needs_edit{background:#CFF4FC;color:#055160;}
+[data-dark="true"] .pill-pending{background:#2a1e00 !important;color:#ffd966 !important;}
+[data-dark="true"] .pill-active{background:#0a2a1a !important;color:#6ee7a8 !important;}
+[data-dark="true"] .pill-rejected{background:#2a0a0a !important;color:#ff8888 !important;}
+[data-dark="true"] .pill-needs_edit{background:#00202a !important;color:#7dd3fc !important;}
 .admin-card{background:var(--white);border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);}
 .input-wrap-light{background:var(--white);border:1.5px solid rgba(0,0,0,.15);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:10px;width:100%;}
 .input-wrap-light input{border:none;outline:none;background:transparent;font-family:var(--body);font-size:15px;font-weight:400;color:var(--black);flex:1;}
@@ -1886,7 +1930,7 @@ function VenueCard({venue, onClick}) {
             <span>{tCat(venue.category)||tCui(venue.cuisine)}</span><span>·</span>
             <span>{t("venue.dist")} {venue.district}</span><span>·</span>
             <span>{venue.price_level||venue.price}</span>
-            {openStatus&&<span style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:11,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"2px 7px",borderRadius:10}}>
+            {openStatus&&<span className={openStatus==="open"?"status-open":"status-closed"} style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:11,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"2px 7px",borderRadius:10}}>
               {openStatus==="open"?t("venue.open_now"):t("venue.closed")}
             </span>}
           </div>
@@ -2041,7 +2085,7 @@ function SignInScreen({navigate, onLogin}) {
           </button>
         </div>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:4,marginBottom:2}}>{t("misc.or")}...</div>
-        <button style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:50,padding:"11px 20px",fontFamily:"var(--body)",fontWeight:500,fontSize:15,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,color:"#3c4043",width:"100%",boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}
+        <button style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:50,padding:"11px 20px",fontFamily:"var(--body)",fontWeight:500,fontSize:15,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,color:"var(--black)",width:"100%",boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}
           onClick={async()=>{ await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:"https://lokalz.vercel.app"}}); }}>
           <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z" fill="#EA4335"/></g></svg>
           {t("auth.google")}
@@ -2241,7 +2285,7 @@ function OnboardingScreen({navigate, user, setUser}) {
       <div style={{padding:"0 28px calc(48px + env(safe-area-inset-bottom))"}}>
         <Dots/>
         <div style={{display:"flex",gap:10}}>
-          <button onClick={()=>setStep("intro1")} style={{background:"none",border:"2px solid rgba(0,0,0,.2)",borderRadius:50,padding:"18px 22px",fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",color:"var(--black)"}}>←</button>
+          <button onClick={()=>setStep("intro1")} style={{background:"none",border:"2px solid var(--border-col)",borderRadius:50,padding:"18px 22px",fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",color:"var(--black)"}}>←</button>
           <button className="btn-black" style={{flex:1}} onClick={()=>setStep("city")}>next →</button>
         </div>
       </div>
@@ -2310,7 +2354,7 @@ function OnboardingScreen({navigate, user, setUser}) {
         ))}
       </div>
       <div style={{display:"flex",gap:10,flexShrink:0,paddingTop:8}}>
-        <button onClick={()=>setStep("city")} style={{background:"none",border:"2px solid rgba(0,0,0,.2)",borderRadius:50,padding:"18px 22px",fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",color:"var(--black)"}}>←</button>
+        <button onClick={()=>setStep("city")} style={{background:"none",border:"2px solid var(--border-col)",borderRadius:50,padding:"18px 22px",fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",color:"var(--black)"}}>←</button>
         <button className="btn-black" onClick={()=>saveAndNavigate(city,badge)} style={{flex:1,opacity:badge?1:.4}}>
           {saving?t("btn.saving"):t("btn.lets_go")}
         </button>
@@ -2646,7 +2690,7 @@ function QProgress({step}) {
     <div style={{padding:"0 24px 8px",flexShrink:0}}>
       <div style={{display:"flex",gap:4}}>
         {steps.map((_,i)=>(
-          <div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=idx?"var(--black)":"rgba(0,0,0,.12)",transition:"background .2s"}}/>
+          <div key={i} style={{flex:1,height:3,borderRadius:2,background:i<=idx?"var(--red)":"var(--surface3)",transition:"background .2s"}}/>
         ))}
       </div>
       <div style={{fontFamily:"var(--body)",fontSize:11,color:"#888",marginTop:4,textAlign:"right"}}>{idx+1} / {total}</div>
@@ -2899,7 +2943,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
         <button onClick={detectLocation}
           style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--red)":"var(--surface)",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid var(--border-col)"}}>
           <span>{locLoading?t("q.locating"):t("q.detect_location")}</span>
-          {!locLoading&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,background:"var(--bg)",color:"var(--black)",padding:"2px 8px",borderRadius:20}}>GPS</span>}
+          {!locLoading&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,background:"#333",color:"white",padding:"2px 8px",borderRadius:20}}>GPS</span>}
         </button>
         {DISTRICTS_MAIN.filter(d=>d!=="near me").map(d=>(
           <button key={d} style={{...PILL,background:sel.includes(d)?"var(--red)":"var(--surface)",color:sel.includes(d)?"white":"var(--black)"}} onClick={()=>toggle(d)}>
@@ -3236,13 +3280,13 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8,width:"100%",marginBottom:16,alignItems:"center"}}>
               {answers.locations?.length>0&&!answers.locations.includes(t("q.anywhere"))&&(
-                <button style={{background:"var(--surface)",border:"1.5px solid var(--black)",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer",color:"var(--black)"}}
+                <button style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer",color:"var(--black)"}}
                   onClick={()=>{setAnswers(a=>({...a,locations:[t("q.anywhere")]}));setShownCount(BATCH);}}>
                   🗺️ try anywhere in Budapest
                 </button>
               )}
               {answers.budgets?.length>0&&(
-                <button style={{background:"var(--surface)",border:"1.5px solid var(--black)",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer",color:"var(--black)"}}
+                <button style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,cursor:"pointer",color:"var(--black)"}}
                   onClick={()=>{setAnswers(a=>({...a,budgets:[],budget:null}));setShownCount(BATCH);}}>
                   💸 remove budget filter
                 </button>
@@ -3508,7 +3552,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         {/* 1. Name + open status */}
         <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",marginBottom:6}}>
           <div style={{fontFamily:"var(--display)",fontSize:"36px",color:"var(--red)",lineHeight:1,letterSpacing:0}}>{venue.name}</div>
-          {openStatus&&<span style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:12,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"3px 10px",borderRadius:12,flexShrink:0}}>
+          {openStatus&&<span className={openStatus==="open"?"status-open":"status-closed"} style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:12,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"3px 10px",borderRadius:12,flexShrink:0}}>
             {openStatus==="open"?t("venue.open_now"):t("venue.closed")}
           </span>}
         </div>
@@ -3555,7 +3599,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:14}}>
           <span style={{fontSize:16,flexShrink:0,marginTop:1}}>📍</span>
           <div>
-            <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"#444",lineHeight:1.5}}>{venue.address}</div>
+            <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"var(--text-muted)",lineHeight:1.5}}>{venue.address}</div>
             <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>Budapest, {t("venue.dist_label")} {venue.district}</div>
           </div>
         </div>
@@ -3571,7 +3615,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
                   :<span style={{color:"#dc2626"}}>{t("vd.closed")}</span>}
               </div>
               {translateOpenHours(openHours).map((h,i)=>(
-                <div key={i} style={{fontFamily:"var(--body)",fontSize:12,color:"#666",lineHeight:1.7}}>{h}</div>
+                <div key={i} style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",lineHeight:1.7}}>{h}</div>
               ))}
             </div>
           </div>
@@ -3776,13 +3820,13 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
             ?<div style={{textAlign:"center",padding:"48px 20px"}}>
                 <div style={{fontSize:44,marginBottom:12}}>👤</div>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:8}}>{t("saved.pro_feature")}</div>
-                <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#777",marginBottom:24,lineHeight:1.6}}>{t("venue.follow_pro")}</div>
+                <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--text-muted)",marginBottom:24,lineHeight:1.6}}>{t("venue.follow_pro")}</div>
                 <button className="btn-black" onClick={()=>navigate("upgrade")}>{t("saved.upgrade")}</button>
               </div>
             :scoutsLoading
-              ?<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>
+              ?<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>
               :scouts.length===0
-                ?<div className="empty"><div className="empty-icon">👤</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>{t("empty.no_scouts").split("\n")[0]}<br/>{t("empty.no_scouts").split("\n")[1]}</div></div>
+                ?<div className="empty"><div className="empty-icon">👤</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("empty.no_scouts").split("\n")[0]}<br/>{t("empty.no_scouts").split("\n")[1]}</div></div>
                 :scouts.map(s=>(
                   <div key={s.id} onClick={()=>navigate("scout_profile", s.id)}
                     style={{background:"var(--surface)",borderRadius:16,padding:"16px",marginBottom:12,cursor:"pointer",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
@@ -3928,7 +3972,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
     return true;
   });
   const sorted=[...filtered].sort((a,b)=>a.name.localeCompare(b.name));
-  const selectStyle={background:"var(--surface)",color:"var(--black)",border:"1.5px solid var(--black)",borderRadius:50,padding:"10px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",outline:"none",width:"100%",marginBottom:10};
+  const selectStyle={background:"var(--surface)",color:"var(--black)",border:"1.5px solid var(--border-col)",borderRadius:50,padding:"10px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",outline:"none",width:"100%",marginBottom:10};
 
   return (
     <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
@@ -3978,7 +4022,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           {/* Zoom + locate */}
           <div style={{position:"absolute",bottom:100,right:16,display:"flex",flexDirection:"column",gap:8}}>
             <div style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:20,boxShadow:"0 2px 8px rgba(0,0,0,.2)",display:"flex",flexDirection:"column",overflow:"hidden"}}>
-              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)+1)} style={{background:"rgba(30,30,30,.85)",border:"none",borderBottom:"1px solid #333",cursor:"pointer",width:40,height:40,fontSize:20,color:"white",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+              <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)+1)} style={{background:"rgba(20,20,20,.9)",border:"none",borderBottom:"1px solid #333",cursor:"pointer",width:40,height:40,fontSize:20,color:"white",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
               <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)-1)} style={{background:"rgba(30,30,30,.85)",border:"none",cursor:"pointer",width:40,height:40,fontSize:20,color:"white",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
             </div>
             <button onClick={()=>{
@@ -4010,7 +4054,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
           window._avPullStart=null;
         }}>
         {sorted.length===0
-          ?<div className="empty"><div className="empty-icon">🍽</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#777"}}>no venues found</div></div>
+          ?<div className="empty"><div className="empty-icon">🍽</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--text-muted)"}}>no venues found</div></div>
           :sorted.map((v,i)=>(
             <div key={v.id} style={{animation:`staggerUp .3s ${Math.min(i,8)*0.05}s cubic-bezier(.2,.8,.4,1) both`,opacity:0,animationFillMode:"forwards"}}>
               <VenueCard venue={v} onClick={()=>{saveScroll("allVenues",scrollRef.current);navigate("venue",v);}}/>
@@ -4150,9 +4194,9 @@ function ScoutEventsTab({user, allVenues, showToast}) {
       )}
 
       {loading
-        ?<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>
+        ?<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>
         :events.length===0
-          ?<div className="empty"><div className="empty-icon">🗓</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>{t("scout.no_events")}</div></div>
+          ?<div className="empty"><div className="empty-icon">🗓</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("scout.no_events")}</div></div>
           :events.map(ev=>(
             <div key={ev.id} className="admin-card" style={{marginBottom:10}}>
               <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:4}}>
@@ -4980,7 +5024,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           ))}
           <div style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:12,padding:"12px 14px",marginBottom:8}}>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--black)",marginBottom:6}}>{t("vd.why_title")} — tips</div>
-            <div style={{fontFamily:"var(--body)",fontSize:12,color:"#444444",fontWeight:600,lineHeight:1.6}}>
+            <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",fontWeight:600,lineHeight:1.6}}>
               <span style={{display:"block",marginBottom:2}}>🎯 <b>Vibe</b> — atmosphere? (hidden courtyard, live jazz, candlelit...)</span>
               <span style={{display:"block",marginBottom:2}}>🍽 <b>Quality</b> — unmissable dish/drink? (best carbonara, wagyu...)</span>
               <span style={{display:"block",marginBottom:2}}>👥 <b>Social</b> — who comes here? (expats, young locals, families...)</span>
@@ -5024,7 +5068,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </div>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:10}}>my submissions</div>
           {myVenues.length===0
-            ?<div className="empty"><div className="empty-icon">📍</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No submissions yet.</div></div>
+            ?<div className="empty"><div className="empty-icon">📍</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>No submissions yet.</div></div>
             :myVenues.map(v=>(
               <div key={v.id} className="admin-card">
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:v.edit_comment?6:0}}>
@@ -5502,7 +5546,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       {tab==="pending"&&(
         <div className="scroll" style={{padding:"14px 20px 80px"}}>
           {pending.length===0
-            ?<div className="empty"><div className="empty-icon">✅</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>{t("cl.no_pending")}</div></div>
+            ?<div className="empty"><div className="empty-icon">✅</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("cl.no_pending")}</div></div>
             :pending.map(v=>(
               <div key={v.id} className="admin-card" style={{marginBottom:12}}>
                 <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:6,cursor:"pointer"}} onClick={()=>setExpandedVenue(expandedVenue===v.id?null:v.id)}>
@@ -5526,7 +5570,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
                       <div><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa"}}>SCOUT</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>{v.scout_alias||"—"}</div></div>
                     </div>
                     <div style={{marginBottom:8}}><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa",marginBottom:3}}>ADDRESS</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>{v.address}</div></div>
-                    <div style={{marginBottom:8}}><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa",marginBottom:3}}>WHY LOCALS GO HERE</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"#444",lineHeight:1.5}}>{v.why}</div></div>
+                    <div style={{marginBottom:8}}><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa",marginBottom:3}}>WHY LOCALS GO HERE</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",lineHeight:1.5}}>{v.why}</div></div>
                     {v.occasions?.length>0&&<div style={{marginBottom:8}}><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>OCCASIONS</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{v.occasions.map(o=><span key={o} style={{background:"var(--surface3)",borderRadius:20,padding:"3px 10px",fontFamily:"var(--body)",fontSize:11,color:"var(--black)"}}>{o}</span>)}</div></div>}
                     {v.tags?.length>0&&<div style={{marginBottom:6}}><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>{t("cl.tags")}</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{v.tags.map(t=><span key={t} style={{background:"var(--surface3)",borderRadius:20,padding:"3px 10px",fontFamily:"var(--body)",fontSize:11,color:"var(--black)"}}>{t}</span>)}</div></div>}
                     {v.google_maps_url&&<a href={v.google_maps_url} target="_blank" rel="noreferrer" style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",display:"block",marginTop:4}}>📍 View on Google Maps</a>}
@@ -5640,7 +5684,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
               .filter(v=>!clCategory||v.category===clCategory)
               .sort((a,b)=>a.name.localeCompare(b.name));
             return filtered.length===0
-              ? <div className="empty"><div className="empty-icon">🔍</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No venues found</div></div>
+              ? <div className="empty"><div className="empty-icon">🔍</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>No venues found</div></div>
               : filtered.map(v=>(
                 <div key={v.id} className="admin-card" style={{marginBottom:10}}>
                   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
@@ -5667,7 +5711,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       {tab==="reports"&&(
         <div className="scroll" style={{padding:"14px 20px 80px"}}>
           {reports.length===0
-            ?<div className="empty"><div className="empty-icon">🚩</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No reports yet.</div></div>
+            ?<div className="empty"><div className="empty-icon">🚩</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>No reports yet.</div></div>
             :Object.entries(
                 reports.reduce((acc,r)=>{
                   const key = r.venue_id;
@@ -5707,7 +5751,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       {tab==="events"&&(
         <div className="scroll" style={{padding:"14px 20px 80px"}}>
           {pendingEvents.length===0
-            ?<div className="empty"><div className="empty-icon">🗓</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>{t("cl.no_pending_events")}</div></div>
+            ?<div className="empty"><div className="empty-icon">🗓</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("cl.no_pending_events")}</div></div>
             :pendingEvents.map(ev=>(
               <div key={ev.id} className="admin-card" style={{marginBottom:12}}>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,marginBottom:4}}>{ev.title}</div>
@@ -5771,7 +5815,7 @@ function PartnerManageTab({showToast, cityId}) {
   return (
     <div className="scroll" style={{padding:"14px 20px 80px"}}>
       {partners.length===0
-        ?<div className="empty"><div className="empty-icon">🏨</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>No partners yet.</div></div>
+        ?<div className="empty"><div className="empty-icon">🏨</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>No partners yet.</div></div>
         :partners.map(p=>(
           <div key={p.id} className="admin-card" style={{marginBottom:12}}>
             <div style={{marginBottom:8}}>
@@ -5928,7 +5972,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
               <span style={{color:"var(--red)",fontSize:20}}>{editing==="profile"?"∨":"›"}</span>
             </div>
             {editing!=="profile"&&(
-              <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"#666",marginTop:4}}>
+              <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"var(--text-muted)",marginTop:4}}>
                 {user?.bio||<span style={{color:"var(--text-muted)"}}>{t("profile.add_bio")}</span>}
                 {user?.instagram_url&&<span style={{marginLeft:8,color:"var(--red)"}}>@{user.instagram_url.replace("https://instagram.com/","").replace("@","")}</span>}
               </div>
@@ -6187,7 +6231,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
         </div>
       </div>
       <div className="scroll" style={{padding:"12px 20px 80px"}}>
-        {loading&&<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>}
+        {loading&&<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>}
         {!loading&&filtered.length===0&&<div style={{textAlign:"center",padding:32,fontFamily:"var(--body)",fontSize:14,color:"var(--text-muted)"}}>{t("sc.no_scouts")}</div>}
         {filtered.map(s=>(
           <div key={s.id} onClick={()=>navigate("scout_profile",s.id)}
@@ -6202,7 +6246,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
               <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"#888",marginTop:2}}>
                 {s.role==="city_lead"?"✦ City Lead":s.badge||t("venue.local_scout")}
               </div>
-              {s.bio&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"#666",marginTop:4,lineHeight:1.4}}>{s.bio}</div>}
+              {s.bio&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginTop:4,lineHeight:1.4}}>{s.bio}</div>}
             </div>
             <span style={{color:"var(--text-muted)",fontSize:20}}>›</span>
           </div>
@@ -6292,14 +6336,14 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
       <div style={{padding:"60px 28px",textAlign:"center"}}>
         <div style={{fontSize:56,marginBottom:20}}>⭐</div>
         <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:22,color:"var(--black)",marginBottom:10}}>{t("sc.premium_feature")}</div>
-        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:600,color:"#777",lineHeight:1.6}}>{t("sc.premium_msg")}</div>
+        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:600,color:"var(--text-muted)",lineHeight:1.6}}>{t("sc.premium_msg")}</div>
       </div>
     </div>
   );
 
   if(loading) return (
     <div className="screen" style={{alignItems:"center",justifyContent:"center",gap:16}}>
-      <div style={{width:36,height:36,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
+      <div style={{width:36,height:36,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--text-muted)"}}>{t("sc.loading")}</div>
     </div>
   );
@@ -6400,7 +6444,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
           {filtered.length===0&&(
             <div className="empty">
               <div className="empty-icon">📍</div>
-              <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#777"}}>{t("sc.no_picks")}</div>
+              <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("sc.no_picks")}</div>
             </div>
           )}
           {filtered.map(v=>(
@@ -6427,11 +6471,11 @@ function AboutScreen({navigate}) {
       <div className="scroll" style={{padding:"20px 28px 80px"}}>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",marginBottom:24}}>{t("about.headline")}</div>
 
-        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"#444",lineHeight:1.8,marginBottom:24}}>
+        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"var(--text-muted)",lineHeight:1.8,marginBottom:24}}>
           {t("about.p1")}
         </div>
 
-        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"#444",lineHeight:1.8,marginBottom:24}}>
+        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"var(--text-muted)",lineHeight:1.8,marginBottom:24}}>
           {t("about.p2")}
         </div>
 
@@ -6444,12 +6488,12 @@ function AboutScreen({navigate}) {
           <div key={title} style={{background:"var(--surface)",borderRadius:16,padding:"18px",marginBottom:12}}>
             <div style={{fontSize:24,marginBottom:8}}>{icon}</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:6}}>{title}</div>
-            <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#666",lineHeight:1.6}}>{text}</div>
+            <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--text-muted)",lineHeight:1.6}}>{text}</div>
           </div>
         ))}
 
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginBottom:12,marginTop:8}}>{t("about.promise")}</div>
-        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"#444",lineHeight:1.8,marginBottom:24}}>
+        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:400,color:"var(--text-muted)",lineHeight:1.8,marginBottom:24}}>
           {t("about.promise_text")}
         </div>
 
@@ -6668,7 +6712,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
 
       {loading
         ? <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <div style={{width:28,height:28,border:"2.5px solid rgba(0,0,0,.15)",borderTop:"2.5px solid black",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
+            <div style={{width:28,height:28,border:"2.5px solid var(--surface3)",borderTop:"2.5px solid black",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
           </div>
         : <div className="scroll" style={{padding:"16px 20px 80px"}}>
             {tab==="my"&&!isPremium&&(
@@ -6698,7 +6742,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
                     </div>
                     <div style={{padding:"12px 16px"}}>
                       <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:700,color:"var(--red)",marginBottom:4}}>📅 {formatDate(ev.event_date)}</div>
-                      {ev.venues&&<div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"#666",marginBottom:4}}>📍 {ev.venues.name} · Dist. {ev.venues.district}</div>}
+                      {ev.venues&&<div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"var(--text-muted)",marginBottom:4}}>📍 {ev.venues.name} · Dist. {ev.venues.district}</div>}
                       {ev.description&&<div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:400,color:"#888",lineHeight:1.5}}>{ev.description.slice(0,80)}{ev.description.length>80?"…":""}</div>}
                     </div>
                   </div>
@@ -6767,7 +6811,7 @@ function EventDetailScreen({navigate, event, user, showToast}) {
           <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",marginBottom:16}}>📍 {event.venues?.name||""} · {event.venues?.address||""}</div>
         )}
         {event.description&&(
-          <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#444",lineHeight:1.7,marginBottom:20}}>{event.description}</div>
+          <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)",lineHeight:1.7,marginBottom:20}}>{event.description}</div>
         )}
 
         {/* RSVP */}
@@ -6828,7 +6872,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
       <div style={{padding:"60px 28px",textAlign:"center"}}>
         <div style={{fontSize:56,marginBottom:20}}>🎉</div>
         <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:22,color:"var(--black)",marginBottom:10}}>{t("sc.premium_feature")}</div>
-        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:600,color:"#777",lineHeight:1.6,marginBottom:24}}>{t("ev.plan_premium")}</div>
+        <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:600,color:"var(--text-muted)",lineHeight:1.6,marginBottom:24}}>{t("ev.plan_premium")}</div>
         <button className="btn-black" onClick={()=>navigate("upgrade")}>{t("ev.upgrade_premium2")}</button>
       </div>
     </div>
@@ -6844,7 +6888,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
 
       {loading
         ? <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <div style={{width:32,height:32,border:"3px solid rgba(0,0,0,.15)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
+            <div style={{width:32,height:32,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
           </div>
         : <div className="scroll" style={{padding:"0 20px 100px"}}>
             {myPlans.length===0&&invited.length===0&&(
@@ -7014,7 +7058,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
         <div style={{padding:"60px 28px",textAlign:"center"}}>
           <div style={{fontSize:52,marginBottom:16}}>⏳</div>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginBottom:8}}>{t("ev.plan_unavail")}</div>
-          <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#777",lineHeight:1.6}}>{t("ev.plan_waiting")}</div>
+          <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--text-muted)",lineHeight:1.6}}>{t("ev.plan_waiting")}</div>
         </div>
       </div>
     );
@@ -7129,7 +7173,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
         <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:26,color:"var(--black)",marginBottom:8}}>{currentPlan.title}</div>
         <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:700,color:"var(--red)",marginBottom:6}}>📅 {formatDate(currentPlan.event_date)}</div>
         {currentPlan.venues&&<div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",marginBottom:12}}>📍 {currentPlan.venues.name} · Dist. {currentPlan.venues.district}</div>}
-        {currentPlan.description&&<div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"#444",lineHeight:1.7,marginBottom:16}}>{currentPlan.description}</div>}
+        {currentPlan.description&&<div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)",lineHeight:1.7,marginBottom:16}}>{currentPlan.description}</div>}
 
         {/* Owner actions */}
         {isOwner&&(
@@ -7274,7 +7318,7 @@ function UpgradeScreen({navigate, user}) {
         <div style={{textAlign:"center",padding:"8px 0 24px"}}>
           <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:40,color:"var(--red)",letterSpacing:0,lineHeight:1}}>LOKAL&#39;Z</div>
           <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:26,color:"var(--black)",marginTop:6}}>Explorer Pro</div>
-          <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"#777",marginTop:6}}>{t("up.subtitle")}</div>
+          <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--text-muted)",marginTop:6}}>{t("up.subtitle")}</div>
         </div>
 
         {/* Free trial banner */}
@@ -7286,7 +7330,7 @@ function UpgradeScreen({navigate, user}) {
             const url = user?.email ? base+"?prefilled_email="+encodeURIComponent(user.email) : base;
             window.location.href = url;
           }}
-            style={{width:"100%",background:"var(--surface)",border:"none",borderRadius:50,padding:"12px",fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",cursor:"pointer"}}>
+            style={{width:"100%",background:"#111",border:"1.5px solid #333",borderRadius:50,padding:"12px",fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"white",cursor:"pointer"}}>
             start free month →
           </button>
         </div>
@@ -7701,7 +7745,7 @@ function App() {
       {appLoading
         ? <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:20,background:"var(--bg)"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"40px",color:"var(--red)",lineHeight:.88,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{width:24,height:24,border:"2.5px solid rgba(253,1,0,.2)",borderTop:"2.5px solid var(--red)",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
+            <div style={{width:24,height:24,border:"2.5px solid var(--surface3)",borderTop:"2.5px solid var(--red)",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
           </div>
         : <>
             {screens[screen]||screens.signin}
