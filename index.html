@@ -6538,7 +6538,10 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
     .replace("https://instagram.com/","")
     .replace("@","").replace("/","");
 
-  const allVenuesList = [...(venues.added||[]), ...(venues.saved||[])];
+  const allVenuesList = [
+    ...(venues.added||[]).map(v=>({...v,_source:"added"})),
+    ...(venues.saved||[]).map(v=>({...v,_source:"saved"})),
+  ];
   const categories = ["All", ...new Set(allVenuesList.map(v=>v.category||v.cuisine).filter(Boolean))];
   const filtered = catFilter==="All" ? allVenuesList : allVenuesList.filter(v=>(v.category||v.cuisine)===catFilter);
   const isOwnProfile = user?.id===scoutId;
@@ -6633,8 +6636,16 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
             </div>
           )}
           {filtered.map(v=>(
-            <VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>
-          ))}
+              <div key={v.id} style={{position:"relative"}}>
+                <div style={{position:"absolute",top:10,left:10,zIndex:5,display:"flex",gap:4}}>
+                  {v._source==="added"
+                    ? <span style={{background:"var(--red)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,padding:"2px 8px",borderRadius:20,letterSpacing:".04em"}}>✦ ADDED</span>
+                    : <span style={{background:"rgba(0,0,0,.55)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,padding:"2px 8px",borderRadius:20,letterSpacing:".04em"}}>♥ SAVED</span>
+                  }
+                </div>
+                <VenueCard venue={v} onClick={()=>navigate("venue",v)}/>
+              </div>
+            ))}
         </div>
       </div>
     </div>
