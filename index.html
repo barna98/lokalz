@@ -1650,7 +1650,7 @@ function translateOpenHours(hoursArr) {
     return result;
   });
 }
-function tTag(tag){ return t("tag."+tag.toLowerCase().replace(/ /g,"_").replace(/&/g,"").replace(/-/g,"_")) || tag; }
+function tTag(tag){ const key="tag."+tag.toLowerCase().replace(/ /g,"_").replace(/&/g,"").replace(/-/g,"_"); const translated=(TRANSLATIONS[_lang]||TRANSLATIONS.en)[key]||TRANSLATIONS.en[key]; return translated||tag; }
 const OCCASIONS = [
   {id:"Casual dining",        label:"Casual dining",        illus:"dinner"},
   {id:"Fine dining",          label:"Fine dining",           illus:"date"},
