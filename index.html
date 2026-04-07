@@ -6382,7 +6382,7 @@ function ScoutsScreen({navigate, onMenu, user}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 8px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -6392,14 +6392,15 @@ function ScoutsScreen({navigate, onMenu, user}) {
         </div>
       </div>
 
-      <div style={{background:"#111",padding:"12px 20px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.1)",borderRadius:50,padding:"8px 14px"}}>
-          <span style={{color:"rgba(255,255,255,.5)",fontSize:13}}>🔍</span>
+      <div style={{padding:"0 16px 10px",flexShrink:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px"}}>
+          <span style={{color:"rgba(255,255,255,.6)",fontSize:13}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search scouts..."
-            style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1}}/>
+            style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}}/>
         </div>
       </div>
-      <div className="scroll" style={{padding:"12px 20px 80px"}}>
+
+      <div className="scroll" style={{padding:"4px 20px 80px"}}>
         {loading&&<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>}
         {!loading&&filtered.length===0&&<div style={{textAlign:"center",padding:32,fontFamily:"var(--body)",fontSize:14,color:"var(--text-muted)"}}>{t("sc.no_scouts")}</div>}
         {filtered.map(s=>(
