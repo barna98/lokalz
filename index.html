@@ -80,6 +80,8 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 [data-dark="true"] [style*="#FFF3CD"] { background: #2a2200 !important; }
 [data-dark="true"] [style*="#FFF8F8"] { background: #2a0a0a !important; }
 [data-dark="true"] [style*="#F8D7DA"] { border-color: #5a1a1a !important; }
+[data-dark="true"] .report-panel { background: #1e0a0a !important; border-color: #5a1a1a !important; }
+[data-dark="true"] .report-panel > div:first-child { color: #ff8888 !important; }
 [data-dark="true"] [style*="#FFD966"] { border-color: #5a4400 !important; }
 /* Hardcoded white screen overrides */
 [data-dark="true"] [style*="background:\"var(--surface)\""][class="screen"] { background: #0d0d0d !important; }
@@ -3624,11 +3626,11 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           </button>
         </div>
         {showReport&&(
-          <div style={{background:"#FFF8F8",border:"1.5px solid #F8D7DA",borderRadius:16,padding:16,marginBottom:12,animation:"fadeUp .2s ease both"}}>
+          <div className="report-panel" style={{background:"#FFF8F8",border:"1.5px solid #F8D7DA",borderRadius:16,padding:16,marginBottom:12,animation:"fadeUp .2s ease both"}}>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"#58151C",marginBottom:10}}>{t("vd.report_title")}</div>
             {[["closed",t("vd.report_closed")],["wrong_address",t("vd.report_wrong_addr")],["photos_outdated",t("vd.report_photos")],["other",t("vd.report_other")]].map(([val,label])=>(
               <button key={val} onClick={()=>setReportType(val)}
-                style={{display:"block",width:"100%",textAlign:"left",background:reportType===val?"#F8D7DA":"none",border:"1.5px solid",borderColor:reportType===val?"#dc3545":"var(--border-col)",borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:700,color:"var(--black)",cursor:"pointer",marginBottom:8}}>
+                style={{display:"block",width:"100%",textAlign:"left",background:reportType===val?"#5a1a1a":"transparent",border:"1.5px solid",borderColor:reportType===val?"#dc3545":"var(--border-col)",borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:700,color:reportType===val?"#ffaaaa":"var(--black)",cursor:"pointer",marginBottom:8}}>
                 {label}
               </button>
             ))}
