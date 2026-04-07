@@ -6586,12 +6586,12 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
 
           {/* Stats */}
           <div style={{display:"flex",gap:0,marginBottom:16,borderRadius:12,overflow:"hidden",border:"1.5px solid var(--border-col)"}}>
-            <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.04)"}}>
+            <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.8)"}}>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)"}}>{(venues.added||[]).length}</div>
               <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"var(--text-muted)",marginTop:2}}>{t("sc.added")}</div>
             </div>
             <div style={{width:1,background:"var(--border-col)"}}/>
-            <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:dark?"rgba(255,255,255,.06)":"rgba(0,0,0,.04)"}}>
+            <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.8)"}}>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)"}}>{(venues.saved||[]).length}</div>
               <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"var(--text-muted)",marginTop:2}}>{t("saved.title2")}</div>
             </div>
@@ -6600,8 +6600,8 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
           {/* Follow button */}
           {!isOwnProfile&&(
             <button onClick={toggleFollow} disabled={followLoading}
-              style={{width:"100%",background:isFollowing?"transparent":"var(--red)",border:isFollowing?"2px solid var(--border-col)":"none",borderRadius:50,padding:"13px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,color:isFollowing?"var(--black)":"white",cursor:"pointer",opacity:followLoading?0.6:1,transition:"all .2s"}}>
-              {followLoading?"...":(isFollowing?`✓ ${t("btn.following")}`:t("btn.follow"))}
+              style={{width:"100%",background:isFollowing?"transparent":"var(--red)",border:isFollowing?"2px solid var(--red)":"none",borderRadius:50,padding:"13px",fontFamily:"var(--body)",fontWeight:600,fontSize:14,color:isFollowing?"var(--red)":"white",cursor:"pointer",opacity:followLoading?0.6:1,transition:"all .2s"}}>
+              {followLoading?"...":(isFollowing?t("btn.following"):t("btn.follow"))}
             </button>
           )}
         </div>
