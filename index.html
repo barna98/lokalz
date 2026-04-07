@@ -145,12 +145,10 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 @keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
 @keyframes staggerUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes imgFadeIn{from{opacity:0}to{opacity:1}}
-@keyframes screenIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes screenSlideIn{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
 
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:screenIn .28s cubic-bezier(.25,.46,.45,.94) both;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:fadeUp .2s cubic-bezier(.25,.46,.45,.94) both;}
 .screen-no-anim{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);}
-.screen-detail{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:screenSlideIn .3s cubic-bezier(.25,.46,.45,.94) both;}
+.screen-detail{position:absolute;inset:0;display:flex;flex-direction:column;background:transparent;}
 
 /* Tap feedback */
 .tap{transition:transform .12s ease,opacity .12s ease;}
@@ -3613,17 +3611,18 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
       const bg = document.getElementById("bg-screen-wrapper");
       if(y>110){
         if(innerRef.current){
-          innerRef.current.style.transition="transform .28s cubic-bezier(.4,0,1,1)";
+          innerRef.current.style.transition="transform .3s cubic-bezier(.4,0,1,1)";
           innerRef.current.style.transform="translateY(100vh)";
         }
-        // Animate background back to full
+        // Animate background back to full before navigate
+        const bg = document.getElementById("bg-screen-wrapper");
         if(bg){
-          bg.style.transition="transform .28s cubic-bezier(.25,.46,.45,.94),filter .28s ease,border-radius .28s";
+          bg.style.transition="transform .3s cubic-bezier(.25,.46,.45,.94),filter .3s ease,border-radius .3s ease";
           bg.style.transform="scale(1)";
           bg.style.filter="brightness(1)";
           bg.style.borderRadius="0";
         }
-        setTimeout(()=>navigate(-1),260);
+        setTimeout(()=>navigate(-1),280);
       } else {
         if(innerRef.current){
           innerRef.current.style.transition="transform .32s cubic-bezier(.2,.8,.4,1),border-radius .32s,box-shadow .32s";
@@ -3645,6 +3644,21 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
     touchStartY.current=null;
   }
 
+  // Animate innerRef in on mount
+  React.useEffect(()=>{
+    if(!innerRef.current) return;
+    innerRef.current.style.transform="translateY(100%)";
+    innerRef.current.style.transition="none";
+    // Next frame: slide up
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        if(!innerRef.current) return;
+        innerRef.current.style.transition="transform .38s cubic-bezier(.25,.46,.45,.94)";
+        innerRef.current.style.transform="translateY(0)";
+      });
+    });
+  },[]);
+
   // Register native touch listeners with passive:false so preventDefault works
   React.useEffect(()=>{
     const el = innerRef.current;
@@ -3661,8 +3675,8 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
   // ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="screen-detail" style={{background:"transparent",overflow:"hidden",animation:"none",borderRadius:0}}>
-      <div ref={innerRef} style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",background:"var(--bg)",overflow:"hidden",willChange:"transform",animation:"screenSlideIn .3s cubic-bezier(.25,.46,.45,.94) both"}}>
+    <div className="screen-detail" style={{overflow:"hidden"}}>
+      <div ref={innerRef} style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",background:"var(--bg)",overflow:"hidden",willChange:"transform"}}>
 
       {/* ── Scrollable container: image + content together ── */}
       <div className="scroll" style={{flex:1,position:"relative"}} ref={scrollRef}>
@@ -7920,10 +7934,10 @@ function App() {
                     pointerEvents:isDetail?"none":"auto",
                     userSelect:isDetail?"none":"auto",
                     transform:isDetail?"scale(.94)":"scale(1)",
-                    filter:isDetail?"brightness(.7)":"brightness(1)",
-                    transition:"transform .32s cubic-bezier(.25,.46,.45,.94), filter .32s ease",
+                    filter:isDetail?"brightness(.65)":"brightness(1)",
+                    transition:"transform .38s cubic-bezier(.25,.46,.45,.94), filter .38s ease, border-radius .38s ease",
                     transformOrigin:"center center",
-                    borderRadius:isDetail?"16px":"0",
+                    borderRadius:isDetail?"14px":"0",
                     overflow:"hidden",
                   }}>
                     {screens[bgKey]||screens.signin}
