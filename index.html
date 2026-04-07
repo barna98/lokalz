@@ -3547,24 +3547,21 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
     const absDy = Math.abs(dy);
     const scrollTop = scrollRef.current?.scrollTop||0;
 
-    // Lock gesture direction after clear movement
     if(!gesture.current){
-      if(absDx<8 && absDy<8) return; // wait for clear direction
+      if(absDx<8 && absDy<8) return;
       if(absDx > absDy * 2.0){
-        // Clearly horizontal (2x more horizontal than vertical) → gallery
         if(images.length>1) gesture.current="gallery";
         else gesture.current="scroll";
       } else if(absDy > absDx * 1.5){
-        // Clearly vertical
         if(dy>0 && scrollTop<=0) gesture.current="dismiss";
         else gesture.current="scroll";
       } else {
-        gesture.current="scroll"; // ambiguous → scroll
+        gesture.current="scroll";
       }
     }
 
     if(gesture.current==="gallery"){
-      e.preventDefault();
+      e.preventDefault(); // works because listener is passive:false
       if(galleryRef.current){
         galleryRef.current.style.transition="none";
         galleryRef.current.style.transform=`translateX(${-(imgIdxRef.current*getW())+dx}px)`;
@@ -3580,7 +3577,6 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         innerRef.current.style.boxShadow=clamped>10?"0 -8px 32px rgba(0,0,0,.35)":"";
       }
     }
-    // "scroll" → browser handles natively
   }
 
   function onTouchEnd(e){
@@ -3616,13 +3612,24 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
     touchStartX.current=null;
     touchStartY.current=null;
   }
+
+  // Register native touch listeners with passive:false so preventDefault works
+  React.useEffect(()=>{
+    const el = innerRef.current;
+    if(!el) return;
+    el.addEventListener("touchstart", onTouchStart, {passive:true});
+    el.addEventListener("touchmove", onTouchMove, {passive:false});
+    el.addEventListener("touchend", onTouchEnd, {passive:true});
+    return ()=>{
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+    };
+  },[images.length]); // re-register when images load
   // ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="screen" style={{background:"transparent",overflow:"hidden"}}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}>
+    <div className="screen" style={{background:"transparent",overflow:"hidden"}}>
       <div ref={innerRef} style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",background:"var(--bg)",overflow:"hidden",willChange:"transform"}}>
 
       {/* ── Scrollable container: image + content together ── */}
