@@ -6198,6 +6198,11 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [newBio, setNewBio] = useState(user?.bio||"");
   const [newInstagram, setNewInstagram] = useState(user?.instagram_url||"");
+
+  React.useEffect(()=>{
+    setNewBio(user?.bio||"");
+    setNewInstagram(user?.instagram_url||"");
+  },[user?.bio, user?.instagram_url]);
   const [uploadingImg, setUploadingImg] = useState(false);
 
   function showMsg(text, isErr=false){setMsg({text,isErr});setTimeout(()=>setMsg(null),3000);}
@@ -6354,8 +6359,8 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",marginBottom:editing==="profile"?10:0}} onClick={()=>setEditing(editing==="profile"?null:"profile")}>
                 <div>
                   <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>Bio</div>
-                  {editing!=="profile"&&<div style={{fontFamily:"var(--body)",fontSize:14,color:user?.bio?"var(--black)":"var(--text-muted)",marginTop:3,lineHeight:1.4}}>
-                    {user?.bio||t("profile.add_bio")}
+                  {editing!=="profile"&&<div style={{fontFamily:"var(--body)",fontSize:14,color:newBio?"var(--black)":"var(--text-muted)",marginTop:3,lineHeight:1.4}}>
+                    {newBio||t("profile.add_bio")}
                   </div>}
                 </div>
                 <span style={{color:"var(--red)",fontSize:18,flexShrink:0,marginLeft:8}}>{editing==="profile"?"∨":"›"}</span>
@@ -6374,11 +6379,11 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
             </div>
 
             {/* Instagram preview */}
-            {user?.instagram_url&&editing!=="profile"&&(
+            {newInstagram&&editing!=="profile"&&(
               <div style={{borderTop:"1px solid var(--border-col)",paddingTop:10}}>
                 <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Instagram</div>
                 <div style={{fontFamily:"var(--body)",fontSize:14,color:"var(--red)"}}>
-                  @{user.instagram_url.replace("https://www.instagram.com/","").replace("https://instagram.com/","").replace("@","").replace("/","")}
+                  @{newInstagram.replace("https://www.instagram.com/","").replace("https://instagram.com/","").replace("@","").replace("/","")}
                 </div>
               </div>
             )}
