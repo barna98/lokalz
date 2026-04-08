@@ -2908,13 +2908,14 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
   const [locLoading, setLocLoading] = useState(false);
 
   function detectLocation(){
+    if(!navigator.geolocation){ setLocLoading(false); return; }
     setLocLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos)=>{
-        setLocationGranted(true); // remember user granted location
+        setLocationGranted(true);
         const {latitude:lat, longitude:lng} = pos.coords;
         function runGeocode(){
-          if(!window.google?.maps) return false;
+          if(!window.google?.maps?.Geocoder) return false;
           const geocoder = new window.google.maps.Geocoder();
           geocoder.geocode({location:{lat,lng}}, (results, status)=>{
             let district = null;
@@ -2939,7 +2940,12 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
           return true;
         }
         if(!runGeocode()){
-          const _t=setInterval(()=>{ if(runGeocode()) clearInterval(_t); },300);
+          let attempts = 0;
+          const _t = setInterval(()=>{
+            attempts++;
+            if(runGeocode()){ clearInterval(_t); return; }
+            if(attempts > 20){ clearInterval(_t); setLocLoading(false); }
+          }, 300);
         }
       },
       ()=>{ setLocationGranted(false); setLocLoading(false); },
