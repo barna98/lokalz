@@ -4986,11 +4986,21 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         submitted_by: user?.id||null,
         status: "pending",
         occasions: customOccasion.trim() ? [...selOccasions, customOccasion.trim()] : selOccasions,
-        ...await fetchPlaceId(form.name, form.address).then(pd=>({
-          google_place_id: pd?.place_id||null,
-          latitude: pd?.latitude||null,
-          longitude: pd?.longitude||null,
-        })).catch(()=>({google_place_id:null,latitude:null,longitude:null})),
+        city_name: form.city_name||null,
+        country: form.country||null,
+        // Use coordinates from autocomplete if available, otherwise fetch
+        ...(form.latitude && form.longitude
+          ? {
+              google_place_id: form.google_place_id||null,
+              latitude: form.latitude,
+              longitude: form.longitude,
+            }
+          : await fetchPlaceId(form.name, form.address).then(pd=>({
+              google_place_id: pd?.place_id||null,
+              latitude: pd?.latitude||null,
+              longitude: pd?.longitude||null,
+            })).catch(()=>({google_place_id:null,latitude:null,longitude:null}))
+        ),
       }).select().single();
       if(error) throw error;
       // Upload images if selected
