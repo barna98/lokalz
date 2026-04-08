@@ -16,7 +16,7 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <!-- Google Places API - replace with your own API key -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5l6iOsve4-Ig5wSwZ5fboDDZ45V_PTUs&libraries=places&language=en" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5l6iOsve4-Ig5wSwZ5fboDDZ45V_PTUs&libraries=places" async defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;}
@@ -6508,28 +6508,6 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
                   style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,marginBottom:10,outline:"none",boxSizing:"border-box"}}/>
                 <button onClick={savePassword} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
                   {saving?t("btn.saving"):t("btn.save_password")}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* City */}
-          <div style={{borderTop:"1px solid var(--border-col)",paddingTop:14}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}} onClick={()=>setEditing(editing==="city"?null:"city")}>
-              <div>
-                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.city_label")}</div>
-                <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>{newCity}</div>
-              </div>
-              <span style={{color:"var(--red)",fontSize:18}}>{editing==="city"?"∨":"›"}</span>
-            </div>
-            {editing==="city"&&(
-              <div style={{marginTop:10}} onClick={e=>e.stopPropagation()}>
-                <select value={newCity} onChange={e=>setNewCity(e.target.value)}
-                  style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,marginBottom:10,outline:"none",background:"var(--surface)",boxSizing:"border-box"}}>
-                  {(cities&&cities.length>0?cities.map(c=>c.name):["Budapest"]).map(c=><option key={c} value={c}>{tCui(c)}</option>)}
-                </select>
-                <button onClick={saveCity} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
-                  {saving?t("btn.saving"):t("btn.save_city")}
                 </button>
               </div>
             )}
