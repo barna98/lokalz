@@ -1983,52 +1983,68 @@ function NavIcon({id, active}) {
 
 function CityPicker({availableCities, selectedCity, onSelect}) {
   const [open, setOpen] = useState(false);
-  const dark = useDark();
-  const label = selectedCity || "📍 all cities";
 
   return (
     <>
       <button onClick={()=>setOpen(true)} style={{
-        display:"inline-flex",alignItems:"center",gap:6,
+        display:"inline-flex",alignItems:"center",gap:5,flexShrink:0,
         background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
-        border:"none",borderRadius:50,padding:"6px 14px",
-        fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"white",cursor:"pointer"
+        border:"none",borderRadius:50,padding:"6px 12px",
+        fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"white",cursor:"pointer",
+        whiteSpace:"nowrap"
       }}>
-        📍 {selectedCity||"all cities"} <span style={{opacity:.7,fontSize:11}}>▼</span>
+        📍 {selectedCity||"all"} <span style={{opacity:.6,fontSize:10}}>▼</span>
       </button>
 
       {open&&(
-        <div style={{position:"fixed",inset:0,zIndex:500,display:"flex",flexDirection:"column",justifyContent:"flex-end"}} onClick={()=>setOpen(false)}>
-          <div style={{background:"var(--surface)",borderRadius:"20px 20px 0 0",padding:"20px 20px 0",maxHeight:"60vh",overflowY:"auto",paddingBottom:"calc(80px + env(safe-area-inset-bottom))"}} onClick={e=>e.stopPropagation()}>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:14}}>Select city</div>
-            {/* All cities option */}
+        <>
+          {/* Backdrop */}
+          <div style={{position:"fixed",inset:0,zIndex:498,background:"rgba(0,0,0,.4)"}} onClick={()=>setOpen(false)}/>
+          {/* Sheet */}
+          <div style={{
+            position:"fixed",left:0,right:0,bottom:0,zIndex:499,
+            background:"var(--surface)",
+            borderRadius:"20px 20px 0 0",
+            padding:"16px 20px",
+            paddingBottom:"calc(90px + env(safe-area-inset-bottom))",
+            maxHeight:"50vh",overflowY:"auto",
+            boxShadow:"0 -8px 32px rgba(0,0,0,.2)",
+            animation:"slideInUp .25s cubic-bezier(.25,.46,.45,.94)"
+          }}>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:12}}>Select city</div>
+
             <button onClick={()=>{onSelect(null);setOpen(false);}} style={{
               width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
-              background:!selectedCity?"var(--red)":"var(--surface2)",
+              background:!selectedCity?"var(--red)":"transparent",
               color:!selectedCity?"white":"var(--black)",
-              border:"none",borderRadius:12,padding:"12px 16px",
-              fontFamily:"var(--body)",fontWeight:700,fontSize:15,cursor:"pointer",marginBottom:8
+              border:"1.5px solid",borderColor:!selectedCity?"var(--red)":"var(--border-col)",
+              borderRadius:12,padding:"11px 16px",
+              fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",marginBottom:8,
+              transition:"all .15s"
             }}>
               <span>🌍 All cities</span>
               {!selectedCity&&<span>✓</span>}
             </button>
+
             {availableCities.map(c=>(
               <button key={c.name} onClick={()=>{onSelect(c.name);setOpen(false);}} style={{
                 width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
-                background:selectedCity===c.name?"var(--red)":"var(--surface2)",
+                background:selectedCity===c.name?"var(--red)":"transparent",
                 color:selectedCity===c.name?"white":"var(--black)",
-                border:"none",borderRadius:12,padding:"12px 16px",
-                fontFamily:"var(--body)",fontWeight:700,fontSize:15,cursor:"pointer",marginBottom:8
+                border:"1.5px solid",borderColor:selectedCity===c.name?"var(--red)":"var(--border-col)",
+                borderRadius:12,padding:"11px 16px",
+                fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",marginBottom:8,
+                transition:"all .15s"
               }}>
                 <div style={{textAlign:"left"}}>
                   <div>{c.name}</div>
-                  <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,opacity:.7,marginTop:2}}>{c.country} · {c.count} {c.count===1?"venue":"venues"}</div>
+                  <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,opacity:.6,marginTop:1}}>{c.country}{c.count>0?` · ${c.count} venues`:""}</div>
                 </div>
                 {selectedCity===c.name&&<span>✓</span>}
               </button>
             ))}
           </div>
-        </div>
+        </>
       )}
     </>
   );
