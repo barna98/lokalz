@@ -3466,7 +3466,15 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
   const [votes,setVotes]=useState({like:0,neutral:0,dislike:0});
   const [myVote,setMyVote]=useState(null);
   const [votingLoading,setVotingLoading]=useState(false);
+  const [scoutInfo,setScoutInfo]=useState(null);
   const saved = localSaved;
+
+  // Load fresh scout info (name + badge) from users table
+  useEffect(()=>{
+    if(!venue.submitted_by) return;
+    supabase.from("users").select("id,name,badge,role,profile_image").eq("id",venue.submitted_by).single()
+      .then(({data})=>{ if(data) setScoutInfo(data); });
+  },[venue.submitted_by]);
 
   // Load votes
   useEffect(()=>{
@@ -3840,16 +3848,16 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:400,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>
           <span>—</span>
           <span
-            style={{color:(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")?"var(--red)":"#aaa",
-              cursor:(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")?"pointer":"default",
+            style={{color:(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead"||user?.role==="SCOUT"||user?.role==="CITY_LEAD")?"var(--red)":"#aaa",
+              cursor:(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead"||user?.role==="SCOUT"||user?.role==="CITY_LEAD")?"pointer":"default",
               fontWeight:700}}
             onClick={()=>{
-              if((user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&venue.submitted_by)
+              if((user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead"||user?.role==="SCOUT"||user?.role==="CITY_LEAD")&&venue.submitted_by)
                 navigate("scout_profile", venue.submitted_by);
             }}>
-            {venue.scout_alias}
+            {scoutInfo ? `${scoutInfo.name.split(" ")[0]} - ${scoutInfo.badge||(scoutInfo.role==="city_lead"||scoutInfo.role==="CITY_LEAD"?t("menu.city_lead"):t("venue.local_scout"))}` : venue.scout_alias}
           </span>
-          {(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&venue.submitted_by&&
+          {(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead"||user?.role==="SCOUT"||user?.role==="CITY_LEAD")&&venue.submitted_by&&
             <span style={{fontSize:11,color:"var(--text-muted)"}}>{t("vd.view_picks")}</span>}
         </div>
 
