@@ -4136,7 +4136,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
   );
 }
 
-function AllVenuesScreen({navigate, allVenues, onMenu}) {
+function AllVenuesScreen({navigate, allVenues, onMenu, user}) {
   const [search,setSearch]=useState("");
   const [category,setCategory]=useState("");
   const [cuisine,setCuisine]=useState("");
@@ -4242,8 +4242,12 @@ function AllVenuesScreen({navigate, allVenues, onMenu}) {
   const BAR_SUBCATEGORIES = ["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"];
 
 
-  const active=allVenues.filter(v=>v.status==="active");
-  const filtered=active.filter(v=>{
+  const active = allVenues.filter(v=>v.status==="active");
+  // List view: only user's city. Map view: all venues
+  const cityFiltered = viewMode==="list" && user?.city_id
+    ? active.filter(v=>v.city_id===user.city_id)
+    : active;
+  const filtered=cityFiltered.filter(v=>{
     if(search){
       const q=search.toLowerCase();
       const inName=(v.name||"").toLowerCase().includes(q);
@@ -8152,7 +8156,7 @@ function App() {
     venue: selectedVenue&&<VenueDetailScreen venue={selectedVenue} navigate={navigate} savedIds={savedIds} toggleSave={toggleSave} showToast={showToastMsg} isScout={isScout} user={user} allVenues={allVenues}/>,
     saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user}/>,
     scouts: <ScoutsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user}/>,
-    all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)}/>,
+    all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user}/>,
     scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user} cities={cities}/>,
     city_lead: <CityLeadScreen navigate={navigate} allVenues={allVenues} setAllVenues={setAllVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} user={user}/>,
     profile: <ProfileScreen navigate={navigate} user={user} setUser={setUser} onMenu={()=>setShowMenu(true)} onSignOut={signOut} cities={cities} lang={lang} changeLang={changeLang} dark={dark} changeDark={changeDark}/>,
