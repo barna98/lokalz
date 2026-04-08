@@ -5501,14 +5501,14 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
   const BAR_SUBCATEGORIES = ["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"];
   const CAPACITIES = ["2","3-6","6-8","9+"];
 
-  // City Lead csak a saját városának venue-jait látja
+  // City Lead: active venues csak saját város, pending/needs_edit minden városból
   const cityVenues = user?.city_id
     ? allVenues.filter(v=>v.city_id===user.city_id)
     : allVenues;
 
-  const pending=cityVenues.filter(v=>v.status==="pending"||v.status==="needs_edit");
-  const rejected=cityVenues.filter(v=>v.status==="rejected");
-  const active=[...cityVenues.filter(v=>v.status==="active")].reverse();
+  const pending = allVenues.filter(v=>v.status==="pending"||v.status==="needs_edit");
+  const rejected = cityVenues.filter(v=>v.status==="rejected");
+  const active = [...cityVenues.filter(v=>v.status==="active")].reverse();
 
   useEffect(()=>{
     // Reports csak az adott város venue-jaihoz
@@ -7880,15 +7880,28 @@ function App() {
   },[]);
 
   // Load venues from Supabase — only after city is known
-  const loadVenues = React.useCallback(async function(cityId){
+  const loadVenues = React.useCallback(async function(cityId, userRole){
     setVenuesLoading(true);
-    let query = supabase
+    const isCityLead = userRole==="CITY_LEAD"||userRole==="city_lead";
+
+    // Active venues — filtered by city
+    let activeQuery = supabase
       .from("venues")
       .select("*, scout:submitted_by(id,name,badge,role,profile_image)")
-      .in("status",["active","pending","needs_edit"]);
-    if(cityId) query = query.eq("city_id", cityId);
-    const {data, error} = await query;
-    if(!error && data) setAllVenues(data.map(v=>({
+      .eq("status","active");
+    if(cityId) activeQuery = activeQuery.eq("city_id", cityId);
+
+    // Pending/needs_edit — ALL cities for city leads, own city for others
+    let pendingQuery = supabase
+      .from("venues")
+      .select("*, scout:submitted_by(id,name,badge,role,profile_image)")
+      .in("status",["pending","needs_edit"]);
+    if(!isCityLead && cityId) pendingQuery = pendingQuery.eq("city_id", cityId);
+
+    const [activeRes, pendingRes] = await Promise.all([activeQuery, pendingQuery]);
+    const combined = [...(activeRes.data||[]), ...(pendingRes.data||[])];
+
+    if(combined.length > 0) setAllVenues(combined.map(v=>({
       ...v,
       price: v.price_level,
       why: v.why,
@@ -7901,7 +7914,7 @@ function App() {
   // Reload venues when user city changes
   useEffect(()=>{
     if(!user?.city_id) return;
-    loadVenues(user.city_id);
+    loadVenues(user.city_id, user.role);
   },[user?.city_id]);
 
   useEffect(()=>{
