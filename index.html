@@ -4097,11 +4097,12 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
   );
 }
 
-function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
+function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity, availableCities, onCitySelect}) {
   const [tab, setTab] = useState("places");
   const [scouts, setScouts] = useState([]);
   const [scoutsLoading, setScoutsLoading] = useState(true);
-  const saved=[...allVenues].filter(v=>savedIds.has(v.id));
+  const allSaved=[...allVenues].filter(v=>savedIds.has(v.id));
+  const saved = selectedCity ? allSaved.filter(v=>v.city_name===selectedCity) : allSaved;
   const isPremium = user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead";
 
   useEffect(()=>{
@@ -4127,7 +4128,12 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
         </div>
       </div>
 
-      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0}}>
+      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+        {availableCities?.length>0&&(
+          <div style={{marginBottom:8}}>
+            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          </div>
+        )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["places",t("saved.places")],["scouts",t("saved.scouts")]].map(([k,l])=>(
           <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
@@ -6732,12 +6738,7 @@ function ScoutsScreen({navigate, onMenu, user, selectedCity, availableCities, on
         </div>
       </div>
 
-      <div style={{padding:"0 16px 10px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
-        {availableCities?.length>0&&(
-          <div style={{display:"flex"}}>
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          </div>
-        )}
+      <div style={{padding:"0 16px 10px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px"}}>
           <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search scouts..."
@@ -6772,7 +6773,7 @@ function ScoutsScreen({navigate, onMenu, user, selectedCity, availableCities, on
 }
 
 // ── SCOUT PROFILE SCREEN ─────────────────────
-function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
+function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, availableCities, onCitySelect}) {
   const [scout, setScout] = useState(null);
   const [venues, setVenues] = useState({added:[], saved:[]});
   const [loading, setLoading] = useState(true);
@@ -6878,8 +6879,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      {/* Header — rózsaszín + fekete, mint Scouts screen */}
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 8px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <button className="back-btn" onClick={()=>navigate(-1)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -6887,6 +6887,11 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user}) {
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>scout</div>
           </div>
         </div>
+        {availableCities?.length>0&&(
+          <div style={{marginTop:8}}>
+            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          </div>
+        )}
       </div>
 
       <div className="scroll" style={{padding:"0 0 80px"}}>
@@ -8001,11 +8006,11 @@ function App() {
         occasions: v.occasions || []
       }));
       setAllVenues(mapped);
-      // Build available cities from venues
+      // Build available cities from all venues (including pending)
       const cityMap = {};
-      mapped.filter(v=>v.status==="active"&&v.city_name).forEach(v=>{
+      mapped.filter(v=>v.city_name).forEach(v=>{
         if(!cityMap[v.city_name]) cityMap[v.city_name] = {name:v.city_name, country:v.country||"", count:0};
-        cityMap[v.city_name].count++;
+        if(v.status==="active") cityMap[v.city_name].count++;
       });
       setAvailableCities(Object.values(cityMap).sort((a,b)=>b.count-a.count));
     }
@@ -8017,28 +8022,37 @@ function App() {
     if(!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const {latitude: lat, longitude: lng} = pos.coords;
-      // Reverse geocode to get city
-      if(!window.google?.maps?.Geocoder) return;
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({location: {lat, lng}}, async (results, status) => {
-        if(status !== "OK" || !results) return;
-        const comps = results.flatMap(r => r.address_components || []);
-        const cityComp = comps.find(c => c.types.includes("locality")) ||
-                         comps.find(c => c.types.includes("administrative_area_level_2"));
-        const cityName = cityComp?.long_name;
-        if(!cityName) return;
 
-        // Find city in DB
-        const {data: cityData} = await supabase
-          .from("cities").select("id,name").eq("name", cityName).single();
+      function runGeocode() {
+        if(!window.google?.maps?.Geocoder) return false;
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({location: {lat, lng}}, async (results, status) => {
+          if(status !== "OK" || !results) return;
+          const comps = results.flatMap(r => r.address_components || []);
+          const cityComp = comps.find(c => c.types.includes("locality")) ||
+                           comps.find(c => c.types.includes("administrative_area_level_2"));
+          const cityName = cityComp?.long_name;
+          if(!cityName) return;
 
-        if(cityData && cityData.id !== u.city_id) {
-          // User is in a different city that exists in DB — update
-          await supabase.from("users").update({city_id: cityData.id}).eq("id", u.id);
-          setUser(prev => ({...prev, city_id: cityData.id}));
-          // loadVenues will trigger via useEffect on city_id change
-        }
-      });
+          const {data: cityData} = await supabase
+            .from("cities").select("id,name").eq("name", cityName).single();
+
+          if(cityData && cityData.id !== u.city_id) {
+            await supabase.from("users").update({city_id: cityData.id}).eq("id", u.id);
+            setUser(prev => ({...prev, city_id: cityData.id}));
+          }
+        });
+        return true;
+      }
+
+      if(!runGeocode()) {
+        let attempts = 0;
+        const interval = setInterval(()=>{
+          attempts++;
+          if(runGeocode()){ clearInterval(interval); return; }
+          if(attempts > 20) clearInterval(interval);
+        }, 300);
+      }
     }, () => {}, {enableHighAccuracy: false, timeout: 8000, maximumAge: 3600000});
   }
 
@@ -8283,7 +8297,7 @@ function App() {
     q6: <Q6Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user}/>,
     venue: selectedVenue&&<VenueDetailScreen venue={selectedVenue} navigate={navigate} savedIds={savedIds} toggleSave={toggleSave} showToast={showToastMsg} isScout={isScout} user={user} allVenues={allVenues}/>,
-    saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user}/>,
+    saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
     scouts: <ScoutsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
     all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
     scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user} cities={cities} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
@@ -8294,7 +8308,7 @@ function App() {
     event_calendar: <EventCalendarScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
     event_detail: selectedEvent&&<EventDetailScreen navigate={navigate} event={selectedEvent} user={user} showToast={showToastMsg}/>,
     event_plan_detail: selectedPlan&&<EventPlanDetailScreen navigate={navigate} plan={selectedPlan} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
-    scout_profile: selectedScout&&<ScoutProfileScreen navigate={navigate} scoutId={selectedScout} allVenues={allVenues} savedIds={savedIds} user={user}/>,
+    scout_profile: selectedScout&&<ScoutProfileScreen navigate={navigate} scoutId={selectedScout} allVenues={allVenues} savedIds={savedIds} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
     results_list: (()=>{
       const listData = selectedVenue||{};
       const listVenues = listData.venues||[];
