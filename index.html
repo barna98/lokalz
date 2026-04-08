@@ -2473,24 +2473,23 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
       const VALID_DIS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV",t("q.anywhere")];
       const VALID_DIE = ["Gluten-free","Vegan","Vegetarian","Halal","Kosher","Dairy-free","Nut-free","Pescatarian"];
       const VALID_BUD = ["$","$$","$$$","$$$$"];
-      const VALID_GRP = ["solo","2","3-6","6-8","9+"];
 
       const aiData = {
-        // Semantic results — ordered list of venue IDs by similarity
-        semanticVenueIds: Array.isArray(parsed.semanticVenueIds) ? parsed.semanticVenueIds : null,
-        similarities: parsed.similarities || {},
-        // Inferred category — used for hard filtering in app
-        inferredCategory: parsed.inferredCategory || null,
+        // New structured required conditions (AND logic)
+        aiRequired: Array.isArray(parsed.required) ? parsed.required : [],
+        inferredCategory: VALID_CAT.includes(parsed.category) ? parsed.category : null,
         // Hard filters
-        category:  VALID_CAT.includes(parsed.category) ? parsed.category : null,
-        budget:    VALID_BUD.includes(parsed.budget) ? parsed.budget : null,
-        group:     VALID_GRP.includes(parsed.group) ? parsed.group : null,
+        category: null,
+        budget: VALID_BUD.includes(parsed.budget) ? parsed.budget : null,
+        group: null,
         locations: Array.isArray(parsed.locations) ? parsed.locations.filter(l=>VALID_DIS.includes(l)) : [],
-        dietary:   Array.isArray(parsed.dietary) ? parsed.dietary.filter(d=>VALID_DIE.includes(d)) : [],
-        // Clear old filter-based fields
+        dietary: Array.isArray(parsed.dietary) ? parsed.dietary.filter(d=>VALID_DIE.includes(d)) : [],
+        cuisines: parsed.cuisine ? [parsed.cuisine] : [],
+        // Clear old fields
+        semanticVenueIds: null,
+        similarities: {},
         occasions: [],
         tags: [],
-        cuisines: [],
         whySearch: null,
         aiQuery: query,
       };
@@ -3171,15 +3170,62 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
   const partnerDistrict = answers.partnerDistrict || partner?.district;
 
   const filtered = active.filter(v=>{
-    // If AI semantic search: only show venues in semantic results
-    if(isAI && semanticIds){
-      if(!semanticIds.includes(v.id)) return false;
+
+    // ── AI SEARCH: strict AND filtering ──
+    if(isAI){
+      // 1. Category filter
+      if(answers.inferredCategory && v.category !== answers.inferredCategory) return false;
+
+      // 2. Cuisine filter
+      if(answers.cuisines?.length>0){
+        if(!v.cuisine) return false;
+        if(!answers.cuisines.some(c=>v.cuisine.toLowerCase().includes(c.toLowerCase()))) return false;
+      }
+
+      // 3. Budget filter
+      if(answers.budget){
+        const vPrice = (v.price_level||v.price||"").trim();
+        if(vPrice !== answers.budget) return false;
+      }
+
+      // 4. Dietary filter
+      if(answers.dietary?.length>0){
+        if(!answers.dietary.some(d=>(v.dietary||[]).includes(d))) return false;
+      }
+
+      // 5. Required conditions — strict AND logic
+      // Every condition must be satisfied
+      // Within a condition, at least one value must match (OR)
+      const required = answers.aiRequired || [];
+      for(const condition of required){
+        const {field, values} = condition;
+        if(!values || values.length === 0) continue;
+
+        if(field === "tags"){
+          const vTags = v.tags || [];
+          const matches = values.some(val => vTags.includes(val));
+          if(!matches) return false;
+        }
+        else if(field === "occasions"){
+          const vOcc = v.occasions || [];
+          const matches = values.some(val => vOcc.includes(val));
+          if(!matches) return false;
+        }
+        else if(field === "district"){
+          const matches = values.some(val => String(val).trim() === String(v.district).trim());
+          if(!matches) return false;
+        }
+        else if(field === "price"){
+          const vPrice = (v.price_level||v.price||"").trim();
+          const matches = values.includes(vPrice);
+          if(!matches) return false;
+        }
+      }
+
+      return true;
     }
-    // AI: filter by inferred category (what Claude determined user is looking for)
-    if(isAI && answers.inferredCategory){
-      if(v.category !== answers.inferredCategory) return false;
-    }
-    // Hard filters (always applied)
+
+    // ── DISCOVER FLOW: original logic ──
     if(answers.category && v.category!==answers.category) return false;
     const vPrice = (v.price_level||v.price||"").trim();
     const budgetList = answers.budgets?.length>0 ? answers.budgets : (answers.budget ? [answers.budget.trim()] : []);
@@ -3192,21 +3238,32 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
     if(answers.dietary?.length>0) {
       if(!answers.dietary.some(d=>(v.dietary||[]).includes(d))) return false;
     }
-    if(!isAI) {
-      if(answers.occasions?.length>0 && !answers.occasions.some(o=>(v.occasions||[]).includes(o))) return false;
-      if(answers.tags?.length>0 && !answers.tags.some(t=>(v.tags||[]).includes(t))) return false;
-    }
+    if(answers.occasions?.length>0 && !answers.occasions.some(o=>(v.occasions||[]).includes(o))) return false;
+    if(answers.tags?.length>0 && !answers.tags.some(t=>(v.tags||[]).includes(t))) return false;
     return true;
   });
 
   const sorted = [...filtered].sort((a,b)=>{
-    if(isAI && semanticIds){
-      // Sort by semantic similarity score (highest first)
-      const simA = similarities[a.id] ?? 0;
-      const simB = similarities[b.id] ?? 0;
-      return simB - simA;
+    if(isAI){
+      // Score by total matching tags+occasions (more matches = more relevant)
+      const required = answers.aiRequired || [];
+      function score(v){
+        let s = 0;
+        const vTags = v.tags || [];
+        const vOcc = v.occasions || [];
+        for(const cond of required){
+          const {field, values} = cond;
+          if(field==="tags") s += values.filter(val=>vTags.includes(val)).length;
+          if(field==="occasions") s += values.filter(val=>vOcc.includes(val)).length;
+        }
+        // Bonus for higher price (more upscale)
+        if(v.price_level==="$$$$") s += 1;
+        if(v.price_level==="$$$") s += 0.5;
+        return s;
+      }
+      return score(b) - score(a);
     }
-    // Regular discover flow: partner district first, rest random
+    // Regular discover flow
     if(partnerDistrict){
       const aMatch = a.district===partnerDistrict ? -1 : 1;
       const bMatch = b.district===partnerDistrict ? -1 : 1;
