@@ -5586,12 +5586,14 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
   const BAR_SUBCATEGORIES = ["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"];
   const CAPACITIES = ["2","3-6","6-8","9+"];
 
-  // City Lead: active venues csak saját város, pending/needs_edit minden városból
-  const cityVenues = user?.city_id
-    ? allVenues.filter(v=>v.city_id===user.city_id)
-    : allVenues;
+  // City Lead: filter by selectedCity if set, otherwise own city
+  const cityVenues = selectedCity
+    ? allVenues.filter(v=>v.city_name===selectedCity)
+    : (user?.city_id ? allVenues.filter(v=>v.city_id===user.city_id) : allVenues);
 
-  const pending = allVenues.filter(v=>v.status==="pending"||v.status==="needs_edit");
+  const pending = selectedCity
+    ? allVenues.filter(v=>(v.status==="pending"||v.status==="needs_edit")&&v.city_name===selectedCity)
+    : allVenues.filter(v=>v.status==="pending"||v.status==="needs_edit");
   const rejected = cityVenues.filter(v=>v.status==="rejected");
   const active = [...cityVenues.filter(v=>v.status==="active")].reverse();
 
