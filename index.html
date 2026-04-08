@@ -8032,6 +8032,7 @@ function App() {
           const cityComp = comps.find(c => c.types.includes("locality")) ||
                            comps.find(c => c.types.includes("administrative_area_level_2"));
           const cityName = cityComp?.long_name;
+          console.log("[detectUserCity] lat:", lat, "lng:", lng, "cityName:", cityName, "comps:", comps.map(c=>c.long_name+"("+c.types.join(",")+")"));
           if(!cityName) return;
 
           const {data: cityData} = await supabase
