@@ -4815,6 +4815,9 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       const countryComp = get("country");
       const countryName = countryComp?.long_name || "";
       const countryCode = countryComp?.short_name || "";
+      // Use English country name via a lookup, fallback to long_name
+      const COUNTRY_NAMES: Record<string,string> = {AT:"Austria",HU:"Hungary",DE:"Germany",FR:"France",IT:"Italy",ES:"Spain",GB:"United Kingdom",US:"United States",JP:"Japan",CN:"China",KR:"South Korea",CZ:"Czech Republic",SK:"Slovakia",PL:"Poland",RO:"Romania",HR:"Croatia",SI:"Slovenia",RS:"Serbia",UA:"Ukraine",NL:"Netherlands",BE:"Belgium",CH:"Switzerland",PT:"Portugal",GR:"Greece",SE:"Sweden",NO:"Norway",DK:"Denmark",FI:"Finland",TR:"Turkey",RU:"Russia",BR:"Brazil",MX:"Mexico",AR:"Argentina",AU:"Australia",TH:"Thailand",VN:"Vietnam",ID:"Indonesia",SG:"Singapore",MY:"Malaysia",IN:"India",AE:"United Arab Emirates",EG:"Egypt",ZA:"South Africa"};
+      const countryNameEn = COUNTRY_NAMES[countryCode] || countryName;
 
       const route = get("route")?.long_name || "";
       const streetNum = get("street_number")?.long_name || "";
@@ -4834,7 +4837,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           // Create new city
           const {data: newCity} = await supabase.from("cities").insert({
             name: cityName,
-            country: countryName,
+            country: countryNameEn,
             country_code: countryCode,
           }).select("id").single();
           if(newCity) cityId = newCity.id;
@@ -4851,7 +4854,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         longitude: lng,
         city_id: cityId,
         city_name: cityName,
-        country: countryName,
+        country: countryNameEn,
       }));
       setPlaceSearchVal(place.name || name);
       setPlaceSelected(true);
@@ -5266,13 +5269,15 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
             </div>
           )}
 
-          {/* District override — editable if needed */}
-          <select style={selectStyle} value={form.district} onChange={e=>setF("district",e.target.value)}>
-            <option value="">{t("opt.select_district")}</option>
-            {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
-              <option key={d} value={d}>District {d}.</option>
-            ))}
-          </select>
+          {/* District — only for Budapest */}
+          {(!form.city_name || form.city_name === "Budapest") && (
+            <select style={selectStyle} value={form.district} onChange={e=>setF("district",e.target.value)}>
+              <option value="">{t("opt.select_district")}</option>
+              {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
+                <option key={d} value={d}>District {d}.</option>
+              ))}
+            </select>
+          )}
           <select style={selectStyle} value={form.category} onChange={e=>{setF("category",e.target.value);setF("subcategory","");if(e.target.value!=="Restaurant")setF("cuisine","");loadCustomTagsForCategory(e.target.value);}}>
             <option value="">{t("opt.select_category_req")}</option>
             {CATEGORIES.map(c=><option key={c} value={c}>{tCat(c)}</option>)}
