@@ -1955,7 +1955,8 @@ function VenueCard({venue, onClick}) {
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:6,gap:8}}>
           <div className="venue-meta" style={{flex:1}}>
             <span>{tCat(venue.category)||tCui(venue.cuisine)}</span><span>·</span>
-            <span>{t("venue.dist")} {venue.district}</span><span>·</span>
+            {venue.district && <><span>{t("venue.dist")} {venue.district}</span><span>·</span></>}
+            {!venue.district && venue.city_name && venue.city_name!=="Budapest" && <><span>{venue.city_name}</span><span>·</span></>}
             <span>{venue.price_level||venue.price}</span>
             {openStatus&&<span className={openStatus==="open"?"status-open":"status-closed"} style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:11,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"2px 7px",borderRadius:10}}>
               {openStatus==="open"?t("venue.open_now"):t("venue.closed")}
@@ -2864,7 +2865,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
                     <RecentVenueThumb venueId={v.id} category={v.category}/>
                     <div style={{padding:"10px 12px 12px"}}>
                       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"white",lineHeight:1.2,marginBottom:3,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{v.name}</div>
-                      <div style={{fontFamily:"var(--body)",fontSize:11,color:"rgba(255,255,255,.7)",fontWeight:400}}>{tCat(v.category)} · {t("venue.dist")} {v.district}</div>
+                      <div style={{fontFamily:"var(--body)",fontSize:11,color:"rgba(255,255,255,.7)",fontWeight:400}}>{tCat(v.category)} · {v.district ? `${t("venue.dist")} ${v.district}` : (v.city_name||"")}</div>
                     </div>
                   </div>
                 ))}
@@ -4055,7 +4056,8 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         {/* 2. Category pills */}
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
           <span className="venue-tag">{tCat(venue.subcategory||venue.category)||tCui(venue.cuisine)}</span>
-          <span className="venue-tag">{t("venue.dist")} {venue.district}</span>
+          {venue.district&&<span className="venue-tag">{t("venue.dist")} {venue.district}</span>}
+          {!venue.district&&venue.city_name&&venue.city_name!=="Budapest"&&<span className="venue-tag">{venue.city_name}</span>}
           <span className="venue-tag">{venue.price_level||venue.price}</span>
           {venue.is_city_pick&&(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&<span className="venue-tag" style={{background:"#FFF3CD",color:"#856404"}}>{t("vd.city_pick")}</span>}
         </div>
@@ -4095,7 +4097,10 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           <span style={{fontSize:16,flexShrink:0,marginTop:1}}>📍</span>
           <div>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"var(--text-muted)",lineHeight:1.5}}>{venue.address}</div>
-            <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>Budapest, {t("venue.dist_label")} {venue.district}</div>
+            {venue.district
+              ? <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>Budapest, {t("venue.dist_label")} {venue.district}</div>
+              : venue.city_name&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>{venue.city_name}{venue.country?`, ${venue.country}`:""}</div>
+            }
           </div>
         </div>
 
@@ -4238,7 +4243,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",marginBottom:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{v.name}</div>
                       <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"var(--text-muted)"}}>
-                        {v.cuisine&&<span>{tCui(v.cuisine)} · </span>}{t("venue.dist_label")} {v.district} · {v.price_level||v.price||""}
+                        {v.cuisine&&<span>{tCui(v.cuisine)} · </span>}{v.district ? `${t("venue.dist_label")} ${v.district}` : (v.city_name||"")} · {v.price_level||v.price||""}
                         {v.is_city_pick&&<span style={{marginLeft:6}}>⭐</span>}
                       </div>
                     </div>
@@ -4559,7 +4564,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
             </div>
           )}
       </div>
-      {viewMode==="list"&&<div className="scroll" style={{position:"absolute",inset:0,padding:"12px 20px 80px",paddingTop:"calc(180px + env(safe-area-inset-top))"}} ref={scrollRef}
+      {viewMode==="list"&&<div className="scroll" style={{position:"absolute",inset:0,padding:"12px 20px 80px",paddingTop:"calc(220px + env(safe-area-inset-top))"}} ref={scrollRef}
         onScroll={e=>saveScroll("allVenues", e.currentTarget)}
         onTouchStart={e=>{ if(scrollRef.current?.scrollTop===0) window._avPullStart=e.touches[0].clientY; }}
         onTouchEnd={e=>{
