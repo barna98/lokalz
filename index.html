@@ -3445,6 +3445,8 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
   const [images,setImages]=useState([]);
   const [imagesFetched,setImagesFetched]=useState(false);
   const [galleryLoaded,setGalleryLoaded]=useState(false);
+  const [localSaved, setLocalSaved] = useState(savedIds.has(venue.id));
+  React.useEffect(()=>{ setLocalSaved(savedIds.has(venue.id)); },[savedIds, venue.id]);
   React.useEffect(()=>{ setGalleryLoaded(false); },[imgIdx]);
   const openStatus = useOpenStatus(venue.google_place_id);
   const [openHours, setOpenHours] = React.useState(null);
@@ -3464,7 +3466,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
   const [votes,setVotes]=useState({like:0,neutral:0,dislike:0});
   const [myVote,setMyVote]=useState(null);
   const [votingLoading,setVotingLoading]=useState(false);
-  const saved=savedIds.has(venue.id);
+  const saved = localSaved;
 
   // Load votes
   useEffect(()=>{
@@ -3749,7 +3751,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
 
         {/* Fixed overlay buttons — always visible */}
         <button className="back-btn" style={{position:"fixed",top:16,left:16,background:"rgba(0,0,0,.5)",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:22,zIndex:200,backdropFilter:"blur(4px)"}} onClick={()=>navigate(-1)}>‹</button>
-        <button onClick={()=>{haptic("medium");toggleSave(venue.id);showToast(saved?t("toast.removed"):t("toast.saved"));}}
+        <button onClick={()=>{haptic("medium");setLocalSaved(s=>!s);toggleSave(venue.id);showToast(saved?t("toast.removed"):t("toast.saved"));}}
           style={{position:"fixed",top:16,right:16,background:"rgba(0,0,0,.5)",border:"none",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,color:saved?"#F97B30":"white",zIndex:200,backdropFilter:"blur(4px)"}}>
           {saved?"♥":"♡"}
         </button>
@@ -6164,202 +6166,223 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
       </div>
       <div className="scroll" style={{padding:"16px 20px 80px",background:"var(--bg)",flex:1}}>
 
-        {/* Profile header — fekete pill kártya */}
-        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16,padding:"16px 20px",background:"black",borderRadius:50}}>
-          <label style={{cursor:"pointer",flexShrink:0}}>
-            <input type="file" accept="image/*" style={{display:"none"}} onChange={e=>e.target.files[0]&&uploadProfileImage(e.target.files[0])}/>
-            <div style={{width:72,height:72,borderRadius:"50%",background:"var(--surface)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
-              {user?.profile_image
-                ?<ShimmerImg src={user.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                :<span style={{fontSize:32}}>📷</span>
-              }
-              {uploadingImg&&<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.5)",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:20,height:20,border:"2px solid white",borderTop:"2px solid transparent",borderRadius:"50%",animation:"spin .8s linear infinite"}}/></div>}
-            </div>
-          </label>
-          <div style={{flex:1}}>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"white"}}>{user?.name||"name"}</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"rgba(255,255,255,.7)",marginTop:2}}>
-              {user?.role==="explorer"?"Explorer":user?.role==="explorer_pro"?"Explorer Pro":user?.role==="scout"?t("venue.local_scout"):user?.role==="city_lead"?t("menu.city_lead"):"Explorer"}
+        {/* Profile card */}
+        <div style={{background:"var(--surface)",borderRadius:20,padding:"20px",marginBottom:16,border:"1.5px solid var(--border-col)"}}>
+          <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16}}>
+            <label style={{cursor:"pointer",flexShrink:0}}>
+              <input type="file" accept="image/*" style={{display:"none"}} onChange={e=>e.target.files[0]&&uploadProfileImage(e.target.files[0])}/>
+              <div style={{width:72,height:72,borderRadius:"50%",background:"var(--surface2)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",border:"2px solid var(--border-col)"}}>
+                {user?.profile_image
+                  ?<ShimmerImg src={user.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                  :<span style={{fontSize:32}}>📷</span>
+                }
+                {uploadingImg&&<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.5)",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:20,height:20,border:"2px solid white",borderTop:"2px solid transparent",borderRadius:"50%",animation:"spin .8s linear infinite"}}/></div>}
+                <div style={{position:"absolute",bottom:0,right:0,background:"var(--red)",borderRadius:"50%",width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11}}>✎</div>
+              </div>
+            </label>
+            <div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)"}}>{user?.name||"name"}</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"var(--text-muted)",marginTop:2}}>
+                {user?.role==="explorer"?"Explorer":user?.role==="explorer_pro"?"Explorer Pro":user?.role==="SCOUT"||user?.role==="scout"?t("venue.local_scout"):user?.role==="CITY_LEAD"||user?.role==="city_lead"?t("menu.city_lead"):"Explorer"}
+              </div>
+              <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"var(--text-muted)",marginTop:1}}>{user?.email||""}</div>
             </div>
           </div>
-        </div>
 
-        {/* Bio + Instagram — scout/city_lead esetén szerkeszthető */}
-        {(user?.role==="scout"||user?.role==="city_lead")&&(
-          <div style={{background:"var(--surface)",borderRadius:14,padding:"16px",marginBottom:10,cursor:"pointer"}} onClick={()=>setEditing(editing==="profile"?null:"profile")}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)"}}>{t("profile.scout_profile")}</div>
-              <span style={{color:"var(--red)",fontSize:20}}>{editing==="profile"?"∨":"›"}</span>
-            </div>
-            {editing!=="profile"&&(
-              <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"var(--text-muted)",marginTop:4}}>
-                {user?.bio||<span style={{color:"var(--text-muted)"}}>{t("profile.add_bio")}</span>}
-                {user?.instagram_url&&<span style={{marginLeft:8,color:"var(--red)"}}>@{user.instagram_url.replace("https://instagram.com/","").replace("@","")}</span>}
+          {/* Name edit */}
+          <div style={{borderTop:"1px solid var(--border-col)",paddingTop:14}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}} onClick={()=>setEditing(editing==="name"?null:"name")}>
+              <div>
+                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.name_label")}</div>
+                <div style={{fontFamily:"var(--body)",fontWeight:600,fontSize:15,color:"var(--black)",marginTop:2}}>{user?.name||"User"}</div>
               </div>
-            )}
-            {editing==="profile"&&(
-              <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
-                <textarea placeholder={t("profile.add_bio")} maxLength={160} rows={3} value={newBio} onChange={e=>setNewBio(e.target.value)}
-                  style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:8,outline:"none",resize:"none"}}/>
-                <input placeholder="instagram" value={newInstagram} onChange={e=>setNewInstagram(e.target.value)}
-                  style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
-                <button onClick={saveProfile} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
-                  {saving?t("btn.saving"):t("btn.save_profile")}
+              <span style={{color:"var(--red)",fontSize:18}}>{editing==="name"?"∨":"›"}</span>
+            </div>
+            {editing==="name"&&(
+              <div style={{marginTop:10}} onClick={e=>e.stopPropagation()}>
+                <input value={newName} onChange={e=>setNewName(e.target.value)} placeholder={t("profile.new_name")}
+                  style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:8,outline:"none",boxSizing:"border-box"}}/>
+                <button onClick={async()=>{
+                  if(!newName.trim()) return showMsg(t("profile.name_empty"),true);
+                  setSaving(true);
+                  const {error} = await supabase.from("users").update({name:newName.trim()}).eq("id",user.id);
+                  setSaving(false);
+                  if(error) return showMsg(error.message,true);
+                  setUser(u=>({...u, name: newName.trim()}));
+                  setEditing(null);
+                  showMsg(t("profile.name_updated"));
+                }} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
+                  {saving?t("btn.saving"):t("btn.save_name")}
                 </button>
               </div>
             )}
           </div>
-        )}
+        </div>
 
-        {/* Badge — scouts only */}
-        {(user?.role==="scout"||user?.role==="city_lead")&&(
-          <div style={{...rowStyle,borderRadius:14,padding:"14px 20px"}} onClick={()=>setEditing(editing==="badge"?null:"badge")}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div>
-                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>{t("profile.badge_label")}</div>
-                <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>
-                  {user?.badge ? SCOUT_BADGES.find(b=>b.id===user.badge)?.emoji+" "+user.badge : <span style={{color:"var(--text-muted)"}}>{t("ui.choose_badge")}</span>}
+        {/* Scout / City Lead profile section */}
+        {(user?.role==="scout"||user?.role==="SCOUT"||user?.role==="city_lead"||user?.role==="CITY_LEAD")&&(
+          <div style={{background:"var(--surface)",borderRadius:20,padding:"20px",marginBottom:16,border:"1.5px solid var(--border-col)"}}>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--red)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:14}}>Scout Profile</div>
+
+            {/* Bio */}
+            <div style={{marginBottom:14}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",marginBottom:editing==="profile"?10:0}} onClick={()=>setEditing(editing==="profile"?null:"profile")}>
+                <div>
+                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>Bio</div>
+                  {editing!=="profile"&&<div style={{fontFamily:"var(--body)",fontSize:14,color:user?.bio?"var(--black)":"var(--text-muted)",marginTop:3,lineHeight:1.4}}>
+                    {user?.bio||t("profile.add_bio")}
+                  </div>}
+                </div>
+                <span style={{color:"var(--red)",fontSize:18,flexShrink:0,marginLeft:8}}>{editing==="profile"?"∨":"›"}</span>
+              </div>
+              {editing==="profile"&&(
+                <div onClick={e=>e.stopPropagation()}>
+                  <textarea placeholder={t("profile.add_bio")} maxLength={160} rows={3} value={newBio} onChange={e=>setNewBio(e.target.value)}
+                    style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,marginBottom:8,outline:"none",resize:"none",boxSizing:"border-box"}}/>
+                  <input placeholder="instagram URL" value={newInstagram} onChange={e=>setNewInstagram(e.target.value)}
+                    style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,marginBottom:10,outline:"none",boxSizing:"border-box"}}/>
+                  <button onClick={saveProfile} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
+                    {saving?t("btn.saving"):t("btn.save_profile")}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Instagram preview */}
+            {user?.instagram_url&&editing!=="profile"&&(
+              <div style={{borderTop:"1px solid var(--border-col)",paddingTop:10}}>
+                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Instagram</div>
+                <div style={{fontFamily:"var(--body)",fontSize:14,color:"var(--red)"}}>
+                  @{user.instagram_url.replace("https://www.instagram.com/","").replace("https://instagram.com/","").replace("@","").replace("/","")}
                 </div>
               </div>
-              <span style={{color:"var(--red)",fontSize:20}}>{editing==="badge"?"∨":"›"}</span>
+            )}
+
+            {/* Badge */}
+            <div style={{borderTop:"1px solid var(--border-col)",paddingTop:14,marginTop:user?.instagram_url&&editing!=="profile"?10:0}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}} onClick={()=>setEditing(editing==="badge"?null:"badge")}>
+                <div>
+                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.badge_label")}</div>
+                  <div style={{fontFamily:"var(--body)",fontSize:14,color:"var(--black)",marginTop:3}}>
+                    {user?.badge ? `${SCOUT_BADGES.find(b=>b.id===user.badge)?.emoji} ${user.badge}` : <span style={{color:"var(--text-muted)"}}>{t("ui.choose_badge")}</span>}
+                  </div>
+                </div>
+                <span style={{color:"var(--red)",fontSize:18}}>{editing==="badge"?"∨":"›"}</span>
+              </div>
+              {editing==="badge"&&(
+                <div style={{marginTop:10}} onClick={e=>e.stopPropagation()}>
+                  {SCOUT_BADGES.filter(b=>b.id!=="The Founder"||["78be06ee-5e05-402a-b74e-b9e4e60ee1f0","b20cd939-2165-42be-b69b-d15faa5ed8e3"].includes(user?.id)).map(b=>(
+                    <button key={b.id} onClick={()=>saveBadge(b.id)}
+                      style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:user?.badge===b.id?"var(--red)":"var(--surface2)",color:user?.badge===b.id?"white":"var(--black)",border:"1.5px solid",borderColor:user?.badge===b.id?"var(--red)":"var(--border-col)",borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,cursor:"pointer",marginBottom:6,textAlign:"left"}}>
+                      <span style={{fontSize:20}}>{b.emoji}</span>
+                      <div>
+                        <div style={{fontWeight:700}}>{b.id}</div>
+                        <div style={{fontSize:12,color:user?.badge===b.id?"rgba(255,255,255,.7)":"var(--text-muted)"}}>{t("badge."+b.desc.toLowerCase().replace(/ /g,"_").replace(/&/g,"").replace(/-/g,"_"))}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            {editing==="badge"&&(
-              <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
-                {SCOUT_BADGES.filter(b=>b.id!=="The Founder"||["78be06ee-5e05-402a-b74e-b9e4e60ee1f0","b20cd939-2165-42be-b69b-d15faa5ed8e3"].includes(user?.id)).map(b=>(
-                  <button key={b.id} onClick={()=>saveBadge(b.id)}
-                    style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:user?.badge===b.id?"var(--black)":"var(--surface)",color:user?.badge===b.id?"white":"var(--black)",border:"1.5px solid",borderColor:user?.badge===b.id?"var(--black)":"var(--border-col)",borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,cursor:"pointer",marginBottom:8,textAlign:"left"}}>
-                    <span style={{fontSize:20}}>{b.emoji}</span>
-                    <div>
-                      <div style={{fontWeight:700}}>{b.id}</div>
-                      <div style={{fontSize:12,color:user?.badge===b.id?"rgba(255,255,255,.7)":"#888"}}>{t("badge."+b.desc.toLowerCase().replace(/ /g,"_").replace(/&/g,"").replace(/-/g,"_"))}</div>
-                    </div>
-                  </button>
-                ))}
+          </div>
+        )}
+
+        {/* Account settings */}
+        <div style={{background:"var(--surface)",borderRadius:20,padding:"20px",marginBottom:16,border:"1.5px solid var(--border-col)"}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:14}}>Account</div>
+
+          {/* Email */}
+          <div style={{marginBottom:14}}>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>E-mail</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:3}}>{user?.email||""}</div>
+          </div>
+
+          {/* Password */}
+          <div style={{borderTop:"1px solid var(--border-col)",paddingTop:14,marginBottom:editing==="password"?14:0}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}} onClick={()=>setEditing(editing==="password"?null:"password")}>
+              <div>
+                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.password_label")}</div>
+                <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>••••••••</div>
+              </div>
+              <span style={{color:"var(--red)",fontSize:18}}>{editing==="password"?"∨":"›"}</span>
+            </div>
+            {editing==="password"&&(
+              <div style={{marginTop:10}} onClick={e=>e.stopPropagation()}>
+                <input type="password" placeholder={t("profile.new_password")} value={newPassword} onChange={e=>setNewPassword(e.target.value)}
+                  style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,marginBottom:8,outline:"none",boxSizing:"border-box"}}/>
+                <input type="password" placeholder={t("profile.confirm_password")} value={newPassword2} onChange={e=>setNewPassword2(e.target.value)}
+                  style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,marginBottom:10,outline:"none",boxSizing:"border-box"}}/>
+                <button onClick={savePassword} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
+                  {saving?t("btn.saving"):t("btn.save_password")}
+                </button>
               </div>
             )}
           </div>
-        )}
 
-        {/* Name — editable */}
-        <div style={rowStyle} onClick={()=>setEditing(editing==="name"?null:"name")}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>{t("profile.name_label")}</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>{user?.name||"User"}</div>
+          {/* City */}
+          <div style={{borderTop:"1px solid var(--border-col)",paddingTop:14}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}} onClick={()=>setEditing(editing==="city"?null:"city")}>
+              <div>
+                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.city_label")}</div>
+                <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>{newCity}</div>
+              </div>
+              <span style={{color:"var(--red)",fontSize:18}}>{editing==="city"?"∨":"›"}</span>
             </div>
-            <span style={{color:"var(--red)",fontSize:20}}>{editing==="name"?"∨":"›"}</span>
+            {editing==="city"&&(
+              <div style={{marginTop:10}} onClick={e=>e.stopPropagation()}>
+                <select value={newCity} onChange={e=>setNewCity(e.target.value)}
+                  style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,marginBottom:10,outline:"none",background:"var(--surface)",boxSizing:"border-box"}}>
+                  {(cities&&cities.length>0?cities.map(c=>c.name):["Budapest"]).map(c=><option key={c} value={c}>{tCui(c)}</option>)}
+                </select>
+                <button onClick={saveCity} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
+                  {saving?t("btn.saving"):t("btn.save_city")}
+                </button>
+              </div>
+            )}
           </div>
-          {editing==="name"&&(
-            <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
-              <input
-                value={newName}
-                onChange={e=>setNewName(e.target.value)}
-                placeholder={t("profile.new_name")}
-                style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
-              <button onClick={async()=>{
-                if(!newName.trim()) return showMsg(t("profile.name_empty"),true);
-                setSaving(true);
-                const {error} = await supabase.from("users").update({name:newName.trim()}).eq("id",user.id);
-                setSaving(false);
-                if(error) return showMsg(error.message,true);
-                setUser(u=>({...u, name: newName.trim()}));
-                setEditing(null);
-                showMsg(t("profile.name_updated"));
-              }} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
-                {saving?t("btn.saving"):t("btn.save_name")}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Email — read only */}
-        <div style={rowStyle}>
-          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>e-mail</div>
-          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>{user?.email||""}</div>
-        </div>
-
-        {/* Password */}
-        <div style={rowStyle} onClick={()=>setEditing(editing==="password"?null:"password")}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>{t("profile.password_label")}</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>••••••••</div>
-            </div>
-            <span style={{color:"var(--red)",fontSize:20}}>{editing==="password"?"∨":"›"}</span>
-          </div>
-          {editing==="password"&&(
-            <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
-              <input type="password" placeholder={t("profile.new_password")} value={newPassword} onChange={e=>setNewPassword(e.target.value)}
-                style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:8,outline:"none"}}/>
-              <input type="password" placeholder={t("profile.confirm_password")} value={newPassword2} onChange={e=>setNewPassword2(e.target.value)}
-                style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,marginBottom:10,outline:"none"}}/>
-              <button onClick={savePassword} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
-                {saving?t("btn.saving"):t("btn.save_password")}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* City */}
-        <div style={rowStyle} onClick={()=>setEditing(editing==="city"?null:"city")}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>{t("profile.city_label")}</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:15,color:"var(--black)",marginTop:2}}>{newCity}</div>
-            </div>
-            <span style={{color:"var(--red)",fontSize:20}}>{editing==="city"?"∨":"›"}</span>
-          </div>
-          {editing==="city"&&(
-            <div style={{marginTop:12}} onClick={e=>e.stopPropagation()}>
-              <select value={newCity} onChange={e=>setNewCity(e.target.value)}
-                style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:400,marginBottom:10,outline:"none",background:"var(--surface)"}}>
-                {(cities&&cities.length>0?cities.map(c=>c.name):["Budapest"]).map(c=><option key={c} value={c}>{tCui(c)}</option>)}
-              </select>
-              <button onClick={saveCity} style={{background:"var(--red)",color:"white",border:"none",borderRadius:10,padding:"11px",width:"100%",fontFamily:"var(--body)",fontWeight:400,fontSize:14,cursor:"pointer",opacity:saving?0.6:1}}>
-                {saving?t("btn.saving"):t("btn.save_city")}
-              </button>
-            </div>
-          )}
         </div>
 
         {msg&&<div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:msg.isErr?"#c00":"#0a3622",background:msg.isErr?"rgba(255,0,0,.08)":"#D1E7DD",padding:"10px 14px",borderRadius:10,marginBottom:10,textAlign:"center"}}>{msg.text}</div>}
 
-        <div style={{height:20}}/>
+        {/* Preferences */}
+        <div style={{background:"var(--surface)",borderRadius:20,padding:"20px",marginBottom:16,border:"1.5px solid var(--border-col)"}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:14}}>Preferences</div>
 
-        {/* Dark mode */}
-        <div style={{background:"var(--surface)",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
-          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:10,textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.dark_mode")}</div>
-          <div style={{display:"flex",gap:8}}>
-            {[{v:false,label:"☀️ "+t("profile.light")},{v:true,label:"🌙 "+t("profile.dark")}].map(({v,label})=>(
-              <button key={String(v)} onClick={()=>changeDark(v)}
-                style={{flex:1,padding:"10px 0",borderRadius:50,border:dark===v?"none":"1.5px solid var(--border-col)",background:dark===v?"var(--red)":"transparent",color:dark===v?"white":"var(--black)",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",transition:"all .15s"}}>
-                {label}
-              </button>
-            ))}
+          {/* Dark mode */}
+          <div style={{marginBottom:14}}>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>{t("profile.dark_mode")}</div>
+            <div style={{display:"flex",gap:8}}>
+              {[{v:false,label:"☀️ "+t("profile.light")},{v:true,label:"🌙 "+t("profile.dark")}].map(({v,label})=>(
+                <button key={String(v)} onClick={()=>changeDark(v)}
+                  style={{flex:1,padding:"10px 0",borderRadius:50,border:dark===v?"none":"1.5px solid var(--border-col)",background:dark===v?"var(--red)":"transparent",color:dark===v?"white":"var(--black)",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",transition:"all .15s"}}>
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Language */}
-        <div style={{background:"var(--surface)",borderRadius:20,padding:"16px 20px",marginBottom:12}}>
-          <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:10,textTransform:"uppercase",letterSpacing:".06em"}}>{t("profile.language")}</div>
-          <div style={{display:"flex",gap:8}}>
-            {[{code:"en",label:"🇬🇧 EN"},{code:"hu",label:"🇭🇺 HU"},{code:"es",label:"🇪🇸 ES"}].map(({code,label})=>(
-              <button key={code} onClick={()=>changeLang(code)}
-                style={{flex:1,padding:"10px 0",borderRadius:50,border:lang===code?"none":"1.5px solid var(--border-col)",background:lang===code?"var(--red)":"transparent",color:lang===code?"white":"var(--black)",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",transition:"all .15s"}}>
-                {label}
-              </button>
-            ))}
+          {/* Language */}
+          <div style={{borderTop:"1px solid var(--border-col)",paddingTop:14}}>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>{t("profile.language")}</div>
+            <div style={{display:"flex",gap:8}}>
+              {[{code:"en",label:"🇬🇧 EN"},{code:"hu",label:"🇭🇺 HU"},{code:"es",label:"🇪🇸 ES"}].map(({code,label})=>(
+                <button key={code} onClick={()=>changeLang(code)}
+                  style={{flex:1,padding:"10px 0",borderRadius:50,border:lang===code?"none":"1.5px solid var(--border-col)",background:lang===code?"var(--red)":"transparent",color:lang===code?"white":"var(--black)",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",transition:"all .15s"}}>
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Delete account */}
         {!showDelete
-          ?<div style={{textAlign:"center"}}>
+          ?<div style={{textAlign:"center",marginBottom:16}}>
             <button onClick={()=>setShowDelete(true)} style={{background:"transparent",border:"1.5px solid var(--red)",borderRadius:50,padding:"6px 16px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"var(--red)",cursor:"pointer"}}>
               {t("profile.delete_account")}
             </button>
           </div>
-          :<div style={{border:"1.5px solid var(--red)",borderRadius:20,padding:16}}>
+          :<div style={{border:"1.5px solid var(--red)",borderRadius:20,padding:16,marginBottom:16}}>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--red)",marginBottom:8}}>{t("profile.are_you_sure")}</div>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"#888",marginBottom:12}}>{t("profile.type_delete")}</div>
             <input placeholder={t("profile.type_delete_placeholder")} value={deleteConfirm} onChange={e=>setDeleteConfirm(e.target.value)}
