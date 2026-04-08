@@ -1981,6 +1981,59 @@ function NavIcon({id, active}) {
   return null;
 }
 
+function CityPicker({availableCities, selectedCity, onSelect}) {
+  const [open, setOpen] = useState(false);
+  const dark = useDark();
+  const label = selectedCity || "📍 all cities";
+
+  return (
+    <>
+      <button onClick={()=>setOpen(true)} style={{
+        display:"inline-flex",alignItems:"center",gap:6,
+        background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
+        border:"none",borderRadius:50,padding:"6px 14px",
+        fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"white",cursor:"pointer"
+      }}>
+        📍 {selectedCity||"all cities"} <span style={{opacity:.7,fontSize:11}}>▼</span>
+      </button>
+
+      {open&&(
+        <div style={{position:"fixed",inset:0,zIndex:500,display:"flex",flexDirection:"column",justifyContent:"flex-end"}} onClick={()=>setOpen(false)}>
+          <div style={{background:"var(--surface)",borderRadius:"20px 20px 0 0",padding:"20px 20px 40px",maxHeight:"60vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:14}}>Select city</div>
+            {/* All cities option */}
+            <button onClick={()=>{onSelect(null);setOpen(false);}} style={{
+              width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
+              background:!selectedCity?"var(--red)":"var(--surface2)",
+              color:!selectedCity?"white":"var(--black)",
+              border:"none",borderRadius:12,padding:"12px 16px",
+              fontFamily:"var(--body)",fontWeight:700,fontSize:15,cursor:"pointer",marginBottom:8
+            }}>
+              <span>🌍 All cities</span>
+              {!selectedCity&&<span>✓</span>}
+            </button>
+            {availableCities.map(c=>(
+              <button key={c.name} onClick={()=>{onSelect(c.name);setOpen(false);}} style={{
+                width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
+                background:selectedCity===c.name?"var(--red)":"var(--surface2)",
+                color:selectedCity===c.name?"white":"var(--black)",
+                border:"none",borderRadius:12,padding:"12px 16px",
+                fontFamily:"var(--body)",fontWeight:700,fontSize:15,cursor:"pointer",marginBottom:8
+              }}>
+                <div style={{textAlign:"left"}}>
+                  <div>{c.name}</div>
+                  <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,opacity:.7,marginTop:2}}>{c.country} · {c.count} {c.count===1?"venue":"venues"}</div>
+                </div>
+                {selectedCity===c.name&&<span>✓</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function BottomNav({screen, navigate, onMenu, menuOpen, answers}) {
   const tabs = [
     {id:"home",       label:t("nav.home")},
@@ -4136,7 +4189,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user}) {
   );
 }
 
-function AllVenuesScreen({navigate, allVenues, onMenu, user}) {
+function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, availableCities, onCitySelect}) {
   const [search,setSearch]=useState("");
   const [category,setCategory]=useState("");
   const [cuisine,setCuisine]=useState("");
@@ -4243,9 +4296,11 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user}) {
 
 
   const active = allVenues.filter(v=>v.status==="active");
-  // List view: only user's city. Map view: all venues
-  const cityFiltered = viewMode==="list" && user?.city_id
-    ? active.filter(v=>v.city_id===user.city_id)
+  // List view: filter by selectedCity. Map view: all venues
+  const cityFiltered = viewMode==="list"
+    ? (selectedCity
+        ? active.filter(v=>v.city_name===selectedCity)
+        : (user?.city_id ? active.filter(v=>v.city_id===user.city_id) : active))
     : active;
   const filtered=cityFiltered.filter(v=>{
     if(search){
@@ -4267,13 +4322,18 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user}) {
   return (
     <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
       <div style={{position:"absolute",top:0,left:0,right:0,zIndex:10,padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",display:"flex",flexDirection:"column",gap:8,alignItems:"center"}}>
-        <div className="av-ctrl" style={{display:"flex",gap:8,width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4}}>
-          <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:viewMode==="map"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
-            {t("map.map")}
-          </button>
-          <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:viewMode==="list"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
-            {t("map.list")}
-          </button>
+        <div style={{display:"flex",gap:8,width:"100%",alignItems:"center"}}>
+          <div className="av-ctrl" style={{flex:1,display:"flex",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4}}>
+            <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:viewMode==="map"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
+              {t("map.map")}
+            </button>
+            <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:viewMode==="list"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
+              {t("map.list")}
+            </button>
+          </div>
+          {availableCities?.length > 0 && (
+            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          )}
         </div>
         <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
           <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
@@ -4572,7 +4632,7 @@ function DraggableImageGrid({previews, onMove, onRemove, onAdd, maxPhotos=5}) {
   );
 }
 
-function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user, cities}) {
+function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user, cities, selectedCity, availableCities, onCitySelect}) {
   const scoutScrollRef = React.useRef(null);
   React.useEffect(()=>{ setTimeout(()=>restoreScroll("scout", scoutScrollRef.current), 50); },[]);
   const [tab,setTab]=useState("add");
@@ -5225,7 +5285,12 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </div>
         </div>
       </div>
-      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0}}>
+      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+        {availableCities?.length>0&&(
+          <div style={{marginBottom:8}}>
+            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          </div>
+        )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["add","add venue"],["events","events"],[t("scout.activity"),"my activity"]].map(([k,l])=>(
           <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
@@ -5468,7 +5533,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   );
 }
 
-function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, user}) {
+function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, user, selectedCity, availableCities, onCitySelect}) {
   const clScrollRef = React.useRef(null);
   React.useEffect(()=>{
     if(tab==="all") setTimeout(()=>restoreScroll("cityLead", clScrollRef.current), 50);
@@ -5916,7 +5981,12 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
           </div>
         </div>
       </div>
-      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0}}>
+      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+        {availableCities?.length>0&&(
+          <div style={{marginBottom:8}}>
+            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          </div>
+        )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["pending","pending",pending.length],["all","all",active.length],["events","events",pendingEvents.length],["reports","reports",reports.length],["partners","partners",""]].map(([k,l,c])=>(
           <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>
@@ -6606,7 +6676,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
 
 // ── SCOUTS SCREEN ─────────────────────
 
-function ScoutsScreen({navigate, onMenu, user}) {
+function ScoutsScreen({navigate, onMenu, user, selectedCity, availableCities, onCitySelect}) {
   const [scouts, setScouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -6662,7 +6732,12 @@ function ScoutsScreen({navigate, onMenu, user}) {
         </div>
       </div>
 
-      <div style={{padding:"0 16px 10px",flexShrink:0}}>
+      <div style={{padding:"0 16px 10px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
+        {availableCities?.length>0&&(
+          <div style={{display:"flex"}}>
+            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          </div>
+        )}
         <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px"}}>
           <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search scouts..."
@@ -7873,6 +7948,8 @@ function App() {
   const [allVenues, setAllVenues] = useState([]);
   const [venuesLoading, setVenuesLoading] = useState(true);
   const [answers, setAnswers] = useState({});
+  const [selectedCity, setSelectedCity] = useState(null); // null = all cities
+  const [availableCities, setAvailableCities] = useState([]);
   const [partner, setPartner] = useState(null);
   const [cities, setCities] = useState([]);
 
@@ -7915,15 +7992,55 @@ function App() {
     const [activeRes, pendingRes] = await Promise.all([activeQuery, pendingQuery]);
     const combined = [...(activeRes.data||[]), ...(pendingRes.data||[])];
 
-    if(combined.length > 0) setAllVenues(combined.map(v=>({
-      ...v,
-      price: v.price_level,
-      why: v.why,
-      emoji: "🍽",
-      occasions: v.occasions || []
-    })));
+    if(combined.length > 0){
+      const mapped = combined.map(v=>({
+        ...v,
+        price: v.price_level,
+        why: v.why,
+        emoji: "🍽",
+        occasions: v.occasions || []
+      }));
+      setAllVenues(mapped);
+      // Build available cities from venues
+      const cityMap = {};
+      mapped.filter(v=>v.status==="active"&&v.city_name).forEach(v=>{
+        if(!cityMap[v.city_name]) cityMap[v.city_name] = {name:v.city_name, country:v.country||"", count:0};
+        cityMap[v.city_name].count++;
+      });
+      setAvailableCities(Object.values(cityMap).sort((a,b)=>b.count-a.count));
+    }
     setVenuesLoading(false);
   }, []);
+
+  // GPS-based city detection — runs after login
+  async function detectUserCity(u) {
+    if(!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const {latitude: lat, longitude: lng} = pos.coords;
+      // Reverse geocode to get city
+      if(!window.google?.maps?.Geocoder) return;
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({location: {lat, lng}}, async (results, status) => {
+        if(status !== "OK" || !results) return;
+        const comps = results.flatMap(r => r.address_components || []);
+        const cityComp = comps.find(c => c.types.includes("locality")) ||
+                         comps.find(c => c.types.includes("administrative_area_level_2"));
+        const cityName = cityComp?.long_name;
+        if(!cityName) return;
+
+        // Find city in DB
+        const {data: cityData} = await supabase
+          .from("cities").select("id,name").eq("name", cityName).single();
+
+        if(cityData && cityData.id !== u.city_id) {
+          // User is in a different city that exists in DB — update
+          await supabase.from("users").update({city_id: cityData.id}).eq("id", u.id);
+          setUser(prev => ({...prev, city_id: cityData.id}));
+          // loadVenues will trigger via useEffect on city_id change
+        }
+      });
+    }, () => {}, {enableHighAccuracy: false, timeout: 8000, maximumAge: 3600000});
+  }
 
   // Reload venues when user city changes
   useEffect(()=>{
@@ -7974,6 +8091,7 @@ function App() {
           };
           setUser(u);
           loadSavedIds(u.id);
+          detectUserCity(u);
           if(partner){
             const hasActiveAccess = u.partner_id && u.partner_access_expires_at && new Date(u.partner_access_expires_at) > new Date();
             setScreen(hasActiveAccess ? "home" : "partner_activate");
@@ -8096,6 +8214,7 @@ function App() {
   function onLogin(u){
     setUser(u);
     if(u?.id) loadSavedIds(u.id);
+    if(u?.id) detectUserCity(u);
     // If pending invite → go to event directly
     if(pendingInvite){
       setSelectedPlan(pendingInvite);
@@ -8165,10 +8284,10 @@ function App() {
     results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user}/>,
     venue: selectedVenue&&<VenueDetailScreen venue={selectedVenue} navigate={navigate} savedIds={savedIds} toggleSave={toggleSave} showToast={showToastMsg} isScout={isScout} user={user} allVenues={allVenues}/>,
     saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user}/>,
-    scouts: <ScoutsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user}/>,
-    all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user}/>,
-    scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user} cities={cities}/>,
-    city_lead: <CityLeadScreen navigate={navigate} allVenues={allVenues} setAllVenues={setAllVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} user={user}/>,
+    scouts: <ScoutsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
+    all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
+    scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user} cities={cities} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
+    city_lead: <CityLeadScreen navigate={navigate} allVenues={allVenues} setAllVenues={setAllVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
     profile: <ProfileScreen navigate={navigate} user={user} setUser={setUser} onMenu={()=>setShowMenu(true)} onSignOut={signOut} cities={cities} lang={lang} changeLang={changeLang} dark={dark} changeDark={changeDark}/>,
     about: <AboutScreen navigate={navigate}/>,
     upgrade: <UpgradeScreen navigate={navigate} user={user}/>,
