@@ -4939,8 +4939,13 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   }
 
   async function submitVenue(){
-    if(!form.name||!form.address||!form.district||!form.category||!form.price_level||!form.why||!form.google_maps_url||!form.city_id){
+    const isBudapest = !form.city_name || form.city_name === "Budapest";
+    if(!form.name||!form.address||!form.category||!form.price_level||!form.why||!form.google_maps_url||!form.city_id){
       setFormError("Please fill in all required fields (*).");
+      return;
+    }
+    if(isBudapest && !form.district){
+      setFormError("Please select a district (*).");
       return;
     }
     if(form.category==="Restaurant"&&!form.cuisine){
