@@ -2002,15 +2002,16 @@ function CityPicker({availableCities, selectedCity, onSelect}) {
       {open&&(
         <>
           {/* Backdrop */}
-          <div style={{position:"fixed",inset:0,zIndex:498,background:"rgba(0,0,0,.4)"}} onClick={()=>setOpen(false)}/>
+          <div style={{position:"fixed",inset:0,zIndex:498,background:"rgba(0,0,0,.5)"}} onClick={()=>setOpen(false)}/>
           {/* Sheet */}
           <div style={{
-            position:"fixed",left:0,right:0,bottom:"calc(60px + env(safe-area-inset-bottom))",zIndex:499,
+            position:"fixed",left:0,right:0,bottom:0,zIndex:499,
             background:"var(--surface)",
             borderRadius:"20px 20px 0 0",
-            padding:"16px 20px 24px",
-            maxHeight:"50vh",overflowY:"auto",
-            boxShadow:"0 -8px 32px rgba(0,0,0,.2)",
+            padding:"16px 20px",
+            paddingBottom:"calc(80px + env(safe-area-inset-bottom))",
+            maxHeight:"55vh",overflowY:"auto",
+            boxShadow:"0 -8px 32px rgba(0,0,0,.25)",
             animation:"slideInUp .25s cubic-bezier(.25,.46,.45,.94)"
           }}>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:12}}>Select city</div>
@@ -4357,10 +4358,12 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
         <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
           <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
           <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} className="search-input" style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}} />
-          {viewMode==="list"&&availableCities?.length>0&&(
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          )}
         </div>
+        {viewMode==="list"&&availableCities?.length>0&&(
+          <div style={{display:"flex",width:"100%"}}>
+            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          </div>
+        )}
         <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
           {CATEGORIES.map(c=>{
             const sel = category===c;
