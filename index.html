@@ -1981,7 +1981,7 @@ function NavIcon({id, active}) {
   return null;
 }
 
-function BottomNav({screen, navigate, onMenu, menuOpen}) {
+function BottomNav({screen, navigate, onMenu, menuOpen, answers}) {
   const tabs = [
     {id:"home",       label:t("nav.home")},
     {id:"q1",         label:t("nav.discover")},
@@ -1991,8 +1991,8 @@ function BottomNav({screen, navigate, onMenu, menuOpen}) {
   ];
   const active = (id) => {
     if(menuOpen) return id==="menu";
-    if(id==="home") return screen==="home"||screen==="results_list";
-    if(id==="q1") return ["q1","q2","q3","q4","q5","q6","results"].includes(screen);
+    if(id==="home") return screen==="home"||screen==="results_list"||(screen==="results"&&!!answers?.aiQuery);
+    if(id==="q1") return ["q1","q2","q3","q4","q5","q6"].includes(screen)||(screen==="results"&&!answers?.aiQuery);
     if(id==="menu") return false;
     return screen===id;
   };
@@ -2468,28 +2468,33 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
       });
       if(result.error) throw result.error;
       const parsed = result.data||{};
+
       const VALID_CAT = ["Restaurant","Café","Bar","Bakery","Patisserie","Street food","Other"];
-      const VALID_OCC = ["Casual dining","Fine dining","Dinner with friends","Date night","Lunch","Breakfast and brunch","Quick bite","Coffee","Quiet work spot","Pre-drinks / drinks","Late night","Celebration","Family outing"];
-      const VALID_TAGS = ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Cocktails","Wine bar","Speakeasy","Live music","Good music","Good for groups","Romantic","Lively","Upscale","Scenic","Underrated","Aesthetic","Outdoor seating","Indoor seating"];
-      const VALID_CUI = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","Italian","French","Spanish","Greek","Mexican","American","Hungarian","Middle Eastern","Mediterranean"];
       const VALID_DIS = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV",t("q.anywhere")];
       const VALID_DIE = ["Gluten-free","Vegan","Vegetarian","Halal","Kosher","Dairy-free","Nut-free","Pescatarian"];
       const VALID_BUD = ["$","$$","$$$","$$$$"];
       const VALID_GRP = ["solo","2","3-6","6-8","9+"];
+
       const aiData = {
-        category:  VALID_CAT.includes(parsed.category)?parsed.category:null,
-        occasions: Array.isArray(parsed.occasions)?parsed.occasions.filter(o=>VALID_OCC.includes(o)):[],
-        tags:      Array.isArray(parsed.tags)?parsed.tags.filter(t=>VALID_TAGS.includes(t)):[],
-        cuisines:  Array.isArray(parsed.cuisines)?parsed.cuisines.filter(c=>VALID_CUI.includes(c)):[],
-        budget:    VALID_BUD.includes(parsed.budget)?parsed.budget:null,
-        group:     VALID_GRP.includes(parsed.group)?parsed.group:null,
-        locations: Array.isArray(parsed.locations)?parsed.locations.filter(l=>VALID_DIS.includes(l)):[],
-        dietary:   Array.isArray(parsed.dietary)?parsed.dietary.filter(d=>VALID_DIE.includes(d)):[],
-        whySearch: typeof parsed.whySearch==="string"&&parsed.whySearch.trim()?parsed.whySearch.trim():null,
+        // Semantic results — ordered list of venue IDs by similarity
+        semanticVenueIds: Array.isArray(parsed.semanticVenueIds) ? parsed.semanticVenueIds : null,
+        similarities: parsed.similarities || {},
+        // Hard filters
+        category:  VALID_CAT.includes(parsed.category) ? parsed.category : null,
+        budget:    VALID_BUD.includes(parsed.budget) ? parsed.budget : null,
+        group:     VALID_GRP.includes(parsed.group) ? parsed.group : null,
+        locations: Array.isArray(parsed.locations) ? parsed.locations.filter(l=>VALID_DIS.includes(l)) : [],
+        dietary:   Array.isArray(parsed.dietary) ? parsed.dietary.filter(d=>VALID_DIE.includes(d)) : [],
+        // Clear old filter-based fields
+        occasions: [],
+        tags: [],
+        cuisines: [],
+        whySearch: null,
+        aiQuery: query,
       };
-      setAnswers(a=>({...a, ...aiData, aiQuery:query}));
+      setAnswers(a=>({...a, ...aiData}));
       savePartnerSearch({query, ...aiData});
-      navigate("results");
+      navigate("results", null, {replace: false});
     } catch(e) {
       setError(t("home.ai_error"));
     } finally {
@@ -3150,63 +3155,54 @@ function SkeletonCard(){
 
 function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partner, user}) {
   const BATCH=5;
-  const active = allVenues.filter(v=>v.status==="active").sort((a,b)=>a.name.localeCompare(b.name));
+  const active = allVenues.filter(v=>v.status==="active");
+  const isAI = !!answers.aiQuery;
+  const semanticIds = answers.semanticVenueIds; // ordered by similarity
+  const similarities = answers.similarities || {};
+  const partnerDistrict = answers.partnerDistrict || partner?.district;
+
   const filtered = active.filter(v=>{
-    // 0. Category — strict match
+    // If AI semantic search: only show venues in semantic results
+    if(isAI && semanticIds){
+      if(!semanticIds.includes(v.id)) return false;
+    }
+    // Hard filters (always applied)
     if(answers.category && v.category!==answers.category) return false;
-    // 1. Occasions — legalább egy egyezzen
-    if(answers.occasions?.length>0 && !answers.occasions.some(o=>(v.occasions||[]).includes(o))) return false;
-    // 1b. Tags — at least one must match
-    // 2. Budget — singular (AI) vagy plural (discover flow) egyaránt
     const vPrice = (v.price_level||v.price||"").trim();
     const budgetList = answers.budgets?.length>0 ? answers.budgets : (answers.budget ? [answers.budget.trim()] : []);
     if(budgetList.length>0 && !budgetList.includes(vPrice)) return false;
-    // 3. Cuisines — legalább egy egyezzen
     if(answers.cuisines?.length>0 && v.cuisine && !answers.cuisines.some(c=>v.cuisine.toLowerCase().includes(c.toLowerCase()))) return false;
-    // 4. Group / capacity
     if(answers.group && !capacityMatches(v.capacity, answers.group)) return false;
-
-    // 6. District/location — normalizált összehasonlítás (pl. "District V." == district "V")
     if(answers.locations?.length>0 && !answers.locations.includes(t("q.anywhere")) && !answers.locations.includes("near me")) {
       if(!answers.locations.some(l=>String(l).trim()===String(v.district).trim())) return false;
     }
-    // 7. Dietary
     if(answers.dietary?.length>0) {
       if(!answers.dietary.some(d=>(v.dietary||[]).includes(d))) return false;
     }
-    // Tags filter
-    if(answers.tags?.length>0){
-      const vTags = v.tags||[];
-      if(!answers.tags.some(t=>vTags.includes(t))) return false;
+    if(!isAI) {
+      // Only apply these filters in discover flow
+      if(answers.occasions?.length>0 && !answers.occasions.some(o=>(v.occasions||[]).includes(o))) return false;
+      if(answers.tags?.length>0 && !answers.tags.some(t=>(v.tags||[]).includes(t))) return false;
     }
-    // whySearch: kizáró szűrő — csak ha az AI kinyerte (vibe/mood ami más szűrőbe nem fért)
-    if(answers.whySearch&&answers.whySearch.trim()) {
-      const wq=answers.whySearch.toLowerCase();
-      if(!(v.why||"").toLowerCase().includes(wq)&&!(v.name||"").toLowerCase().includes(wq)) return false;
-    }
-    // Partner district bias — partner's district gets priority but is not exclusive
     return true;
   });
-  // Partner district: venues from partner's district appear first
-  const partnerDistrict = answers.partnerDistrict || partner?.district;
-  const whyQ = answers.whySearch?.toLowerCase();
+
   const sorted = [...filtered].sort((a,b)=>{
-    // whySearch egyezés előre kerül
-    if(whyQ) {
-      const aWhy = (a.why||"").toLowerCase().includes(whyQ)||(a.name||"").toLowerCase().includes(whyQ);
-      const bWhy = (b.why||"").toLowerCase().includes(whyQ)||(b.name||"").toLowerCase().includes(whyQ);
-      if(aWhy && !bWhy) return -1;
-      if(!aWhy && bWhy) return 1;
+    if(isAI && semanticIds){
+      // Sort by semantic similarity score (highest first)
+      const simA = similarities[a.id] ?? 0;
+      const simB = similarities[b.id] ?? 0;
+      return simB - simA;
     }
-    // Partner district előre kerül
-    if(partnerDistrict) {
+    // Regular discover flow: partner district first, rest random
+    if(partnerDistrict){
       const aMatch = a.district===partnerDistrict ? -1 : 1;
       const bMatch = b.district===partnerDistrict ? -1 : 1;
       return aMatch - bMatch;
     }
     return 0;
   });
-  const pool = React.useMemo(()=>shuffle(sorted),[filtered.length, answers]);
+  const pool = React.useMemo(()=>isAI ? sorted : shuffle(sorted),[filtered.length, answers]);
   const [shownCount, setShownCount] = useState(BATCH);
   const shown = pool.slice(0, shownCount);
   const noMore = shownCount >= pool.length;
@@ -7987,7 +7983,7 @@ function App() {
               );
             })()}
             {showMenu&&<Menu onClose={()=>setShowMenu(false)} navigate={navigate} role={user?.role||"explorer"} onSignOut={signOut}/>}
-      {user&&!appLoading&&screen!=="onboarding"&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)} menuOpen={showMenu}/>}
+      {user&&!appLoading&&screen!=="onboarding"&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)} menuOpen={showMenu} answers={answers}/>}
                 </>
       }
       {toast&&<div className="toast">{toast}</div>}
