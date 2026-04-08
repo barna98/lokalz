@@ -1934,6 +1934,8 @@ function VenueCard({venue, onClick}) {
     window.open(venue.google_maps_url||`https://www.google.com/maps/search/?api=1&query=${q}`,"_blank");
   }
 
+  const isNew = venue.created_at && (Date.now() - new Date(venue.created_at).getTime()) < 30 * 24 * 60 * 60 * 1000;
+
   return (
     <div className="venue-card" onClick={onClick}>
       <div className="venue-img" style={{background:!imgFetched||imgUrl?(imgLoaded?"#111":"var(--surface2)"):grads[venue.cuisine]||grads.default,padding:0}}>
@@ -1946,6 +1948,7 @@ function VenueCard({venue, onClick}) {
             </>
             :<span style={{fontSize:52}}>🍽</span>
         }
+        {isNew&&<div style={{position:"absolute",top:10,left:10,background:"var(--red)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,padding:"3px 8px",borderRadius:20,letterSpacing:".06em",textTransform:"uppercase"}}>NEW</div>}
       </div>
       <div className="venue-body">
         <div className="venue-name">{venue.name}</div>
@@ -2293,37 +2296,134 @@ function SignUpScreen({navigate, onLogin}) {
 
 function OnboardingScreen({navigate, user, setUser}) {
   const isScout = user?.role==="scout"||user?.role==="city_lead";
-  // Steps: intro1, intro2 (non-scouts only), city, badge (scouts only)
   const [step, setStep] = useState(isScout ? "city" : "intro1");
   const [city, setCity] = useState(null);
   const [badge, setBadge] = useState(null);
   const [saving, setSaving] = useState(false);
   const [citiesList, setCitiesList] = useState([]);
+  // GPS + autocomplete state
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [gpsError, setGpsError] = useState(null);
+  const [searchVal, setSearchVal] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const autoSvcRef = React.useRef(null);
+  const detailSvcRef = React.useRef(null);
 
   useEffect(()=>{
     supabase.from("cities").select("id,name").order("name").then(({data})=>{
       if(data) setCitiesList(data);
     });
+    // Auto-detect GPS on city step
+    if(isScout) tryGpsDetect();
   },[]);
+
+  useEffect(()=>{
+    if(step==="city") tryGpsDetect();
+  },[step]);
+
+  function getAutoSvc(){
+    if(!window.google?.maps?.places) return null;
+    if(!autoSvcRef.current) autoSvcRef.current = new window.google.maps.places.AutocompleteService();
+    if(!detailSvcRef.current){
+      const div = document.createElement("div");
+      detailSvcRef.current = new window.google.maps.places.PlacesService(div);
+    }
+    return autoSvcRef.current;
+  }
+
+  function tryGpsDetect(){
+    if(!navigator.geolocation) return;
+    setGpsLoading(true);
+    setGpsError(null);
+    navigator.geolocation.getCurrentPosition(async (pos)=>{
+      const {latitude:lat, longitude:lng} = pos.coords;
+      function runGeocode(){
+        if(!window.google?.maps?.Geocoder) return false;
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({location:{lat,lng}}, (results, status)=>{
+          setGpsLoading(false);
+          if(status!=="OK"||!results){ setGpsError("Could not detect location"); return; }
+          const comps = results.flatMap(r=>r.address_components||[]);
+          const cityComp = comps.find(c=>c.types.includes("locality")) ||
+                           comps.find(c=>c.types.includes("administrative_area_level_2"));
+          const countryComp = comps.find(c=>c.types.includes("country"));
+          if(cityComp){
+            setCity({name: cityComp.long_name, country: countryComp?.long_name||""});
+            setSearchVal(cityComp.long_name);
+          } else {
+            setGpsError("Could not detect city");
+          }
+        });
+        return true;
+      }
+      if(!runGeocode()){
+        let attempts = 0;
+        const interval = setInterval(()=>{
+          attempts++;
+          if(runGeocode()){ clearInterval(interval); return; }
+          if(attempts>20){ clearInterval(interval); setGpsLoading(false); setGpsError("Maps not loaded"); }
+        }, 300);
+      }
+    }, ()=>{ setGpsLoading(false); setGpsError("Location denied"); }, {enableHighAccuracy:false,timeout:8000,maximumAge:60000});
+  }
+
+  function handleCitySearch(val){
+    setSearchVal(val);
+    setCity(null);
+    if(val.trim().length<2){ setSuggestions([]); return; }
+    const svc = getAutoSvc();
+    if(!svc){ setSuggestions([]); return; }
+    clearTimeout(window._obCityTimeout);
+    window._obCityTimeout = setTimeout(()=>{
+      setSearchLoading(true);
+      svc.getPlacePredictions({
+        input: val,
+        types: ["(cities)"],
+      },(preds, status)=>{
+        setSearchLoading(false);
+        if(status===window.google.maps.places.PlacesServiceStatus.OK && preds){
+          setSuggestions(preds.slice(0,5));
+        } else {
+          setSuggestions([]);
+        }
+      });
+    }, 300);
+  }
+
+  function selectSuggestion(pred){
+    setSuggestions([]);
+    const cityName = pred.structured_formatting?.main_text || pred.description;
+    const countryName = pred.terms?.[pred.terms.length-1]?.value || "";
+    setSearchVal(cityName);
+    setCity({name: cityName, country: countryName});
+  }
 
   async function saveAndNavigate(selectedCity, selectedBadge){
     setSaving(true);
-    const found = citiesList.find(c=>c.name===selectedCity);
-    const updates = { city_id: found?.id||null };
+    // Find or create city in DB
+    let cityId = null;
+    const found = citiesList.find(c=>c.name===selectedCity.name);
+    if(found){
+      cityId = found.id;
+    } else {
+      const {data: newCity} = await supabase.from("cities").insert({
+        name: selectedCity.name,
+        country: selectedCity.country||"",
+      }).select("id").single();
+      if(newCity) cityId = newCity.id;
+    }
+    const updates = { city_id: cityId };
     if(selectedBadge) updates.badge = selectedBadge;
-    if(found && user?.id){
+    if(cityId && user?.id){
       await supabase.from("users").update(updates).eq("id", user.id);
-      setUser(u=>({...u, city_id: found.id, city: selectedCity, badge: selectedBadge}));
+      setUser(u=>({...u, city_id: cityId, badge: selectedBadge}));
     }
     setSaving(false);
     navigate("home",null,{replace:true});
   }
 
-  const displayCities = citiesList.length>0 ? citiesList.map(c=>c.name) : CITIES;
-
   const BODY = {fontFamily:"var(--body)",fontWeight:400};
-
-  // Progress dots
   const steps = isScout ? ["city","badge"] : ["intro1","intro2","city"];
   const dotIndex = steps.indexOf(step);
 
@@ -2392,22 +2492,63 @@ function OnboardingScreen({navigate, user, setUser}) {
         <div className="logo">LOKAL&#39;Z</div>
         <div style={{marginTop:32}}>
           <div style={{...BODY,fontSize:22,fontWeight:700,color:"var(--black)",marginBottom:4}}>{t("onboard.pick_city")}</div>
-          <div style={{...BODY,fontSize:16,color:"var(--black)",lineHeight:1.5}}>
-            {t("onboard.pick_city_desc")}
+          <div style={{...BODY,fontSize:16,color:"var(--black)",lineHeight:1.5}}>{t("onboard.pick_city_desc")}</div>
+        </div>
+        <div style={{display:"flex",gap:6,marginTop:16}}><Dots/></div>
+      </div>
+
+      <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",gap:12}}>
+        {/* GPS detect button */}
+        <button onClick={tryGpsDetect} style={{
+          display:"flex",alignItems:"center",justifyContent:"center",gap:8,
+          background:"var(--surface)",border:"1.5px solid var(--border-col)",
+          borderRadius:14,padding:"14px",fontFamily:"var(--body)",fontWeight:700,fontSize:14,
+          color:"var(--black)",cursor:"pointer",opacity:gpsLoading?0.6:1
+        }}>
+          {gpsLoading ? "📍 Detecting..." : "📍 Use my current location"}
+        </button>
+        {gpsError&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",textAlign:"center"}}>{gpsError}</div>}
+
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <div style={{flex:1,height:1,background:"var(--border-col)"}}/>
+          <span style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)"}}>or search</span>
+          <div style={{flex:1,height:1,background:"var(--border-col)"}}/>
+        </div>
+
+        {/* City search autocomplete */}
+        <div style={{position:"relative"}}>
+          <div style={{display:"flex",alignItems:"center",background:"var(--surface)",border:"1.5px solid",borderColor:city?"var(--red)":"var(--border-col)",borderRadius:14,padding:"12px 16px",gap:8}}>
+            <span style={{fontSize:16}}>🏙️</span>
+            <input
+              placeholder="Search city..."
+              value={searchVal}
+              onChange={e=>handleCitySearch(e.target.value)}
+              autoComplete="off"
+              style={{flex:1,border:"none",background:"none",outline:"none",fontFamily:"var(--body)",fontSize:15,fontWeight:city?700:400,color:"var(--black)"}}
+            />
+            {searchLoading&&<span style={{fontSize:12,color:"#aaa"}}>...</span>}
+            {city&&<span style={{color:"#16a34a",fontSize:16}}>✓</span>}
           </div>
+          {suggestions.length>0&&(
+            <div style={{position:"absolute",top:"100%",left:0,right:0,background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:14,zIndex:50,boxShadow:"0 8px 24px rgba(0,0,0,.12)",overflow:"hidden",marginTop:4}}>
+              {suggestions.map(pred=>(
+                <div key={pred.place_id} onClick={()=>selectSuggestion(pred)}
+                  style={{padding:"12px 16px",cursor:"pointer",borderBottom:"1px solid var(--border-col)",fontFamily:"var(--body)"}}>
+                  <div style={{fontWeight:700,fontSize:14,color:"var(--black)"}}>{pred.structured_formatting?.main_text||pred.description}</div>
+                  <div style={{fontSize:12,color:"var(--text-muted)",marginTop:2}}>{pred.structured_formatting?.secondary_text||""}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        <div style={{display:"flex",gap:6,marginTop:16}}>
-          <Dots/>
-        </div>
+
+        {city&&(
+          <div style={{background:"rgba(22,163,74,.08)",border:"1.5px solid #16a34a",borderRadius:12,padding:"12px 16px",fontFamily:"var(--body)",fontSize:14,fontWeight:700,color:"#15803d"}}>
+            📍 {city.name}{city.country?`, ${city.country}`:""}
+          </div>
+        )}
       </div>
-      <div style={{display:"flex",flexDirection:"column",gap:10}}>
-        {displayCities.map(c=>(
-          <button key={c} className={`opt-btn${city===c?" sel":""}`} onClick={()=>setCity(c)}>
-            {c}
-            <div className={`opt-check${city===c?" on":""}`}/>
-          </button>
-        ))}
-      </div>
+
       <button className="btn-black" onClick={async()=>{
         if(!city) return;
         if(isScout){ setStep("badge"); return; }
@@ -4716,10 +4857,11 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     setScoutEditImgPreviews(prev=>{ const a=[...prev]; [a[from],a[to]]=[a[to],a[from]]; return a; });
   }
   // Only submitted_by, fallback to scout_alias if submitted_by is null
-  const myVenues=allVenues.filter(v=>
+  const myVenuesAll=allVenues.filter(v=>
     v.submitted_by===user?.id ||
     (!v.submitted_by && v.scout_alias && user?.name && v.scout_alias.toLowerCase().startsWith(user.name.split(" ")[0].toLowerCase()))
   );
+  const myVenues = selectedCity ? myVenuesAll.filter(v=>v.city_name===selectedCity) : myVenuesAll;
 
   function startScoutEdit(v){
     setScoutEditImgFiles([]);
@@ -6897,8 +7039,9 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
     ...(venues.added||[]).map(v=>({...v,_source:"added"})),
     ...(venues.saved||[]).map(v=>({...v,_source:"saved"})),
   ];
-  const categories = ["All", ...new Set(allVenuesList.map(v=>v.category||v.cuisine).filter(Boolean))];
-  const filtered = catFilter==="All" ? allVenuesList : allVenuesList.filter(v=>(v.category||v.cuisine)===catFilter);
+  const cityFiltered = selectedCity ? allVenuesList.filter(v=>v.city_name===selectedCity) : allVenuesList;
+  const categories = ["All", ...new Set(cityFiltered.map(v=>v.category||v.cuisine).filter(Boolean))];
+  const filtered = catFilter==="All" ? cityFiltered : cityFiltered.filter(v=>(v.category||v.cuisine)===catFilter);
   const isOwnProfile = user?.id===scoutId;
 
   return (
