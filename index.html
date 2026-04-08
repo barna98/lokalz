@@ -4328,22 +4328,20 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
   return (
     <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
       <div style={{position:"absolute",top:0,left:0,right:0,zIndex:10,padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",display:"flex",flexDirection:"column",gap:8,alignItems:"center"}}>
-        <div style={{display:"flex",gap:8,width:"100%",alignItems:"center"}}>
-          <div className="av-ctrl" style={{flex:1,display:"flex",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4}}>
-            <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:viewMode==="map"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
-              {t("map.map")}
-            </button>
-            <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:viewMode==="list"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
-              {t("map.list")}
-            </button>
-          </div>
-          {availableCities?.length > 0 && (
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          )}
+        <div className="av-ctrl" style={{display:"flex",gap:8,width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4}}>
+          <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:viewMode==="map"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
+            {t("map.map")}
+          </button>
+          <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:viewMode==="list"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
+            {t("map.list")}
+          </button>
         </div>
         <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
           <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
           <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} className="search-input" style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}} />
+          {viewMode==="list"&&availableCities?.length>0&&(
+            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          )}
         </div>
         <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
           {CATEGORIES.map(c=>{
