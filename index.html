@@ -4750,25 +4750,20 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     return placeSvc.current;
   }
 
-  // Debounced place search
+  // Debounced place search — global, no country restriction
   function handlePlaceSearch(val){
     setPlaceSearchVal(val);
     setPlaceSelected(false);
     setF("name",val);
     if(val.trim().length<2){setPlaceSuggestions([]);return;}
     const svc=getPlaceSvc();
-    if(!svc){
-      // fallback: no google loaded yet, just use regular name field
-      setPlaceSuggestions([]);
-      return;
-    }
+    if(!svc){ setPlaceSuggestions([]); return; }
     clearTimeout(window._placeTimeout);
     window._placeTimeout=setTimeout(()=>{
       setLoadingPlace(true);
       svc.getPlacePredictions({
         input:val,
         types:["establishment"],
-        componentRestrictions:{country:"hu"},
         sessionToken:placeSessionToken.current
       },(preds,status)=>{
         setLoadingPlace(false);
@@ -4790,7 +4785,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   }
 
   // On place selection: fetch details and fill form
-  function selectPlace(pred){
+  async function selectPlace(pred){
     if(!placeDetailSvc.current) return;
     setPlaceSuggestions([]);
     setLoadingPlace(true);
@@ -4799,33 +4794,70 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     setF("name",name);
     placeDetailSvc.current.getDetails({
       placeId:pred.place_id,
-      fields:["name","formatted_address","address_components","url","place_id"],
+      fields:["name","formatted_address","address_components","url","place_id","geometry"],
       sessionToken:placeSessionToken.current
-    },(place,status)=>{
+    },async(place,status)=>{
       setLoadingPlace(false);
-      placeSessionToken.current=null; // reset token after detail fetch
+      placeSessionToken.current=null;
       if(status!==window.google.maps.places.PlacesServiceStatus.OK||!place) return;
-      // Extract postal code for district
-      const postalComp=place.address_components?.find(c=>c.types.includes("postal_code"));
-      const postal=postalComp?.long_name||"";
-      const district=districtFromPostal(postal);
-      // Build clean address (street + number)
-      const route=place.address_components?.find(c=>c.types.includes("route"))?.long_name||"";
-      const num=place.address_components?.find(c=>c.types.includes("street_number"))?.long_name||"";
-      const cleanAddr=route&&num?`${route} ${num}`:place.formatted_address||"";
-      // Google Maps URL
-      const mapsUrl=place.url||`https://maps.google.com/?cid=${place.place_id}`;
+
+      // Extract address components
+      const comps = place.address_components || [];
+      const get = (type) => comps.find(c=>c.types.includes(type));
+
+      const postalComp = get("postal_code");
+      const postal = postalComp?.long_name || "";
+      const district = districtFromPostal(postal);
+
+      const cityComp = get("locality") || get("administrative_area_level_2") || get("postal_town");
+      const cityName = cityComp?.long_name || "";
+
+      const countryComp = get("country");
+      const countryName = countryComp?.long_name || "";
+      const countryCode = countryComp?.short_name || "";
+
+      const route = get("route")?.long_name || "";
+      const streetNum = get("street_number")?.long_name || "";
+      const cleanAddr = route && streetNum ? `${route} ${streetNum}` : place.formatted_address || "";
+
+      const mapsUrl = place.url || `https://maps.google.com/?cid=${place.place_id}`;
+      const lat = place.geometry?.location?.lat() || null;
+      const lng = place.geometry?.location?.lng() || null;
+
+      // Find or create city in DB
+      let cityId = user?.city_id || "";
+      if(cityName){
+        const {data: existingCity} = await supabase.from("cities").select("id").eq("name", cityName).single();
+        if(existingCity){
+          cityId = existingCity.id;
+        } else {
+          // Create new city
+          const {data: newCity} = await supabase.from("cities").insert({
+            name: cityName,
+            country: countryName,
+            country_code: countryCode,
+          }).select("id").single();
+          if(newCity) cityId = newCity.id;
+        }
+      }
+
       setForm(f=>({...f,
-        name:place.name||name,
-        address:cleanAddr,
-        district:district,
-        google_maps_url:mapsUrl,
-        google_place_id:place.place_id||""
+        name: place.name || name,
+        address: cleanAddr,
+        district: district,
+        google_maps_url: mapsUrl,
+        google_place_id: place.place_id || "",
+        latitude: lat,
+        longitude: lng,
+        city_id: cityId,
+        city_name: cityName,
+        country: countryName,
       }));
-      setPlaceSearchVal(place.name||name);
+      setPlaceSearchVal(place.name || name);
       setPlaceSelected(true);
-      // Also trigger dupe check on the filled name
-      if(place.name&&place.name.trim().length>=2){
+
+      // Dupe check
+      if(place.name && place.name.trim().length >= 2){
         setCheckingDupe(true);
         supabase.from("venues").select("id,name,district,status").ilike("name",`%${place.name.trim()}%`).limit(3).then(({data})=>{
           setDuplicates(data||[]);
@@ -5180,29 +5212,61 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       {tab==="add"&&(
         <div className="scroll" style={{padding:"14px 20px 80px"}}>
           <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",marginBottom:14}}>{t("scout.submit_new")}</div>
-          {[["name","Venue name *"],["address","Address *"]].map(([k,p])=>(
-            <div key={k}>
-              <div className="input-wrap-light" style={{marginBottom:k==="name"&&duplicates.length>0?6:10}}>
-                <input placeholder={p} value={form[k]} onChange={e=>setF(k,e.target.value)}/>
-                {k==="name"&&checkingDupe&&<span style={{fontSize:12,color:"var(--text-muted)"}}>...</span>}
-              </div>
-              {k==="name"&&duplicates.length>0&&(
-                <div style={{background:"#FFF3CD",border:"1.5px solid #FFD966",borderRadius:10,padding:"10px 14px",marginBottom:10,animation:"fadeUp .2s ease both"}}>
-                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"#664D03",marginBottom:6}}>⚠️ similar venue already exists</div>
-                  {duplicates.map(d=>(
-                    <div key={d.id} style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"#664D03",marginBottom:2}}>
-                      {d.name} — District {d.district} <span style={{opacity:.6}}>({d.status})</span>
-                    </div>
-                  ))}
-                  <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",marginTop:6}}>{t("scout.sure_different")}</div>
-                </div>
-              )}
+
+          {/* Google Places Autocomplete search */}
+          <div style={{position:"relative",marginBottom:10}}>
+            <div className="input-wrap-light" style={{marginBottom:0}}>
+              <input
+                placeholder="🔍 Search venue name..."
+                value={placeSearchVal}
+                onChange={e=>handlePlaceSearch(e.target.value)}
+                autoComplete="off"
+                style={{flex:1}}
+              />
+              {loadingPlace&&<span style={{fontSize:12,color:"var(--text-muted)"}}>...</span>}
+              {placeSelected&&<span style={{fontSize:16,color:"#16a34a"}}>✓</span>}
             </div>
-          ))}
-          <select style={selectStyle} value={form.city_id} onChange={e=>setF("city_id",e.target.value)}>
-            <option value="">{t("opt.select_city")}</option>
-            {cities.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+            {placeSuggestions.length>0&&(
+              <div style={{position:"absolute",top:"100%",left:0,right:0,background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:14,zIndex:100,boxShadow:"0 8px 24px rgba(0,0,0,.12)",overflow:"hidden",marginTop:4}}>
+                {placeSuggestions.map(pred=>(
+                  <div key={pred.place_id} onClick={()=>selectPlace(pred)}
+                    style={{padding:"12px 16px",cursor:"pointer",borderBottom:"1px solid var(--border-col)",fontFamily:"var(--body)"}}>
+                    <div style={{fontWeight:700,fontSize:14,color:"var(--black)"}}>{pred.structured_formatting?.main_text||pred.description}</div>
+                    <div style={{fontSize:12,color:"var(--text-muted)",marginTop:2}}>{pred.structured_formatting?.secondary_text||""}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Auto-filled fields — show after place selected */}
+          {placeSelected&&(
+            <div style={{background:"var(--surface2)",borderRadius:12,padding:"12px 14px",marginBottom:10,border:"1.5px solid var(--border-col)"}}>
+              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Auto-filled from Google</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+                <div><div style={{fontSize:10,color:"#aaa",fontFamily:"var(--body)",fontWeight:700}}>NAME</div><div style={{fontSize:13,fontFamily:"var(--body)",color:"var(--black)",fontWeight:600}}>{form.name||"—"}</div></div>
+                <div><div style={{fontSize:10,color:"#aaa",fontFamily:"var(--body)",fontWeight:700}}>DISTRICT</div><div style={{fontSize:13,fontFamily:"var(--body)",color:"var(--black)",fontWeight:600}}>{form.district||"—"}</div></div>
+                <div style={{gridColumn:"1/-1"}}><div style={{fontSize:10,color:"#aaa",fontFamily:"var(--body)",fontWeight:700}}>ADDRESS</div><div style={{fontSize:13,fontFamily:"var(--body)",color:"var(--black)",fontWeight:600}}>{form.address||"—"}</div></div>
+                {form.city_name&&<div><div style={{fontSize:10,color:"#aaa",fontFamily:"var(--body)",fontWeight:700}}>CITY</div><div style={{fontSize:13,fontFamily:"var(--body)",color:"var(--black)",fontWeight:600}}>{form.city_name}</div></div>}
+                {form.country&&<div><div style={{fontSize:10,color:"#aaa",fontFamily:"var(--body)",fontWeight:700}}>COUNTRY</div><div style={{fontSize:13,fontFamily:"var(--body)",color:"var(--black)",fontWeight:600}}>{form.country}</div></div>}
+              </div>
+            </div>
+          )}
+
+          {/* Duplicate warning */}
+          {duplicates.length>0&&(
+            <div style={{background:"#FFF3CD",border:"1.5px solid #FFD966",borderRadius:10,padding:"10px 14px",marginBottom:10,animation:"fadeUp .2s ease both"}}>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"#664D03",marginBottom:6}}>⚠️ similar venue already exists</div>
+              {duplicates.map(d=>(
+                <div key={d.id} style={{fontFamily:"var(--body)",fontSize:13,fontWeight:600,color:"#664D03",marginBottom:2}}>
+                  {d.name} — District {d.district} <span style={{opacity:.6}}>({d.status})</span>
+                </div>
+              ))}
+              <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",marginTop:6}}>{t("scout.sure_different")}</div>
+            </div>
+          )}
+
+          {/* District override — editable if needed */}
           <select style={selectStyle} value={form.district} onChange={e=>setF("district",e.target.value)}>
             <option value="">{t("opt.select_district")}</option>
             {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
