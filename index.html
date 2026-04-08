@@ -5046,12 +5046,14 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         {[["name","Name *"],["address","Address *"],["google_maps_url","Google Maps URL"],["instagram_url","Instagram URL"],["reservation_url","Reservation URL"]].map(([k,p])=>(
           <input key={k} style={inputStyle} placeholder={p} value={editForm[k]} onChange={e=>setEditForm(f=>({...f,[k]:e.target.value}))}/>
         ))}
-        <select style={selectStyle} value={editForm.district||""} onChange={e=>setEditForm(f=>({...f,district:e.target.value}))}>
-          <option value="">{t("opt.select_district")}</option>
-          {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
-            <option key={d} value={d}>District {d}.</option>
-          ))}
-        </select>
+        {(!editForm.city_name || editForm.city_name === "Budapest") && (
+          <select style={selectStyle} value={editForm.district||""} onChange={e=>setEditForm(f=>({...f,district:e.target.value}))}>
+            <option value="">{t("opt.select_district")}</option>
+            {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
+              <option key={d} value={d}>District {d}.</option>
+            ))}
+          </select>
+        )}
         <select style={selectStyle} value={editForm.category} onChange={e=>{setEditForm(f=>({...f,category:e.target.value,subcategory:""}));loadCustomTagsForCategory(e.target.value);}}>
           <option value="">{t("opt.select_category")}</option>
           {CATEGORIES.map(c=><option key={c} value={c}>{tCat(c)}</option>)}
@@ -5274,8 +5276,8 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
             </div>
           )}
 
-          {/* District — only for Budapest */}
-          {(!form.city_name || form.city_name === "Budapest") && (
+          {/* District — only for Budapest, only after place selected */}
+          {placeSelected && (!form.city_name || form.city_name === "Budapest") && (
             <select style={selectStyle} value={form.district} onChange={e=>setF("district",e.target.value)}>
               <option value="">{t("opt.select_district")}</option>
               {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
@@ -5737,12 +5739,14 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
           ["reservation_url","Reservation URL"],["website_url","Website URL"]].map(([k,p])=>(
           <input key={k} style={inputStyle} placeholder={p} value={editForm[k]||""} onChange={e=>setEditForm(f=>({...f,[k]:e.target.value}))}/>
         ))}
-        <select style={selectStyle} value={editForm.district||""} onChange={e=>setEditForm(f=>({...f,district:e.target.value}))}>
-          <option value="">{t("opt.select_district")}</option>
-          {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
-            <option key={d} value={d}>District {d}.</option>
-          ))}
-        </select>
+        {(!editForm.city_name || editForm.city_name === "Budapest") && (
+          <select style={selectStyle} value={editForm.district||""} onChange={e=>setEditForm(f=>({...f,district:e.target.value}))}>
+            <option value="">{t("opt.select_district")}</option>
+            {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
+              <option key={d} value={d}>District {d}.</option>
+            ))}
+          </select>
+        )}
         <select style={selectStyle} value={editForm.category||""} onChange={e=>setEditForm(f=>({...f,category:e.target.value,subcategory:""}))}>
           <option value="">{t("opt.select_category")}</option>
           {CATEGORIES.map(c=><option key={c} value={c}>{tCat(c)}</option>)}
