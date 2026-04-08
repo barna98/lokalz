@@ -5774,74 +5774,128 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         <div className="scroll" style={{padding:"14px 20px 80px"}}>
           {pending.length===0
             ?<div className="empty"><div className="empty-icon">✅</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("cl.no_pending")}</div></div>
-            :pending.map(v=>(
-              <div key={v.id} className="admin-card" style={{marginBottom:12}}>
-                <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:6,cursor:"pointer"}} onClick={()=>setExpandedVenue(expandedVenue===v.id?null:v.id)}>
-                  <div style={{flex:1,marginRight:8}}>
-                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16}}>{v.name}</div>
-                    <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600,marginTop:2}}>{v.address} · {v.cuisine}</div>
-                  </div>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <StatusPill status={v.status}/>
-                    <span style={{color:"var(--text-muted)",fontSize:16}}>{expandedVenue===v.id?"▲":"▼"}</span>
-                  </div>
-                </div>
-                {expandedVenue===v.id&&(
-                  <div style={{background:"var(--surface2)",borderRadius:10,padding:"12px 14px",marginBottom:10,animation:"fadeUp .15s ease both"}}>
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:10}}>
-                      <div><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa"}}>CATEGORY</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>{v.category||v.cuisine}</div></div>
-                      <div><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa"}}>DISTRICT</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>Dist. {v.district}</div></div>
-                      <div><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa"}}>PRICE</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>{v.price_level||v.price}</div></div>
-                      <div><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa"}}>CAPACITY</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>{v.capacity||"—"}</div></div>
+            :pending.map(v=>{
+              const scout = v.scout;
+              const daysAgo = v.created_at ? Math.floor((Date.now()-new Date(v.created_at))/(1000*60*60*24)) : null;
+              const timeAgo = daysAgo===0?"today":daysAgo===1?"yesterday":`${daysAgo}d ago`;
+              return (
+              <div key={v.id} style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:20,marginBottom:14,overflow:"hidden"}}>
 
-                      <div><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa"}}>SCOUT</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>{v.scout_alias||"—"}</div></div>
+                {/* Header — always visible */}
+                <div style={{padding:"16px 16px 12px"}}>
+                  {/* Scout row */}
+                  <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+                    <div style={{width:36,height:36,borderRadius:"50%",background:"var(--surface2)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,position:"relative"}}>
+                      {scout?.profile_image
+                        ?<ShimmerImg src={scout.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                        :"👤"}
                     </div>
-                    <div style={{marginBottom:8}}><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa",marginBottom:3}}>ADDRESS</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>{v.address}</div></div>
-                    <div style={{marginBottom:8}}><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"#aaa",marginBottom:3}}>WHY LOCALS GO HERE</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",lineHeight:1.5}}>{v.why}</div></div>
-                    {v.occasions?.length>0&&<div style={{marginBottom:8}}><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>OCCASIONS</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{v.occasions.map(o=><span key={o} style={{background:"var(--surface3)",borderRadius:20,padding:"3px 10px",fontFamily:"var(--body)",fontSize:11,color:"var(--black)"}}>{o}</span>)}</div></div>}
-                    {v.tags?.length>0&&<div style={{marginBottom:6}}><div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--text-muted)",marginBottom:4}}>{t("cl.tags")}</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{v.tags.map(t=><span key={t} style={{background:"var(--surface3)",borderRadius:20,padding:"3px 10px",fontFamily:"var(--body)",fontSize:11,color:"var(--black)"}}>{t}</span>)}</div></div>}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"var(--black)",display:"flex",alignItems:"center",gap:6}}>
+                        {scout?.name||v.scout_alias||"Unknown scout"}
+                        {scout?.badge&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"var(--text-muted)"}}>· {scout.badge}</span>}
+                      </div>
+                      <div style={{fontFamily:"var(--body)",fontSize:11,color:"var(--text-muted)",marginTop:1}}>submitted {timeAgo}</div>
+                    </div>
+                    <StatusPill status={v.status}/>
+                  </div>
+
+                  {/* Venue info */}
+                  <div style={{marginBottom:10}}>
+                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:17,color:"var(--black)",marginBottom:3}}>{v.name}</div>
+                    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                      {v.category&&<span style={{background:"var(--surface2)",borderRadius:20,padding:"2px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--black)"}}>{v.category}</span>}
+                      {v.district&&<span style={{background:"var(--surface2)",borderRadius:20,padding:"2px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--black)"}}>Dist. {v.district}</span>}
+                      {v.price_level&&<span style={{background:"var(--surface2)",borderRadius:20,padding:"2px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--black)"}}>{v.price_level}</span>}
+                    </div>
+                  </div>
+
+                  {/* Address */}
+                  {v.address&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginBottom:8}}>📍 {v.address}</div>}
+
+                  {/* Why locals go here preview */}
+                  {v.why&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)",lineHeight:1.5,fontStyle:"italic",borderLeft:"3px solid var(--red)",paddingLeft:10,marginBottom:10}}>
+                    "{v.why.slice(0,140)}{v.why.length>140?"...":""}"
+                  </div>}
+
+                  {/* Edit comment if needs_edit */}
+                  {v.status==="needs_edit"&&v.edit_comment&&(
+                    <div style={{background:"#FFF3CD",borderRadius:8,padding:"8px 12px",marginBottom:10,fontFamily:"var(--body)",fontSize:12,color:"#664D03"}}>
+                      ✏️ Edit requested: "{v.edit_comment}"
+                    </div>
+                  )}
+
+                  {/* Expand toggle */}
+                  <button onClick={()=>setExpandedVenue(expandedVenue===v.id?null:v.id)}
+                    style={{background:"none",border:"none",padding:0,fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:700,cursor:"pointer"}}>
+                    {expandedVenue===v.id?"▲ hide details":"▼ show full details"}
+                  </button>
+                </div>
+
+                {/* Expanded details */}
+                {expandedVenue===v.id&&(
+                  <div style={{background:"var(--surface2)",padding:"12px 16px",borderTop:"1px solid var(--border-col)",animation:"fadeUp .15s ease both"}}>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+                      {v.cuisine&&<div><div style={{fontFamily:"var(--body)",fontSize:10,fontWeight:700,color:"#aaa",letterSpacing:".06em"}}>CUISINE</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>{v.cuisine}</div></div>}
+                      {v.capacity&&<div><div style={{fontFamily:"var(--body)",fontSize:10,fontWeight:700,color:"#aaa",letterSpacing:".06em"}}>CAPACITY</div><div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)"}}>{v.capacity}</div></div>}
+                    </div>
+                    {v.occasions?.length>0&&<div style={{marginBottom:8}}>
+                      <div style={{fontFamily:"var(--body)",fontSize:10,fontWeight:700,color:"#aaa",letterSpacing:".06em",marginBottom:4}}>OCCASIONS</div>
+                      <div style={{display:"flex",flexWrap:"wrap",gap:4}}>{v.occasions.map(o=><span key={o} style={{background:"var(--surface3)",borderRadius:20,padding:"3px 10px",fontFamily:"var(--body)",fontSize:11,color:"var(--black)"}}>{o}</span>)}</div>
+                    </div>}
+                    {v.tags?.length>0&&<div style={{marginBottom:8}}>
+                      <div style={{fontFamily:"var(--body)",fontSize:10,fontWeight:700,color:"#aaa",letterSpacing:".06em",marginBottom:4}}>TAGS</div>
+                      <div style={{display:"flex",flexWrap:"wrap",gap:4}}>{v.tags.map(tag=><span key={tag} style={{background:"var(--surface3)",borderRadius:20,padding:"3px 10px",fontFamily:"var(--body)",fontSize:11,color:"var(--black)"}}>{tag}</span>)}</div>
+                    </div>}
+                    {v.dietary?.length>0&&<div style={{marginBottom:8}}>
+                      <div style={{fontFamily:"var(--body)",fontSize:10,fontWeight:700,color:"#aaa",letterSpacing:".06em",marginBottom:4}}>DIETARY</div>
+                      <div style={{display:"flex",flexWrap:"wrap",gap:4}}>{v.dietary.map(d=><span key={d} style={{background:"var(--surface3)",borderRadius:20,padding:"3px 10px",fontFamily:"var(--body)",fontSize:11,color:"var(--black)"}}>{d}</span>)}</div>
+                    </div>}
                     {v.google_maps_url&&<a href={v.google_maps_url} target="_blank" rel="noreferrer" style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",display:"block",marginTop:4}}>📍 View on Google Maps</a>}
                   </div>
                 )}
+
+                {/* Request edit input */}
                 {showEditFor===v.id&&(
-                  <div style={{marginBottom:10,animation:"fadeUp .2s ease both"}}>
+                  <div style={{padding:"0 16px 12px",animation:"fadeUp .2s ease both"}}>
                     <textarea
                       value={editComment[v.id]||""}
                       onChange={e=>setEditComment(prev=>({...prev,[v.id]:e.target.value}))}
                       placeholder={t("cl.edit_placeholder")}
                       rows={3}
-                      style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"10px 12px",fontFamily:"var(--body)",fontSize:13,fontWeight:600,resize:"none",outline:"none",marginBottom:6}}
+                      style={{width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"10px 12px",fontFamily:"var(--body)",fontSize:13,fontWeight:400,resize:"none",outline:"none",marginBottom:8,boxSizing:"border-box"}}
                     />
                     <div style={{display:"flex",gap:8}}>
-                      <button style={{flex:1,background:"#FFF3CD",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#664D03",cursor:"pointer"}} onClick={()=>sendEdit(v.id)}>{t("cl.send_to_scout")}</button>
-                      <button style={{background:"var(--surface3)",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"var(--text-muted)",cursor:"pointer"}} onClick={()=>setShowEditFor(null)}>{t("vd.cancel")}</button>
+                      <button style={{flex:1,background:"#FFF3CD",border:"none",borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#664D03",cursor:"pointer"}} onClick={()=>sendEdit(v.id)}>{t("cl.send_to_scout")}</button>
+                      <button style={{background:"var(--surface2)",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"10px 14px",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"var(--text-muted)",cursor:"pointer"}} onClick={()=>setShowEditFor(null)}>cancel</button>
                     </div>
                   </div>
                 )}
-                <div style={{display:"flex",gap:8,marginTop:showEditFor===v.id?0:10,flexWrap:"wrap"}}>
-                  {v.status!=="rejected"&&<button style={{background:"#D1E7DD",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#0A3622",cursor:"pointer"}} onClick={()=>updateStatus(v.id,"active")}>✓ Approve</button>}
-                  {showEditFor!==v.id&&v.status!=="rejected"&&<button style={{background:"#FFF3CD",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#664D03",cursor:"pointer"}} onClick={()=>setShowEditFor(v.id)}>✏ Request edit</button>}
-                  {v.status!=="rejected"&&<button style={{background:"#F8D7DA",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#58151C",cursor:"pointer"}} onClick={async()=>{
-                    if(window.confirm(`Reject "${v.name}"? This will move it to the rejected list.`)) await updateStatus(v.id,"rejected");
+
+                {/* Action buttons — always visible at bottom */}
+                <div style={{display:"flex",gap:0,borderTop:"1px solid var(--border-col)"}}>
+                  {v.status!=="rejected"&&<button style={{flex:1,background:"none",border:"none",borderRight:"1px solid var(--border-col)",padding:"12px 8px",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#0A3622",cursor:"pointer"}} onClick={()=>updateStatus(v.id,"active")}>✓ Approve</button>}
+                  {showEditFor!==v.id&&v.status!=="rejected"&&<button style={{flex:1,background:"none",border:"none",borderRight:"1px solid var(--border-col)",padding:"12px 8px",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#664D03",cursor:"pointer"}} onClick={()=>setShowEditFor(v.id)}>✏ Edit</button>}
+                  {v.status!=="rejected"&&<button style={{flex:1,background:"none",border:"none",padding:"12px 8px",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#58151C",cursor:"pointer"}} onClick={async()=>{
+                    if(window.confirm(`Reject "${v.name}"?`)) await updateStatus(v.id,"rejected");
                   }}>✕ Reject</button>}
                 </div>
               </div>
-            ))
+            )})
           }
           {rejected.length>0&&(
             <div style={{marginTop:16}}>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:10,letterSpacing:".04em"}}>REJECTED ({rejected.length})</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"#888",marginBottom:10,letterSpacing:".06em",textTransform:"uppercase"}}>Rejected ({rejected.length})</div>
               {rejected.map(v=>(
-                <div key={v.id} className="admin-card" style={{marginBottom:10,opacity:0.7}}>
-                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
-                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15}}>{v.name}</div>
-                    <StatusPill status={v.status}/>
+                <div key={v.id} style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:16,marginBottom:10,opacity:0.7,overflow:"hidden"}}>
+                  <div style={{padding:"14px 16px"}}>
+                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",marginBottom:2}}>{v.name}</div>
+                    <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:400}}>{v.address}</div>
                   </div>
-                  <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600,marginBottom:8}}>{v.address}</div>
-                  <div style={{display:"flex",gap:8}}>
-                    <button style={{flex:1,background:"#D1E7DD",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"#0A3622",cursor:"pointer"}} onClick={()=>updateStatus(v.id,"pending")}>↩ Restore</button>
-                    <button style={{flex:1,background:"#58151C",border:"none",borderRadius:8,padding:"8px 14px",fontFamily:"var(--body)",fontWeight:400,fontSize:12,color:"white",cursor:"pointer"}} onClick={()=>{
-                      if(window.confirm(`Permanently delete "${v.name}"? This cannot be undone.`)) deleteVenue(v.id);
+                  <div style={{display:"flex",gap:0,borderTop:"1px solid var(--border-col)"}}>
+                    <button style={{flex:1,background:"none",border:"none",borderRight:"1px solid var(--border-col)",padding:"11px",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#0A3622",cursor:"pointer"}} onClick={()=>updateStatus(v.id,"pending")}>↩ Restore</button>
+                    <button style={{flex:1,background:"none",border:"none",padding:"11px",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#58151C",cursor:"pointer"}} onClick={()=>{
+                      if(window.confirm(`Permanently delete "${v.name}"?`)) deleteVenue(v.id);
                     }}>🗑 Delete</button>
                   </div>
                 </div>
@@ -7706,7 +7760,7 @@ function App() {
     setVenuesLoading(true);
     let query = supabase
       .from("venues")
-      .select("*")
+      .select("*, scout:submitted_by(id,name,badge,role,profile_image)")
       .in("status",["active","pending","needs_edit"]);
     if(cityId) query = query.eq("city_id", cityId);
     const {data, error} = await query;
