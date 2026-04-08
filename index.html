@@ -2479,6 +2479,8 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
         // Semantic results — ordered list of venue IDs by similarity
         semanticVenueIds: Array.isArray(parsed.semanticVenueIds) ? parsed.semanticVenueIds : null,
         similarities: parsed.similarities || {},
+        // Inferred category — used for hard filtering in app
+        inferredCategory: parsed.inferredCategory || null,
         // Hard filters
         category:  VALID_CAT.includes(parsed.category) ? parsed.category : null,
         budget:    VALID_BUD.includes(parsed.budget) ? parsed.budget : null,
@@ -3173,6 +3175,10 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
     if(isAI && semanticIds){
       if(!semanticIds.includes(v.id)) return false;
     }
+    // AI: filter by inferred category (what Claude determined user is looking for)
+    if(isAI && answers.inferredCategory){
+      if(v.category !== answers.inferredCategory) return false;
+    }
     // Hard filters (always applied)
     if(answers.category && v.category!==answers.category) return false;
     const vPrice = (v.price_level||v.price||"").trim();
@@ -3187,7 +3193,6 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
       if(!answers.dietary.some(d=>(v.dietary||[]).includes(d))) return false;
     }
     if(!isAI) {
-      // Only apply these filters in discover flow
       if(answers.occasions?.length>0 && !answers.occasions.some(o=>(v.occasions||[]).includes(o))) return false;
       if(answers.tags?.length>0 && !answers.tags.some(t=>(v.tags||[]).includes(t))) return false;
     }
