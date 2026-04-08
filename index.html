@@ -4587,7 +4587,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     if(!category||!tag) return;
     await supabase.from("category_tags").upsert({category,tag,count:1},{onConflict:"category,tag",ignoreDuplicates:false});
     // increment count
-    await supabase.rpc("increment_tag_count",{p_category:category,p_tag:tag}).then(()=>{}).catch?.(()=>{});
+    // increment_tag_count RPC not used
     setCategoryCustomTags(prev=>({
       ...prev,
       [category]: prev[category] ? [...new Set([...prev[category],tag])] : [tag]
