@@ -482,6 +482,9 @@ applyDarkMode(_dark);
 const LOC_KEY = "lokalz_loc_granted";
 function getStoredLocation(){ return localStorage.getItem(LOC_KEY); }
 function setLocationGranted(v){ localStorage.setItem(LOC_KEY, v?"1":"0"); }
+const CITY_KEY = "lokalz_selected_city";
+function getStoredCity(){ return localStorage.getItem(CITY_KEY)||null; }
+function setStoredCity(c){ if(c) localStorage.setItem(CITY_KEY,c); else localStorage.removeItem(CITY_KEY); }
 
 const TRANSLATIONS = {
   en: {
@@ -4744,15 +4747,16 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
 
   async function submitScoutEdit(){
     setEditSubmitting(true);
-    // Auto-fetch google_place_id if not set
     let placeId = editingVenue.google_place_id||null;
     let lat = editingVenue.latitude||null;
     let lng = editingVenue.longitude||null;
     if(!placeId && editForm.name) {
-      const pd = await fetchPlaceId(editForm.name, editForm.address);
-      placeId = pd?.place_id || null;
-      lat = pd?.latitude || lat;
-      lng = pd?.longitude || lng;
+      try {
+        const pd = await fetchPlaceId(editForm.name, editForm.address);
+        placeId = pd?.place_id || null;
+        lat = pd?.latitude || lat;
+        lng = pd?.longitude || lng;
+      } catch(e) { /* ignore, use existing coords */ }
     }
     const {error} = await supabase.from("venues").update({
       name: editForm.name,
@@ -5111,6 +5115,8 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       setImgFiles([]);
       setImgPreviews([]);
       showToast(t("toast.submitted"));
+      // Auto-generate embedding in background
+      supabase.functions.invoke("generate-embeddings", {body: {}}).catch(()=>{});
       setTab(t("scout.activity"));
     } catch(e){
       setFormError(e.message||"Submit failed. Try again.");
@@ -7969,8 +7975,13 @@ function App() {
   const [allVenues, setAllVenues] = useState([]);
   const [venuesLoading, setVenuesLoading] = useState(true);
   const [answers, setAnswers] = useState({});
-  const [selectedCity, setSelectedCity] = useState(null); // null = all cities
+  const [selectedCity, setSelectedCity] = useState(getStoredCity());
   const [availableCities, setAvailableCities] = useState([]);
+
+  function selectCity(city) {
+    setSelectedCity(city);
+    setStoredCity(city);
+  }
   const [partner, setPartner] = useState(null);
   const [cities, setCities] = useState([]);
 
@@ -8047,17 +8058,14 @@ function App() {
           const cityComp = comps.find(c => c.types.includes("locality")) ||
                            comps.find(c => c.types.includes("administrative_area_level_2"));
           const cityName = cityComp?.long_name;
-          console.log("[detectUserCity] lat:", lat, "lng:", lng, "cityName:", cityName, "comps:", comps.map(c=>c.long_name+"("+c.types.join(",")+")"));
           if(!cityName) return;
 
           const {data: cityData} = await supabase
             .from("cities").select("id,name").eq("name", cityName).single();
 
-          console.log("[detectUserCity] found city:", cityData);
-
           if(cityData) {
             // Always set selectedCity to detected city
-            setSelectedCity(cityData.name);
+            selectCity(cityData.name);
             if(cityData.id !== u.city_id) {
               await supabase.from("users").update({city_id: cityData.id}).eq("id", u.id);
               setUser(prev => ({...prev, city_id: cityData.id}));
@@ -8319,18 +8327,18 @@ function App() {
     q6: <Q6Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user}/>,
     venue: selectedVenue&&<VenueDetailScreen venue={selectedVenue} navigate={navigate} savedIds={savedIds} toggleSave={toggleSave} showToast={showToastMsg} isScout={isScout} user={user} allVenues={allVenues}/>,
-    saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
-    scouts: <ScoutsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
-    all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
-    scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user} cities={cities} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
-    city_lead: <CityLeadScreen navigate={navigate} allVenues={allVenues} setAllVenues={setAllVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
+    saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    scouts: <ScoutsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user} cities={cities} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    city_lead: <CityLeadScreen navigate={navigate} allVenues={allVenues} setAllVenues={setAllVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
     profile: <ProfileScreen navigate={navigate} user={user} setUser={setUser} onMenu={()=>setShowMenu(true)} onSignOut={signOut} cities={cities} lang={lang} changeLang={changeLang} dark={dark} changeDark={changeDark}/>,
     about: <AboutScreen navigate={navigate}/>,
     upgrade: <UpgradeScreen navigate={navigate} user={user}/>,
     event_calendar: <EventCalendarScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
     event_detail: selectedEvent&&<EventDetailScreen navigate={navigate} event={selectedEvent} user={user} showToast={showToastMsg}/>,
     event_plan_detail: selectedPlan&&<EventPlanDetailScreen navigate={navigate} plan={selectedPlan} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
-    scout_profile: selectedScout&&<ScoutProfileScreen navigate={navigate} scoutId={selectedScout} allVenues={allVenues} savedIds={savedIds} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={setSelectedCity}/>,
+    scout_profile: selectedScout&&<ScoutProfileScreen navigate={navigate} scoutId={selectedScout} allVenues={allVenues} savedIds={savedIds} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
     results_list: (()=>{
       const listData = selectedVenue||{};
       const listVenues = listData.venues||[];
