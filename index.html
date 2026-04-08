@@ -7980,12 +7980,11 @@ function App() {
     setVenuesLoading(true);
     const isCityLead = userRole==="CITY_LEAD"||userRole==="city_lead";
 
-    // Active venues — filtered by city
+    // Active venues — ALL cities globally (for map + city picker)
     let activeQuery = supabase
       .from("venues")
       .select("*, scout:submitted_by(id,name,badge,role,profile_image)")
       .eq("status","active");
-    if(cityId) activeQuery = activeQuery.eq("city_id", cityId);
 
     // Pending/needs_edit — ALL cities for city leads, own city for others
     let pendingQuery = supabase
@@ -8038,9 +8037,15 @@ function App() {
           const {data: cityData} = await supabase
             .from("cities").select("id,name").eq("name", cityName).single();
 
-          if(cityData && cityData.id !== u.city_id) {
-            await supabase.from("users").update({city_id: cityData.id}).eq("id", u.id);
-            setUser(prev => ({...prev, city_id: cityData.id}));
+          console.log("[detectUserCity] found city:", cityData);
+
+          if(cityData) {
+            // Always set selectedCity to detected city
+            setSelectedCity(cityData.name);
+            if(cityData.id !== u.city_id) {
+              await supabase.from("users").update({city_id: cityData.id}).eq("id", u.id);
+              setUser(prev => ({...prev, city_id: cityData.id}));
+            }
           }
         });
         return true;
