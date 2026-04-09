@@ -4139,10 +4139,9 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           <span style={{fontSize:16,flexShrink:0,marginTop:1}}>📍</span>
           <div>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"var(--text-muted)",lineHeight:1.5}}>{venue.address}</div>
-            {venue.district
-              : null}
-            {venueLocation(venue)&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>{venueLocation(venue)}{venue.country&&!venue.district?`, ${venue.country}`:""}</div>
-            }
+            {venueLocation(venue)&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>
+              {venueLocation(venue)}{venue.district?`, ${t("venue.dist_label")} ${venue.district}`:""}
+            </div>}
           </div>
         </div>
 
