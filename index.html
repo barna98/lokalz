@@ -2738,9 +2738,9 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
 
   return (
     <div className="screen">
-      <div style={{padding:"20px 28px 0",display:"flex",alignItems:"center"}}>
+      <div style={{padding:"36px 28px 0",display:"flex",alignItems:"center"}}>
       </div>
-      <div className="scroll" style={{padding:"20px 28px 0"}}>
+      <div className="scroll" style={{padding:"36px 28px 0"}}>
         <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none"}}>LOKAL&#39;Z</div>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:0}}>{t("onboard.beyond")}</div>
 
@@ -2992,12 +2992,12 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
           </div>
         </div>
-      </div>
       <QProgress step="q1"/>
+      </div>
       <div style={{padding:"8px 20px 12px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q1.title")}</div>
       </div>
-      <div className="scroll" style={{padding:"0 20px 100px"}}>
+      <div className="scroll" style={{padding:"20px 20px 100px"}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           {CATS.map(c=>(
             <div key={c.id} onClick={()=>{haptic("light");setSel(c.id);}}
@@ -3090,9 +3090,9 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
           </div>
         </div>
-      </div>
       <QProgress step="q2"/>
-      <div className="scroll" style={{padding:"8px 20px 100px"}}>
+      </div>
+      <div className="scroll" style={{padding:"20px 20px 100px"}}>
         {/* Occasions */}
         <div style={{marginBottom:24}}>
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8,marginBottom:12}}>{t("q2.mood")}</div>
@@ -3204,12 +3204,12 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
           </div>
         </div>
-      </div>
       <QProgress step="q3"/>
+      </div>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q3.where_city")}</div>
       </div>
-      <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
+      <div className="scroll" style={{padding:"20px 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
         <button onClick={detectLocation}
           style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--red)":"var(--surface)",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid "+(sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--red)":"var(--border-col)")}}>
           <span>{locLoading?t("q.locating"):t("q.detect_location")}</span>
@@ -3289,12 +3289,12 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
             </div>
         </div>
-      </div>
       <QProgress step="q4"/>
+      </div>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q4.damage")}</div>
       </div>
-      <div style={{padding:"20px 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
+      <div style={{padding:"36px 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
         {BUDGETS.map(b=>(
           <button key={b} style={{...PILL,background:sel.includes(b)?"var(--red)":"var(--surface)",color:sel.includes(b)?"white":"var(--black)",borderColor:sel.includes(b)?"var(--red)":"var(--border-col)"}} onClick={()=>toggle(b)}>
             <span>{b}</span>{sel.includes(b)&&<span>✓</span>}
@@ -3323,12 +3323,12 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
             </div>
         </div>
-      </div>
       <QProgress step="q5"/>
+      </div>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q5.craving")}</div>
       </div>
-      <div className="scroll" style={{padding:"0 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
+      <div className="scroll" style={{padding:"20px 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
         {CUISINES.map(x=>(
           <button key={x} style={{...PILL,background:sel.includes(x)?"var(--red)":"var(--surface)",color:sel.includes(x)?"white":"var(--black)",borderColor:sel.includes(x)?"var(--red)":"var(--border-col)"}} onClick={()=>toggle(x)}>
             <span>{tCui(x)}</span>{sel.includes(x)&&<span>✓</span>}
@@ -3356,12 +3356,12 @@ function Q6Screen({navigate, onMenu, answers, setAnswers}) {
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
             </div>
         </div>
-      </div>
       <QProgress step="q6"/>
+      </div>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q4.how_many")}</div>
       </div>
-      <div style={{padding:"20px 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
+      <div style={{padding:"36px 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
         {[["2","2"],["3-6","3-6"],["6-8","6-8"],["9+","9+"],["solo","solo mission"]].map(([val,label])=>(
           <button key={val} style={{...PILL,background:answers.group===val?"var(--red)":"var(--surface)",color:answers.group===val?"white":"var(--black)",borderColor:answers.group===val?"var(--red)":"var(--border-col)"}} onClick={()=>select(val)}>{label}</button>
         ))}
@@ -3595,7 +3595,7 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
           </div>
         </div>
       )}
-      <div className="scroll" style={{padding:"20px 20px 80px"}} ref={pullRef}
+      <div className="scroll" style={{padding:"36px 20px 80px"}} ref={pullRef}
         onTouchStart={onPullStart} onTouchMove={onPullMove} onTouchEnd={onPullEnd}>
         {(pullDist>0||refreshing)&&(
           <div style={{textAlign:"center",padding:"8px",fontFamily:"var(--body)",fontSize:13,color:"#888",transform:`translateY(${pullDist}px)`,transition:pullDist===0?"all .3s":"none"}}>
@@ -4402,7 +4402,7 @@ function FeedScreen({navigate, user, allVenues}) {
         </div>
       </div>
 
-      <div className="scroll" style={{padding:"24px 16px 80px"}}>
+      <div className="scroll" style={{padding:"36px 16px 80px"}}>
         {loading&&(
           <div style={{display:"flex",justifyContent:"center",padding:40}}>
             <div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
@@ -4541,7 +4541,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
     <div className="screen" style={{background:"var(--bg)"}}>
       <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button className="back-btn" onClick={()=>navigate(-1)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button className="back-btn" onClick={()=>{onMenu&&onMenu();}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("saved.title2")}</div>
@@ -4563,7 +4563,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
       </div>
 
       {tab==="places"&&(
-        <div className="scroll" style={{padding:"32px 20px 80px"}}>
+        <div className="scroll" style={{padding:"36px 20px 80px"}}>
           {saved.length===0
             ?<div className="empty">
                 <div className="empty-icon">🤍</div>
@@ -4581,7 +4581,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
       )}
 
       {tab==="scouts"&&(
-        <div className="scroll" style={{padding:"28px 20px 80px"}}>
+        <div className="scroll" style={{padding:"36px 20px 80px"}}>
           {!isPremium
             ?<div style={{textAlign:"center",padding:"48px 20px"}}>
                 <div style={{fontSize:44,marginBottom:12}}>👤</div>
@@ -4723,11 +4723,9 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
 
 
   const active = allVenues.filter(v=>v.status==="active");
-  // List view: filter by selectedCity. Map view: all venues
+  // List view: filter by selectedCity if set, otherwise show all. Map view: all venues
   const cityFiltered = viewMode==="list"
-    ? (selectedCity
-        ? active.filter(v=>v.city_name===selectedCity)
-        : (user?.city_id ? active.filter(v=>v.city_id===user.city_id) : active))
+    ? (selectedCity ? active.filter(v=>v.city_name===selectedCity) : active)
     : active;
   const filtered=cityFiltered.filter(v=>{
     if(search){
@@ -4924,7 +4922,7 @@ function ScoutEventsTab({user, allVenues, showToast}) {
   const inputStyle = {width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,outline:"none",background:"var(--surface)",color:"var(--black)",marginBottom:10};
 
   return (
-    <div className="scroll" style={{padding:"28px 20px 80px"}}>
+    <div className="scroll" style={{padding:"36px 20px 80px"}}>
       <button className="btn-black" style={{marginBottom:16}} onClick={()=>setShowCreate(v=>!v)}>
         {showCreate?t("btn.cancel"):t("btn.add_event")}
       </button>
@@ -5608,7 +5606,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       <div style={{padding:"8px 20px 12px",background:"#FFF3CD",borderRadius:0}}>
         <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#664D03"}}>✏ {editingVenue.edit_comment||"Edit requested by city lead"}</div>
       </div>
-      <div className="scroll" style={{padding:"28px 20px 80px"}}>
+      <div className="scroll" style={{padding:"36px 20px 80px"}}>
         {[["name","Name *"],["address","Address *"],["google_maps_url","Google Maps URL"],["instagram_url","Instagram URL"],["reservation_url","Reservation URL"]].map(([k,p])=>(
           <input key={k} style={inputStyle} placeholder={p} value={editForm[k]} onChange={e=>setEditForm(f=>({...f,[k]:e.target.value}))}/>
         ))}
@@ -5791,7 +5789,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       </div>
 
       {tab==="add"&&(
-        <div className="scroll" style={{padding:"28px 20px 80px"}}>
+        <div className="scroll" style={{padding:"36px 20px 80px"}}>
           <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",marginBottom:14}}>{t("scout.submit_new")}</div>
 
           {/* Google Places Autocomplete search / Manual mode toggle */}
@@ -6071,7 +6069,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         <ScoutEventsTab user={user} allVenues={allVenues} showToast={showToast}/>
       )}
       {tab==="activity"&&(
-        <div className="scroll" style={{padding:"28px 20px 80px"}} ref={scoutScrollRef}
+        <div className="scroll" style={{padding:"36px 20px 80px"}} ref={scoutScrollRef}
           onScroll={e=>saveScroll("scout",e.currentTarget)}>
           <div style={{display:"flex",gap:12,marginBottom:20}}>
             {[["✅",t("scout.approved"),myVenues.filter(v=>v.status==="active").length],["⏳",t("status.pending"),myVenues.filter(v=>v.status==="pending").length]].map(([ico,label,count])=>(
@@ -6400,7 +6398,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--red)"}}>EDIT VENUE</div>
         <div style={{width:26}}/>
       </div>
-      <div className="scroll" style={{padding:"28px 20px 80px"}}>
+      <div className="scroll" style={{padding:"36px 20px 80px"}}>
         {[["name","Name *"],["address","Address *"],["scout_alias","Scout alias"],
           ["google_maps_url","Google Maps URL"],["instagram_url","Instagram URL"],
           ["reservation_url","Reservation URL"],["website_url","Website URL"]].map(([k,p])=>(
@@ -6584,7 +6582,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       </div>
       {tab==="pending"&&(
-        <div className="scroll" style={{padding:"28px 20px 80px"}}>
+        <div className="scroll" style={{padding:"36px 20px 80px"}}>
           {pending.length===0
             ?<div className="empty"><div className="empty-icon">✅</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("cl.no_pending")}</div></div>
             :pending.map(v=>{
@@ -6718,7 +6716,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       )}
       {tab==="all"&&(
-        <div className="scroll" style={{padding:"28px 20px 80px"}} ref={clScrollRef}
+        <div className="scroll" style={{padding:"36px 20px 80px"}} ref={clScrollRef}
           onScroll={e=>saveScroll("cityLead",e.currentTarget)}>
           <div style={{marginBottom:12,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"var(--text-muted)"}}>
@@ -6806,7 +6804,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       )}
       {tab==="reports"&&(
-        <div className="scroll" style={{padding:"28px 20px 80px"}}>
+        <div className="scroll" style={{padding:"36px 20px 80px"}}>
           {reports.length===0
             ?<div className="empty"><div className="empty-icon">🚩</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>No reports yet.</div></div>
             :Object.entries(
@@ -6846,7 +6844,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       )}
       {tab==="events"&&(
-        <div className="scroll" style={{padding:"28px 20px 80px"}}>
+        <div className="scroll" style={{padding:"36px 20px 80px"}}>
           {pendingEvents.length===0
             ?<div className="empty"><div className="empty-icon">🗓</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("cl.no_pending_events")}</div></div>
             :pendingEvents.map(ev=>(
@@ -6910,7 +6908,7 @@ function PartnerManageTab({showToast, cityId}) {
   }
 
   return (
-    <div className="scroll" style={{padding:"28px 20px 80px"}}>
+    <div className="scroll" style={{padding:"36px 20px 80px"}}>
       {partners.length===0
         ?<div className="empty"><div className="empty-icon">🏨</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>No partners yet.</div></div>
         :partners.map(p=>(
@@ -7044,7 +7042,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
           </div>
         </div>
       </div>
-      <div className="scroll" style={{padding:"32px 20px 80px",background:"var(--bg)",flex:1}}>
+      <div className="scroll" style={{padding:"36px 20px 80px",background:"var(--bg)",flex:1}}>
 
         {/* Profile card */}
         <div style={{background:"var(--surface)",borderRadius:20,padding:"20px",marginBottom:16,border:"1.5px solid var(--border-col)"}}>
@@ -7328,7 +7326,7 @@ function ScoutsScreen({navigate, onMenu, user, selectedCity, availableCities, on
         </div>
       </div>
 
-      <div className="scroll" style={{padding:"20px 20px 80px"}}>
+      <div className="scroll" style={{padding:"36px 20px 80px"}}>
         {loading&&<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>}
         {!loading&&filtered.length===0&&<div style={{textAlign:"center",padding:32,fontFamily:"var(--body)",fontSize:14,color:"var(--text-muted)"}}>{t("sc.no_scouts")}</div>}
         {filtered.map(s=>(
@@ -7850,7 +7848,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
         ? <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
             <div style={{width:28,height:28,border:"2.5px solid var(--surface3)",borderTop:"2.5px solid black",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
           </div>
-        : <div className="scroll" style={{padding:"32px 20px 80px"}}>
+        : <div className="scroll" style={{padding:"36px 20px 80px"}}>
             {tab==="my"&&!isPremium&&(
               <div style={{textAlign:"center",padding:"40px 20px"}}>
                 <div style={{fontFamily:"var(--body)",fontSize:14,color:"#888",marginBottom:16}}>{t("ev.upgrade_rsvp")}</div>
@@ -8026,7 +8024,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
         ? <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
             <div style={{width:32,height:32,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
           </div>
-        : <div className="scroll" style={{padding:"0 20px 100px"}}>
+        : <div className="scroll" style={{padding:"20px 20px 100px"}}>
             {myPlans.length===0&&invited.length===0&&(
               <div className="empty" style={{paddingTop:32}}>
                 <div className="empty-icon">🎉</div>
@@ -8304,7 +8302,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--red)",letterSpacing:".04em"}}>{t("ev.event")}</div>
         <div style={{width:26}}/>
       </div>
-      <div className="scroll" style={{padding:"24px 24px 80px"}}>
+      <div className="scroll" style={{padding:"36px 24px 80px"}}>
 
         <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:26,color:"var(--black)",marginBottom:8}}>{currentPlan.title}</div>
         <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:700,color:"var(--red)",marginBottom:6}}>📅 {formatDate(currentPlan.event_date)}</div>
@@ -8937,7 +8935,7 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="scroll" style={{padding:"20px 20px 80px"}}>
+          <div className="scroll" style={{padding:"36px 20px 80px"}}>
             {listVenues.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)}
           </div>
         </div>
