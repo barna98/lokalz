@@ -1982,7 +1982,7 @@ function NavIcon({id, active}) {
   const s = {display:"block"};
   if(id==="home") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>;
   if(id==="q1") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>;
-  if(id==="saved") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill={active?"white":"none"} stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>;
+  if(id==="feed") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>;
   if(id==="all_venues") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>;
   if(id==="menu") return <svg style={s} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>;
   return null;
@@ -2061,7 +2061,7 @@ function BottomNav({screen, navigate, onMenu, menuOpen, answers}) {
   const tabs = [
     {id:"home",       label:t("nav.home")},
     {id:"q1",         label:t("nav.discover")},
-    {id:"saved",      label:t("nav.saved")},
+    {id:"feed",       label:"feed"},
     {id:"all_venues", label:t("nav.all_venues")},
     {id:"menu",       label:t("nav.menu")},
   ];
@@ -2101,6 +2101,7 @@ function Menu({onClose, navigate, role, onSignOut}) {
 
       <div style={{display:"flex",flexDirection:"column",gap:0,paddingLeft:8}}>
         <div style={itemStyle} onClick={()=>{navigate("profile",null,{replace:true});onClose();}}>{t("menu.profile")}</div>
+        <div style={itemStyle} onClick={()=>{navigate("saved",null,{replace:true});onClose();}}>saved</div>
         <div style={itemStyle} onClick={()=>{navigate("scouts",null,{replace:true});onClose();}}>{t("menu.scouts2")}</div>
         <div style={itemStyle} onClick={()=>{navigate("event_calendar",null,{replace:true});onClose();}}>{t("menu.events")}</div>
         {role==="explorer"&&(
@@ -3723,8 +3724,20 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
   const [imagesFetched,setImagesFetched]=useState(false);
   const [galleryLoaded,setGalleryLoaded]=useState(false);
   const [localSaved, setLocalSaved] = useState(savedIds.has(venue.id));
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   React.useEffect(()=>{ setLocalSaved(savedIds.has(venue.id)); },[savedIds, venue.id]);
   React.useEffect(()=>{ setGalleryLoaded(false); },[imgIdx]);
+
+  // Load like state
+  React.useEffect(()=>{
+    supabase.from("venue_likes").select("id", {count:"exact",head:true}).eq("venue_id",venue.id)
+      .then(({count})=>setLikeCount(count||0));
+    if(user?.id){
+      supabase.from("venue_likes").select("id").eq("venue_id",venue.id).eq("user_id",user.id).single()
+        .then(({data})=>setLiked(!!data));
+    }
+  },[venue.id]);
   const openStatus = useOpenStatus(venue.google_place_id);
   const [openHours, setOpenHours] = React.useState(null);
   React.useEffect(()=>{
@@ -3768,6 +3781,19 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         setVotes(v);
       });
   },[venue.id,user?.id]);
+
+  async function toggleLike(){
+    if(!user?.id) return;
+    if(liked){
+      await supabase.from("venue_likes").delete().eq("venue_id",venue.id).eq("user_id",user.id);
+      setLiked(false);
+      setLikeCount(c=>Math.max(0,c-1));
+    } else {
+      await supabase.from("venue_likes").insert({venue_id:venue.id,user_id:user.id});
+      setLiked(true);
+      setLikeCount(c=>c+1);
+    }
+  }
 
   async function submitVote(type){
     if(!user?.id||votingLoading) return;
@@ -4036,10 +4062,17 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
 
         {/* Fixed overlay buttons — always visible */}
         <button className="back-btn" style={{position:"fixed",top:16,left:16,background:"rgba(0,0,0,.5)",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",color:"white",fontSize:22,zIndex:200,backdropFilter:"blur(4px)"}} onClick={()=>navigate(-1)}>‹</button>
-        <button onClick={()=>{haptic("medium");setLocalSaved(s=>!s);toggleSave(venue.id);showToast(saved?t("toast.removed"):t("toast.saved"));}}
-          style={{position:"fixed",top:16,right:16,background:"rgba(0,0,0,.5)",border:"none",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,color:saved?"#F97B30":"white",zIndex:200,backdropFilter:"blur(4px)"}}>
-          {saved?"♥":"♡"}
-        </button>
+        <div style={{position:"fixed",top:16,right:16,display:"flex",gap:8,zIndex:200}}>
+          <button onClick={toggleLike}
+            style={{background:"rgba(0,0,0,.5)",border:"none",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:16,color:liked?"var(--red)":"white",backdropFilter:"blur(4px)",transition:"all .15s"}}>
+            {liked?"♥":"♡"}
+            {likeCount>0&&<span style={{position:"absolute",top:-4,right:-4,background:"var(--red)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:9,borderRadius:10,padding:"1px 4px",minWidth:14,textAlign:"center"}}>{likeCount}</span>}
+          </button>
+          <button onClick={()=>{haptic("medium");setLocalSaved(s=>!s);toggleSave(venue.id);showToast(saved?t("toast.removed"):t("toast.saved"));}}
+            style={{background:"rgba(0,0,0,.5)",border:"none",borderRadius:"50%",width:38,height:38,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,color:saved?"#F97B30":"white",backdropFilter:"blur(4px)"}}>
+            {saved?"♥":"♡"}
+          </button>
+        </div>
 
         {/* Content */}
         <div style={{padding:"20px 24px 80px",background:"var(--bg)"}}>
@@ -4258,6 +4291,227 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
       </div>{/* end content padding div */}
       </div>{/* end scroll */}
       </div>{/* end innerRef wrapper */}
+    </div>
+  );
+}
+
+function FeedScreen({navigate, user, allVenues}) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [likedIds, setLikedIds] = useState(new Set());
+  const [likeCounts, setLikeCounts] = useState({});
+
+  useEffect(()=>{ loadFeed(); },[]);
+
+  async function loadFeed(){
+    setLoading(true);
+    // Get followed scout IDs
+    const {data: follows} = await supabase
+      .from("scout_follows").select("scout_id").eq("user_id", user.id);
+    const followedIds = (follows||[]).map(f=>f.scout_id);
+
+    // Get recent venues from followed scouts (last 60 days)
+    const since = new Date(Date.now() - 60*24*60*60*1000).toISOString();
+    let feedVenues = [];
+
+    if(followedIds.length > 0){
+      const {data: scoutVenues} = await supabase
+        .from("venues")
+        .select("*, scout:submitted_by(id,name,badge,profile_image)")
+        .in("submitted_by", followedIds)
+        .eq("status","active")
+        .gte("created_at", since)
+        .order("created_at", {ascending:false})
+        .limit(30);
+      feedVenues = scoutVenues||[];
+    }
+
+    // Also get recent venues from user's city (not from followed scouts)
+    const {data: cityVenues} = await supabase
+      .from("venues")
+      .select("*, scout:submitted_by(id,name,badge,profile_image)")
+      .eq("status","active")
+      .eq("city_id", user.city_id)
+      .gte("created_at", since)
+      .order("created_at", {ascending:false})
+      .limit(20);
+
+    // Merge, deduplicate, followed scouts first
+    const followed = feedVenues;
+    const cityOnly = (cityVenues||[]).filter(v=>!followed.find(f=>f.id===v.id));
+    const all = [...followed, ...cityOnly];
+
+    // Load like counts
+    if(all.length > 0){
+      const {data: likes} = await supabase
+        .from("venue_likes")
+        .select("venue_id")
+        .in("venue_id", all.map(v=>v.id));
+      const counts = {};
+      (likes||[]).forEach(l=>{ counts[l.venue_id] = (counts[l.venue_id]||0)+1; });
+      setLikeCounts(counts);
+
+      // Load user's own likes
+      if(user?.id){
+        const {data: myLikes} = await supabase
+          .from("venue_likes").select("venue_id").eq("user_id", user.id)
+          .in("venue_id", all.map(v=>v.id));
+        setLikedIds(new Set((myLikes||[]).map(l=>l.venue_id)));
+      }
+    }
+
+    setItems(all);
+    setLoading(false);
+  }
+
+  async function toggleLike(venueId){
+    if(!user?.id) return;
+    const liked = likedIds.has(venueId);
+    if(liked){
+      await supabase.from("venue_likes").delete().eq("venue_id",venueId).eq("user_id",user.id);
+      setLikedIds(prev=>{ const s=new Set(prev); s.delete(venueId); return s; });
+      setLikeCounts(prev=>({...prev,[venueId]:Math.max(0,(prev[venueId]||1)-1)}));
+    } else {
+      await supabase.from("venue_likes").insert({venue_id:venueId,user_id:user.id});
+      setLikedIds(prev=>new Set([...prev,venueId]));
+      setLikeCounts(prev=>({...prev,[venueId]:(prev[venueId]||0)+1}));
+    }
+  }
+
+  function timeAgo(dateStr){
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const days = Math.floor(diff/86400000);
+    const hours = Math.floor(diff/3600000);
+    if(days===0) return hours<=1?"just now":`${hours}h ago`;
+    if(days===1) return "yesterday";
+    if(days<7) return `${days}d ago`;
+    return `${Math.floor(days/7)}w ago`;
+  }
+
+  return (
+    <div className="screen" style={{background:"var(--bg)"}}>
+      {/* Header */}
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+          <div/>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>feed</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="scroll" style={{padding:"8px 16px 80px"}}>
+        {loading&&(
+          <div style={{display:"flex",justifyContent:"center",padding:40}}>
+            <div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
+          </div>
+        )}
+
+        {!loading&&items.length===0&&(
+          <div style={{textAlign:"center",padding:"60px 32px"}}>
+            <div style={{fontSize:48,marginBottom:16}}>✦</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginBottom:8}}>Your feed is empty</div>
+            <div style={{fontFamily:"var(--body)",fontSize:14,color:"var(--text-muted)",lineHeight:1.6,marginBottom:24}}>Follow scouts to see their latest picks here</div>
+            <button onClick={()=>navigate("scouts")} style={{background:"var(--red)",color:"white",border:"none",borderRadius:50,padding:"12px 24px",fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer"}}>
+              Discover scouts →
+            </button>
+          </div>
+        )}
+
+        {!loading&&items.map((venue,i)=>{
+          const scout = venue.scout;
+          const liked = likedIds.has(venue.id);
+          const count = likeCounts[venue.id]||0;
+          const isFollowed = true; // already filtered
+
+          return (
+            <div key={venue.id} style={{marginBottom:20,animation:`staggerUp .3s ${Math.min(i,6)*0.06}s cubic-bezier(.2,.8,.4,1) both`,opacity:0,animationFillMode:"forwards"}}>
+              {/* Scout header */}
+              {scout&&(
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10,paddingLeft:4}}>
+                  <div onClick={()=>navigate("scout_profile",scout.id)} style={{width:36,height:36,borderRadius:"50%",background:"var(--surface2)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",border:"2px solid var(--border-col)"}}>
+                    {scout.profile_image
+                      ?<img src={scout.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                      :<span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)"}}>{(scout.name||"S")[0].toUpperCase()}</span>
+                    }
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6}}>
+                      <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",cursor:"pointer"}} onClick={()=>navigate("scout_profile",scout.id)}>{scout.name}</span>
+                      {scout.badge&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--text-muted)"}}>· {scout.badge}</span>}
+                    </div>
+                    <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginTop:1}}>
+                      added a new place · {timeAgo(venue.created_at)}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Venue card */}
+              <div onClick={()=>navigate("venue",venue)} style={{background:"var(--surface)",borderRadius:20,overflow:"hidden",border:"1.5px solid var(--border-col)",cursor:"pointer"}}>
+                {/* Image */}
+                <FeedVenueImage venueId={venue.id} category={venue.category}/>
+
+                {/* Body */}
+                <div style={{padding:"14px 16px 12px"}}>
+                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginBottom:4}}>{venue.name}</div>
+                  <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",marginBottom:8}}>
+                    {tCat(venue.category)}
+                    {venue.district&&<span> · Dist. {venue.district}</span>}
+                    {!venue.district&&venue.city_name&&<span> · {venue.city_name}</span>}
+                    {(venue.price_level||venue.price)&&<span> · {venue.price_level||venue.price}</span>}
+                  </div>
+                  {venue.why&&(
+                    <div style={{fontFamily:"var(--body)",fontSize:14,color:"var(--black)",lineHeight:1.5,marginBottom:12,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>
+                      "{venue.why}"
+                    </div>
+                  )}
+                  {/* Like button */}
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"flex-end"}}>
+                    <button onClick={e=>{e.stopPropagation();toggleLike(venue.id);}} style={{
+                      display:"flex",alignItems:"center",gap:6,
+                      background:liked?"rgba(220,38,38,.08)":"transparent",
+                      border:"1.5px solid",borderColor:liked?"var(--red)":"var(--border-col)",
+                      borderRadius:50,padding:"6px 14px",cursor:"pointer",
+                      fontFamily:"var(--body)",fontWeight:700,fontSize:13,
+                      color:liked?"var(--red)":"var(--text-muted)",
+                      transition:"all .15s"
+                    }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill={liked?"var(--red)":"none"} stroke={liked?"var(--red)":"currentColor"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                      </svg>
+                      {count>0&&<span>{count}</span>}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FeedVenueImage({venueId, category}){
+  const [imgUrl, setImgUrl] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [fetched, setFetched] = useState(false);
+  useEffect(()=>{
+    supabase.from("venue_images").select("url").eq("venue_id",venueId).eq("is_primary",true).limit(1).then(({data})=>{
+      if(data&&data.length>0) setImgUrl(data[0].url);
+      setFetched(true);
+    });
+  },[venueId]);
+  return (
+    <div style={{width:"100%",height:220,background:"var(--surface2)",position:"relative",overflow:"hidden"}}>
+      {!fetched&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>}
+      {fetched&&imgUrl&&<>
+        {!loaded&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.2s infinite linear"}}/>}
+        <img src={imgUrl} onLoad={()=>setLoaded(true)} style={{width:"100%",height:"100%",objectFit:"cover",opacity:loaded?1:0,transition:"opacity .3s ease"}}/>
+      </>}
+      {fetched&&!imgUrl&&<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:48}}>🍽</div>}
     </div>
   );
 }
@@ -6951,6 +7205,8 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
   const [catFilter, setCatFilter] = useState("All");
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [likesCount, setLikesCount] = useState(0);
   const dark = useDark();
 
   useEffect(()=>{
@@ -6983,6 +7239,20 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
       const addedVenues = added||[];
       const onlySaved = (savedVenues||[]).filter(v=>!addedVenues.find(a=>a.id===v.id));
       setVenues({added: addedVenues, saved: onlySaved});
+
+      // Follower count
+      const {count: fCount} = await supabase
+        .from("scout_follows").select("id", {count:"exact",head:true})
+        .eq("scout_id", scoutId);
+      setFollowerCount(fCount||0);
+
+      // Likes count — sum of likes on all added venues
+      if(addedVenues.length>0){
+        const {count: lCount} = await supabase
+          .from("venue_likes").select("id", {count:"exact",head:true})
+          .in("venue_id", addedVenues.map(v=>v.id));
+        setLikesCount(lCount||0);
+      }
 
       // Check if following
       if(user?.id){
@@ -7100,13 +7370,18 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
           {/* Stats */}
           <div style={{display:"flex",gap:0,marginBottom:16,borderRadius:12,overflow:"hidden",border:"1.5px solid var(--border-col)"}}>
             <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.8)"}}>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)"}}>{followerCount}</div>
+              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"var(--text-muted)",marginTop:2}}>followers</div>
+            </div>
+            <div style={{width:1,background:"var(--border-col)"}}/>
+            <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.8)"}}>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)"}}>{(venues.added||[]).length}</div>
               <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"var(--text-muted)",marginTop:2}}>{t("sc.added")}</div>
             </div>
             <div style={{width:1,background:"var(--border-col)"}}/>
             <div style={{flex:1,textAlign:"center",padding:"12px 8px",background:dark?"rgba(255,255,255,.06)":"rgba(255,255,255,.8)"}}>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)"}}>{(venues.saved||[]).length}</div>
-              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"var(--text-muted)",marginTop:2}}>{t("saved.title2")}</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)"}}>{likesCount}</div>
+              <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,color:"var(--text-muted)",marginTop:2}}>likes</div>
             </div>
           </div>
 
@@ -8477,6 +8752,7 @@ function App() {
     q6: <Q6Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user}/>,
     venue: selectedVenue&&<VenueDetailScreen venue={selectedVenue} navigate={navigate} savedIds={savedIds} toggleSave={toggleSave} showToast={showToastMsg} isScout={isScout} user={user} allVenues={allVenues}/>,
+    feed: <FeedScreen navigate={navigate} user={user} allVenues={allVenues}/>,
     saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
     scouts: <ScoutsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
     all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
