@@ -382,11 +382,11 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .tab.on{color:var(--black);border-bottom-color:var(--black);}
 
 /* MISC */
-.scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;position:relative;z-index:1;}
+.scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;}
 .scroll::-webkit-scrollbar{display:none;}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
 .screen-hdr{flex-shrink:0;position:relative;z-index:3;}
-.screen-hdr::after{content:"";position:absolute;bottom:-28px;left:0;right:0;height:28px;background:linear-gradient(to bottom,#F5B8EC,rgba(245,184,236,0));pointer-events:none;z-index:3;}
+.screen-hdr::after{content:"";position:absolute;bottom:-16px;left:0;right:0;height:16px;background:linear-gradient(to bottom,#F5B8EC,rgba(245,184,236,0));pointer-events:none;z-index:3;}
 [data-dark="true"] .screen-hdr::after{background:linear-gradient(to bottom,#0d0d0d,rgba(13,13,13,0));}
 .back-btn{background:var(--black);border:none;cursor:pointer;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;line-height:1;flex-shrink:0;}
 .back-btn:active{opacity:.7;}
@@ -4541,7 +4541,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
     <div className="screen" style={{background:"var(--bg)"}}>
       <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <div/>
+          <button className="back-btn" onClick={()=>navigate(-1)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("saved.title2")}</div>
@@ -4549,7 +4549,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
         </div>
       </div>
 
-      <div className="screen-hdr" style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
           <div style={{marginBottom:8}}>
             <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
@@ -4563,7 +4563,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
       </div>
 
       {tab==="places"&&(
-        <div className="scroll" style={{padding:"16px 20px 80px"}}>
+        <div className="scroll" style={{padding:"32px 20px 80px"}}>
           {saved.length===0
             ?<div className="empty">
                 <div className="empty-icon">🤍</div>
@@ -5777,7 +5777,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </div>
         </div>
       </div>
-      <div className="screen-hdr" style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
           <div style={{marginBottom:8}}>
             <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
@@ -6569,7 +6569,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
           </div>
         </div>
       </div>
-      <div className="screen-hdr" style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
           <div style={{marginBottom:8}}>
             <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
@@ -7035,7 +7035,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
   return (
     <div className="screen">
       {/* Pink header */}
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -7044,7 +7044,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
           </div>
         </div>
       </div>
-      <div className="scroll" style={{padding:"16px 20px 80px",background:"var(--bg)",flex:1}}>
+      <div className="scroll" style={{padding:"32px 20px 80px",background:"var(--bg)",flex:1}}>
 
         {/* Profile card */}
         <div style={{background:"var(--surface)",borderRadius:20,padding:"20px",marginBottom:16,border:"1.5px solid var(--border-col)"}}>
@@ -7310,7 +7310,7 @@ function ScoutsScreen({navigate, onMenu, user, selectedCity, availableCities, on
 
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 8px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 8px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -7850,7 +7850,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
         ? <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
             <div style={{width:28,height:28,border:"2.5px solid var(--surface3)",borderTop:"2.5px solid black",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
           </div>
-        : <div className="scroll" style={{padding:"16px 20px 80px"}}>
+        : <div className="scroll" style={{padding:"32px 20px 80px"}}>
             {tab==="my"&&!isPremium&&(
               <div style={{textAlign:"center",padding:"40px 20px"}}>
                 <div style={{fontFamily:"var(--body)",fontSize:14,color:"#888",marginBottom:16}}>{t("ev.upgrade_rsvp")}</div>
