@@ -1900,7 +1900,7 @@ function ShimmerImg({src, style, fallback=null}) {
   );
 }
 
-function VenueCard({venue, onClick}) {
+function VenueCard({venue, onClick, hideNewBadge}) {
   const [imgUrl, setImgUrl] = useState(null);
   const [imgFetched, setImgFetched] = useState(false);
   const dark = useDark();
@@ -1948,7 +1948,7 @@ function VenueCard({venue, onClick}) {
             </>
             :<span style={{fontSize:52}}>🍽</span>
         }
-        {isNew&&<div style={{position:"absolute",top:10,left:10,background:"var(--red)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,padding:"3px 8px",borderRadius:20,letterSpacing:".06em",textTransform:"uppercase"}}>NEW</div>}
+        {isNew&&!hideNewBadge&&<div style={{position:"absolute",top:10,left:10,background:"var(--red)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,padding:"3px 8px",borderRadius:20,letterSpacing:".06em",textTransform:"uppercase"}}>NEW</div>}
       </div>
       <div className="venue-body">
         <div className="venue-name">{venue.name}</div>
@@ -2647,7 +2647,7 @@ function CityPickBox({label, cat, venues, navigate, isPremium}) {
   );
 }
 
-function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading, allVenues}) {
+function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading, allVenues, selectedCity}) {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -2837,7 +2837,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
         {/* Recently added */}
         {(()=>{
           const recent = (allVenues||[])
-            .filter(v=>v.status==="active")
+            .filter(v=>v.status==="active" && (!selectedCity || v.city_name===selectedCity || v.city_id===user?.city_id))
             .sort((a,b)=>new Date(b.approved_at||b.created_at)-new Date(a.approved_at||a.created_at))
             .slice(0,8);
           if(recent.length===0) return null;
@@ -3382,9 +3382,12 @@ function SkeletonCard(){
   );
 }
 
-function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partner, user}) {
+function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partner, user, selectedCity}) {
   const BATCH=5;
-  const active = allVenues.filter(v=>v.status==="active");
+  const activeAll = allVenues.filter(v=>v.status==="active");
+  const active = selectedCity
+    ? activeAll.filter(v=>v.city_name===selectedCity || (!v.city_name && v.city_id===user?.city_id))
+    : (user?.city_id ? activeAll.filter(v=>v.city_id===user.city_id) : activeAll);
   const isAI = !!answers.aiQuery;
   const semanticIds = answers.semanticVenueIds; // ordered by similarity
   const similarities = answers.similarities || {};
@@ -4310,36 +4313,24 @@ function FeedScreen({navigate, user, allVenues}) {
       .from("scout_follows").select("scout_id").eq("user_id", user.id);
     const followedIds = (follows||[]).map(f=>f.scout_id);
 
-    // Get recent venues from followed scouts (last 60 days)
-    const since = new Date(Date.now() - 60*24*60*60*1000).toISOString();
-    let feedVenues = [];
-
-    if(followedIds.length > 0){
-      const {data: scoutVenues} = await supabase
-        .from("venues")
-        .select("*, scout:submitted_by(id,name,badge,profile_image)")
-        .in("submitted_by", followedIds)
-        .eq("status","active")
-        .gte("created_at", since)
-        .order("created_at", {ascending:false})
-        .limit(30);
-      feedVenues = scoutVenues||[];
+    if(followedIds.length === 0){
+      setItems([]);
+      setLoading(false);
+      return;
     }
 
-    // Also get recent venues from user's city (not from followed scouts)
-    const {data: cityVenues} = await supabase
+    // Get ALL venues from followed scouts (last 60 days) — no city filter
+    const since = new Date(Date.now() - 60*24*60*60*1000).toISOString();
+    const {data: scoutVenues} = await supabase
       .from("venues")
       .select("*, scout:submitted_by(id,name,badge,profile_image)")
+      .in("submitted_by", followedIds)
       .eq("status","active")
-      .eq("city_id", user.city_id)
       .gte("created_at", since)
       .order("created_at", {ascending:false})
-      .limit(20);
+      .limit(50);
 
-    // Merge, deduplicate, sort by created_at desc
-    const followed = feedVenues;
-    const cityOnly = (cityVenues||[]).filter(v=>!followed.find(f=>f.id===v.id));
-    const all = [...followed, ...cityOnly].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    const all = scoutVenues||[];
 
     // Load like counts
     if(all.length > 0){
@@ -7314,14 +7305,14 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
     ...(venues.added||[]).map(v=>({...v,_source:"added"})),
     ...(venues.saved||[]).map(v=>({...v,_source:"saved"})),
   ];
-  const cityFiltered = selectedCity ? allVenuesList.filter(v=>v.city_name===selectedCity) : allVenuesList;
-  const categories = ["All", ...new Set(cityFiltered.map(v=>v.category||v.cuisine).filter(Boolean))];
-  const filtered = catFilter==="All" ? cityFiltered : cityFiltered.filter(v=>(v.category||v.cuisine)===catFilter);
+  // No city filter on scout profile — show all venues regardless of city
+  const categories = ["All", ...new Set(allVenuesList.map(v=>v.category||v.cuisine).filter(Boolean))];
+  const filtered = catFilter==="All" ? allVenuesList : allVenuesList.filter(v=>(v.category||v.cuisine)===catFilter);
   const isOwnProfile = user?.id===scoutId;
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 8px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <button className="back-btn" onClick={()=>navigate(-1)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -7329,11 +7320,6 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
             <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>scout</div>
           </div>
         </div>
-        {availableCities?.length>0&&(
-          <div style={{marginTop:8}}>
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          </div>
-        )}
       </div>
 
       <div className="scroll" style={{padding:"0 0 80px"}}>
@@ -7417,17 +7403,21 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
               <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("sc.no_picks")}</div>
             </div>
           )}
-          {filtered.map(v=>(
-              <div key={v.id} style={{position:"relative"}}>
-                <div style={{position:"absolute",top:10,left:10,zIndex:5,display:"flex",gap:4}}>
+          {filtered.map(v=>{
+            const isNew = v.created_at && (Date.now() - new Date(v.created_at).getTime()) < 30 * 24 * 60 * 60 * 1000;
+            return (
+              <div key={v.id} style={{position:"relative",marginBottom:0}}>
+                <div style={{position:"absolute",top:10,left:10,zIndex:5,display:"flex",gap:4,flexWrap:"wrap"}}>
                   {v._source==="added"
                     ? <span style={{background:"var(--red)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,padding:"2px 8px",borderRadius:20,letterSpacing:".04em"}}>✦ ADDED</span>
                     : <span style={{background:"rgba(0,0,0,.55)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,padding:"2px 8px",borderRadius:20,letterSpacing:".04em"}}>♥ SAVED</span>
                   }
+                  {isNew&&<span style={{background:"#111",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,padding:"2px 8px",borderRadius:20,letterSpacing:".04em"}}>NEW</span>}
                 </div>
-                <VenueCard venue={v} onClick={()=>navigate("venue",v)}/>
+                <VenueCard venue={v} onClick={()=>navigate("venue",v)} hideNewBadge/>
               </div>
-            ))}
+            );
+          })}
         </div>
       </div>
     </div>
@@ -8743,14 +8733,14 @@ function App() {
     signin: <SignInScreen navigate={navigate} onLogin={onLogin}/>,
     signup: <SignUpScreen navigate={navigate} onLogin={onLogin}/>,
     onboarding: <OnboardingScreen navigate={navigate} user={user} setUser={setUser}/>,
-    home: <HomeScreen navigate={navigate} onMenu={()=>setShowMenu(true)} setAnswers={setAnswers} user={user} partner={isPartnerActive ? partner : null} venuesLoading={venuesLoading} allVenues={allVenues}/>,
+    home: <HomeScreen navigate={navigate} onMenu={()=>setShowMenu(true)} setAnswers={setAnswers} user={user} partner={isPartnerActive ? partner : null} venuesLoading={venuesLoading} allVenues={allVenues} selectedCity={selectedCity}/>,
     q1: <Q1Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     q2: <Q2Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     q3: <Q3Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} partnerDistrict={isPartnerActive ? partner?.district : null} allVenues={allVenues}/>,
     q4: <Q4Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     q5: <Q5Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     q6: <Q6Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
-    results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user}/>,
+    results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user} selectedCity={selectedCity}/>,
     venue: selectedVenue&&<VenueDetailScreen venue={selectedVenue} navigate={navigate} savedIds={savedIds} toggleSave={toggleSave} showToast={showToastMsg} isScout={isScout} user={user} allVenues={allVenues}/>,
     feed: <FeedScreen navigate={navigate} user={user} allVenues={allVenues}/>,
     saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
