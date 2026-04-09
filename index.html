@@ -2845,7 +2845,11 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
         {/* Recently added */}
         {(()=>{
           const recent = (allVenues||[])
-            .filter(v=>v.status==="active" && (!selectedCity || v.city_name===selectedCity || v.city_id===user?.city_id))
+            .filter(v=>v.status==="active" && (
+              selectedCity
+                ? v.city_name===selectedCity
+                : (!v.city_name || v.city_id===user?.city_id)
+            ))
             .sort((a,b)=>new Date(b.approved_at||b.created_at)-new Date(a.approved_at||a.created_at))
             .slice(0,8);
           if(recent.length===0) return null;
