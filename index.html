@@ -385,6 +385,8 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;}
 .scroll::-webkit-scrollbar{display:none;}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
+.screen-hdr{position:relative;flex-shrink:0;}
+.screen-hdr::after{content:"";position:absolute;bottom:-32px;left:0;right:0;height:32px;background:linear-gradient(to bottom,var(--bg) 0%,transparent 100%);pointer-events:none;z-index:5;}
 .back-btn{background:var(--black);border:none;cursor:pointer;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;line-height:1;flex-shrink:0;}
 .back-btn:active{opacity:.7;}
 .q-next-btn{background:#000;color:#fff;border:none;border-radius:50px;padding:14px 48px;font-family:var(--body);font-weight:400;font-size:16px;cursor:pointer;white-space:nowrap;transition:opacity .12s;}
@@ -1637,6 +1639,12 @@ function t(key){ return (TRANSLATIONS[_lang]||TRANSLATIONS.en)[key] || TRANSLATI
 // Translated label helpers
 function tOcc(id){ if(!id) return id; return t("occ."+id.toLowerCase().replace(/ /g,"_").replace(/\//g,"").replace(/-/g,"_").replace(/&/g,"").replace(/\s+/g,"_")) || id; }
 function tCat(cat){ return t("cat."+cat.toLowerCase().replace(/ /g,"_").replace(/-/g,"_")) || cat; }
+
+// Always returns city name for venue cards — district never shown on cards
+function venueLocation(v){
+  if(v.city_name) return v.city_name;
+  return "Budapest"; // fallback for old data without city_name
+}
 function tDiet(d){ return t("diet."+d.toLowerCase().replace(/-/g,"_")) || d; }
 function tCui(c){ return t("cui."+c.toLowerCase().replace(/ /g,"_").replace(/-/g,"_")) || c; }
 function tNearMe(){ return t("venue.near_me_label"); }
@@ -1955,8 +1963,7 @@ function VenueCard({venue, onClick, hideNewBadge}) {
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:6,gap:8}}>
           <div className="venue-meta" style={{flex:1}}>
             <span>{tCat(venue.category)||tCui(venue.cuisine)}</span><span>·</span>
-            {venue.district && <><span>{t("venue.dist")} {venue.district}</span><span>·</span></>}
-            {!venue.district && venue.city_name && venue.city_name!=="Budapest" && <><span>{venue.city_name}</span><span>·</span></>}
+            {venueLocation(venue)&&<><span>{venueLocation(venue)}</span><span>·</span></>}
             <span>{venue.price_level||venue.price}</span>
             {openStatus&&<span className={openStatus==="open"?"status-open":"status-closed"} style={{color:openStatus==="open"?"#16a34a":"#dc2626",fontWeight:700,fontSize:11,background:openStatus==="open"?"#dcfce7":"#fee2e2",padding:"2px 7px",borderRadius:10}}>
               {openStatus==="open"?t("venue.open_now"):t("venue.closed")}
@@ -2866,7 +2873,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
                     <RecentVenueThumb venueId={v.id} category={v.category}/>
                     <div style={{padding:"10px 12px 12px"}}>
                       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"white",lineHeight:1.2,marginBottom:3,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{v.name}</div>
-                      <div style={{fontFamily:"var(--body)",fontSize:11,color:"rgba(255,255,255,.7)",fontWeight:400}}>{tCat(v.category)} · {v.district ? `${t("venue.dist")} ${v.district}` : (v.city_name||"")}</div>
+                      <div style={{fontFamily:"var(--body)",fontSize:11,color:"rgba(255,255,255,.7)",fontWeight:400}}>{tCat(v.category)} · {venueLocation(v)}</div>
                     </div>
                   </div>
                 ))}
@@ -2972,7 +2979,7 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <div/>
           <div style={{textAlign:"right"}}>
@@ -3070,7 +3077,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>navigate("q1")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -3184,7 +3191,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>navigate("q2")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -3269,7 +3276,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>navigate("q3")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -3303,7 +3310,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>navigate("q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -3336,7 +3343,7 @@ function Q6Screen({navigate, onMenu, answers, setAnswers}) {
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>navigate(answers.category==="Restaurant"?"q5":"q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -3547,7 +3554,7 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -4092,8 +4099,7 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
         {/* 2. Category pills */}
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
           <span className="venue-tag">{tCat(venue.subcategory||venue.category)||tCui(venue.cuisine)}</span>
-          {venue.district&&<span className="venue-tag">{t("venue.dist")} {venue.district}</span>}
-          {!venue.district&&venue.city_name&&venue.city_name!=="Budapest"&&<span className="venue-tag">{venue.city_name}</span>}
+          {venueLocation(venue)&&<span className="venue-tag">{venueLocation(venue)}</span>}
           <span className="venue-tag">{venue.price_level||venue.price}</span>
           {venue.is_city_pick&&(user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead")&&<span className="venue-tag" style={{background:"#FFF3CD",color:"#856404"}}>{t("vd.city_pick")}</span>}
         </div>
@@ -4134,8 +4140,8 @@ function VenueDetailScreen({venue, navigate, savedIds, toggleSave, showToast, is
           <div>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"var(--text-muted)",lineHeight:1.5}}>{venue.address}</div>
             {venue.district
-              ? <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>Budapest, {t("venue.dist_label")} {venue.district}</div>
-              : venue.city_name&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>{venue.city_name}{venue.country?`, ${venue.country}`:""}</div>
+              : null}
+            {venueLocation(venue)&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--red)",fontWeight:600,marginTop:2}}>{venueLocation(venue)}{venue.country&&!venue.district?`, ${venue.country}`:""}</div>
             }
           </div>
         </div>
@@ -4382,7 +4388,7 @@ function FeedScreen({navigate, user, allVenues}) {
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
       {/* Header */}
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <div/>
           <div style={{textAlign:"right"}}>
@@ -4414,25 +4420,27 @@ function FeedScreen({navigate, user, allVenues}) {
           const scout = venue.scout;
           const liked = likedIds.has(venue.id);
           const count = likeCounts[venue.id]||0;
-          const isFollowed = true; // already filtered
 
           return (
-            <div key={venue.id} style={{marginBottom:20,animation:`staggerUp .3s ${Math.min(i,6)*0.06}s cubic-bezier(.2,.8,.4,1) both`,opacity:0,animationFillMode:"forwards"}}>
+            <div key={venue.id} style={{animation:`staggerUp .3s ${Math.min(i,6)*0.06}s cubic-bezier(.2,.8,.4,1) both`,opacity:0,animationFillMode:"forwards"}}>
+              {/* Divider between posts */}
+              {i>0&&<div style={{height:1,background:"var(--border-col)",margin:"24px 0"}}/>}
+
               {/* Scout header */}
               {scout&&(
-                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10,paddingLeft:4}}>
-                  <div onClick={()=>navigate("scout_profile",scout.id)} style={{width:36,height:36,borderRadius:"50%",background:"var(--surface2)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",border:"2px solid var(--border-col)"}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12,paddingLeft:2}}>
+                  <div onClick={()=>navigate("scout_profile",scout.id)} style={{width:40,height:40,borderRadius:"50%",background:"var(--surface2)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",border:"2px solid var(--border-col)"}}>
                     {scout.profile_image
                       ?<img src={scout.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                      :<span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)"}}>{(scout.name||"S")[0].toUpperCase()}</span>
+                      :<span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>{(scout.name||"S")[0].toUpperCase()}</span>
                     }
                   </div>
                   <div style={{flex:1}}>
-                    <div style={{display:"flex",alignItems:"center",gap:6}}>
-                      <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:"var(--black)",cursor:"pointer"}} onClick={()=>navigate("scout_profile",scout.id)}>{scout.name}</span>
-                      {scout.badge&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--text-muted)"}}>· {scout.badge}</span>}
+                    <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                      <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",cursor:"pointer"}} onClick={()=>navigate("scout_profile",scout.id)}>{scout.name}</span>
+                      {scout.badge&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--text-muted)",background:"var(--surface2)",padding:"2px 8px",borderRadius:20}}>· {scout.badge}</span>}
                     </div>
-                    <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginTop:1}}>
+                    <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginTop:2}}>
                       added a new place · {timeAgo(venue.created_at)}
                     </div>
                   </div>
@@ -4445,17 +4453,16 @@ function FeedScreen({navigate, user, allVenues}) {
                 <FeedVenueImage venueId={venue.id} category={venue.category}/>
 
                 {/* Body */}
-                <div style={{padding:"14px 16px 12px"}}>
-                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginBottom:4}}>{venue.name}</div>
-                  <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",marginBottom:8}}>
+                <div style={{padding:"16px 16px 14px"}}>
+                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:19,color:"var(--black)",marginBottom:4}}>{venue.name}</div>
+                  <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",marginBottom:10}}>
                     {tCat(venue.category)}
-                    {venue.district&&<span> · Dist. {venue.district}</span>}
-                    {!venue.district&&venue.city_name&&<span> · {venue.city_name}</span>}
+                    {venueLocation(venue)&&<span> · {venueLocation(venue)}</span>}
                     {(venue.price_level||venue.price)&&<span> · {venue.price_level||venue.price}</span>}
                   </div>
                   {venue.why&&(
-                    <div style={{fontFamily:"var(--body)",fontSize:14,color:"var(--black)",lineHeight:1.5,marginBottom:12,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>
-                      "{venue.why}"
+                    <div style={{fontFamily:"var(--body)",fontSize:14,color:"var(--black)",lineHeight:1.6,marginBottom:14,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",fontStyle:"italic",borderLeft:"3px solid var(--red)",paddingLeft:12}}>
+                      {venue.why}
                     </div>
                   )}
                   {/* Like button */}
@@ -4464,7 +4471,7 @@ function FeedScreen({navigate, user, allVenues}) {
                       display:"flex",alignItems:"center",gap:6,
                       background:liked?"rgba(220,38,38,.08)":"transparent",
                       border:"1.5px solid",borderColor:liked?"var(--red)":"var(--border-col)",
-                      borderRadius:50,padding:"6px 14px",cursor:"pointer",
+                      borderRadius:50,padding:"7px 16px",cursor:"pointer",
                       fontFamily:"var(--body)",fontWeight:700,fontSize:13,
                       color:liked?"var(--red)":"var(--text-muted)",
                       transition:"all .15s"
@@ -4472,7 +4479,7 @@ function FeedScreen({navigate, user, allVenues}) {
                       <svg width="15" height="15" viewBox="0 0 24 24" fill={liked?"var(--red)":"none"} stroke={liked?"var(--red)":"currentColor"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
                       </svg>
-                      {count>0&&<span>{count}</span>}
+                      {count>0?<span>{count}</span>:<span>like</span>}
                     </button>
                   </div>
                 </div>
@@ -4528,7 +4535,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <div/>
           <div style={{textAlign:"right"}}>
@@ -4538,7 +4545,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
         </div>
       </div>
 
-      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
           <div style={{marginBottom:8}}>
             <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
@@ -4686,7 +4693,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
         }
       });
       const infoDiv = document.createElement("div");
-      infoDiv.innerHTML = `<div style="font-family:sans-serif;padding:8px 6px;min-width:150px;max-width:200px"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${v.name}</div><div style="color:#666;font-size:12px;margin-bottom:8px">${v.category||v.cuisine||""} · Ker. ${v.district}</div><button id="info-btn-${v.id}" style="background:#DC2626;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:sans-serif;width:100%">megnyitás →</button></div>`;
+      infoDiv.innerHTML = `<div style="font-family:sans-serif;padding:8px 6px;min-width:150px;max-width:200px"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${v.name}</div><div style="color:#666;font-size:12px;margin-bottom:8px">${v.category||v.cuisine||""} · ${venueLocation(v)}</div><button id="info-btn-${v.id}" style="background:#DC2626;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:sans-serif;width:100%">megnyitás →</button></div>`;
       const info = new window.google.maps.InfoWindow({ content: infoDiv });
       marker.addListener("click",()=>{
         if(activeInfoRef.current) activeInfoRef.current.close();
@@ -4942,7 +4949,7 @@ function ScoutEventsTab({user, allVenues, showToast}) {
                     style={{padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",cursor:"pointer",borderBottom:"1px solid #f5f5f5"}}
                     onMouseEnter={e=>e.currentTarget.style.background="#f9f6f0"}
                     onMouseLeave={e=>e.currentTarget.style.background="var(--surface)"}>
-                    {v.name} <span style={{color:"var(--text-muted)",fontSize:12}}>· Dist. {v.district}</span>
+                    {v.name} <span style={{color:"var(--text-muted)",fontSize:12}}>· {venueLocation(v)}</span>
                   </div>
                 ))}
               </div>
@@ -5140,6 +5147,24 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   }
 
   async function submitScoutEdit(){
+    // Validation
+    if(!editForm.capacity){
+      showToast("Please select a capacity (*).");
+      return;
+    }
+    if((editForm.occasions||[]).length < 3){
+      showToast("Please select at least 3 occasions (*).");
+      return;
+    }
+    if((editForm.tags||[]).length < 3){
+      showToast("Please add at least 3 tags (*).");
+      return;
+    }
+    const totalPhotos = scoutExistingImages.length + scoutEditImgFiles.length;
+    if(totalPhotos < 3){
+      showToast("Please upload at least 3 photos (*).");
+      return;
+    }
     setEditSubmitting(true);
     let placeId = editingVenue.google_place_id||null;
     let lat = editingVenue.latitude||null;
@@ -5427,13 +5452,11 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       : (!form.city_name || form.city_name === "Budapest");
 
     if(manualMode){
-      // Manual mode: name, address, city_name, country required, no city_id needed
       if(!form.name||!form.category||!form.price_level||!form.why||!form.city_name||!form.country){
         setFormError("Please fill in all required fields (*).");
         return;
       }
     } else {
-      // Autocomplete mode: city_id required
       if(!form.name||!form.address||!form.category||!form.price_level||!form.why||!form.google_maps_url||!form.city_id){
         setFormError("Please fill in all required fields (*).");
         return;
@@ -5443,8 +5466,25 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       setFormError("Please select a district (*).");
       return;
     }
+    if(!form.capacity){
+      setFormError("Please select a capacity (*).");
+      return;
+    }
     if(form.category==="Restaurant"&&!form.cuisine){
       setFormError("Please select a cuisine for Restaurant.");
+      return;
+    }
+    const allOccasions = customOccasion.trim() ? [...selOccasions, customOccasion.trim()] : selOccasions;
+    if(allOccasions.length < 3){
+      setFormError("Please select at least 3 occasions (*).");
+      return;
+    }
+    if((form.tags||[]).length < 3){
+      setFormError("Please add at least 3 tags (*).");
+      return;
+    }
+    if(imgFiles.length < 3){
+      setFormError("Please upload at least 3 photos (*).");
       return;
     }
     // Exact duplicate check
@@ -5724,7 +5764,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -5733,7 +5773,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </div>
         </div>
       </div>
-      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
           <div style={{marginBottom:8}}>
             <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
@@ -5913,7 +5953,9 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </select>
 
           <div style={{marginBottom:10}}>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:8}}>occasions</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:selOccasions.length<3?"var(--red)":"#888",marginBottom:8}}>
+              occasions ({selOccasions.length}/3+){selOccasions.length<3&&<span style={{fontWeight:400,fontSize:11}}> — min. 3 required</span>}
+            </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
               {getOccasionsForCategory(form.category).map(o=>(
                 <button key={o} onClick={()=>toggleOcc(o)}
@@ -5927,7 +5969,9 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
             </div>
           </div>
           <div style={{marginBottom:10}}>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:8}}>tags</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:(form.tags||[]).length<3?"var(--red)":"#888",marginBottom:8}}>
+              tags ({(form.tags||[]).length}/3+){(form.tags||[]).length<3&&<span style={{fontWeight:400,fontSize:11}}> — min. 3 required</span>}
+            </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:7,marginBottom:8}}>
               {getTagsForCategory(form.category, categoryCustomTags[form.category]||[]).map(t=>{
                 const sel=(form.tags||[]).includes(t);
@@ -6003,7 +6047,9 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </div>
           {formError&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"#c00",fontWeight:600,background:"rgba(255,0,0,.08)",padding:"10px 14px",borderRadius:10,marginBottom:10}}>{formError}</div>}
           <div style={{marginBottom:14}}>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"#888",marginBottom:8}}>photos ({imgPreviews.length}/5)</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:imgPreviews.length<3?"var(--red)":"#888",marginBottom:8}}>
+              photos ({imgPreviews.length}/5){imgPreviews.length<3&&<span style={{fontWeight:400,fontSize:11}}> — min. 3 required</span>}
+            </div>
             <DraggableImageGrid
               previews={imgPreviews}
               onMove={moveImg}
@@ -6263,6 +6309,19 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
   }
 
   async function saveEdit(){
+    // Validation
+    if(!editForm.capacity){
+      showToast("Please select a capacity (*).");
+      return;
+    }
+    if((editForm.occasions||[]).length < 3){
+      showToast("Please select at least 3 occasions (*).");
+      return;
+    }
+    if((editForm.tags||[]).length < 3){
+      showToast("Please add at least 3 tags (*).");
+      return;
+    }
     setSaving(true);
     // Auto-fetch google_place_id if not already set
     let placeId = editingVenue.google_place_id||null;
@@ -6497,7 +6556,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -6506,7 +6565,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
           </div>
         </div>
       </div>
-      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
           <div style={{marginBottom:8}}>
             <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
@@ -6555,7 +6614,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
                     <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:17,color:"var(--black)",marginBottom:3}}>{v.name}</div>
                     <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
                       {v.category&&<span style={{background:"var(--surface2)",borderRadius:20,padding:"2px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--black)"}}>{v.category}</span>}
-                      {v.district&&<span style={{background:"var(--surface2)",borderRadius:20,padding:"2px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--black)"}}>Dist. {v.district}</span>}
+                      {v.district&&<span style={{background:"var(--surface2)",borderRadius:20,padding:"2px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--black)"}}>{venueLocation(v)}</span>}
                       {v.price_level&&<span style={{background:"var(--surface2)",borderRadius:20,padding:"2px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--black)"}}>{v.price_level}</span>}
                     </div>
                   </div>
@@ -6725,7 +6784,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
                     <div style={{flex:1,marginRight:8}}>
                       <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15}}>{v.name}</div>
                       <div style={{fontFamily:"var(--body)",fontSize:12,color:"#888",fontWeight:600,marginTop:2}}>
-                        {v.category}{v.cuisine?` · ${v.cuisine}`:""} · Dist. {v.district} · {v.price_level||v.price}
+                        {v.category}{v.cuisine?` · ${v.cuisine}`:""} · {venueLocation(v)} · {v.price_level||v.price}
     
                         {v.is_city_pick&&<span style={{marginLeft:6}}>⭐</span>}
                       </div>
@@ -6972,7 +7031,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
   return (
     <div className="screen">
       {/* Pink header */}
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -7247,7 +7306,7 @@ function ScoutsScreen({navigate, onMenu, user, selectedCity, availableCities, on
 
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 8px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 8px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -7415,7 +7474,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <button className="back-btn" onClick={()=>navigate(-1)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -7530,7 +7589,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
 function AboutScreen({navigate}) {
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -7763,7 +7822,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -7941,7 +8000,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   if(!isPremium) return (
     <div className="screen">
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
       <div style={{padding:"60px 28px",textAlign:"center"}}>
         <div style={{fontSize:56,marginBottom:20}}>🎉</div>
         <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:22,color:"var(--black)",marginBottom:10}}>{t("sc.premium_feature")}</div>
@@ -7953,7 +8012,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   return (
     <div className="screen">
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
+      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
       <div style={{padding:"12px 24px 16px",flexShrink:0}}>
         <div className="logo-md">Lokal&#39;z</div>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",marginTop:6}}>{t("ev.my_events")}</div>
@@ -8088,7 +8147,7 @@ function CreatePlanModal({onClose, onCreate, user, allVenues, showToast}) {
                   style={{padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",cursor:"pointer",borderBottom:"1px solid #f5f5f5"}}
                   onMouseEnter={e=>e.currentTarget.style.background="#f9f6f0"}
                   onMouseLeave={e=>e.currentTarget.style.background="var(--surface)"}>
-                  {v.name} <span style={{color:"var(--text-muted)",fontSize:12}}>· Dist. {v.district}</span>
+                  {v.name} <span style={{color:"var(--text-muted)",fontSize:12}}>· {venueLocation(v)}</span>
                 </div>
               ))}
             </div>
@@ -8335,7 +8394,7 @@ function EventPlanDetailScreen({navigate, plan, user, allVenues, showToast}) {
                   {venueSuggestions.map(v=>(
                     <div key={v.id} onClick={()=>{setEditForm(f=>({...f,venue_id:v.id}));setVenueSearch(v.name+" · Dist. "+v.district);setVenueSuggestions([]);}}
                       style={{padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--black)",cursor:"pointer",borderBottom:"1px solid #f5f5f5"}}>
-                      {v.name} <span style={{color:"var(--text-muted)",fontSize:12}}>· Dist. {v.district}</span>
+                      {v.name} <span style={{color:"var(--text-muted)",fontSize:12}}>· {venueLocation(v)}</span>
                     </div>
                   ))}
                 </div>
@@ -8864,7 +8923,7 @@ function App() {
       const listTitle = listData.title||"spots";
       return (
         <div className="screen" style={{background:"var(--bg)"}}>
-          <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+          <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
             <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
               <button onClick={()=>navigate("home",null,{replace:true})} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
               <div style={{textAlign:"right"}}>
