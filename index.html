@@ -5422,7 +5422,9 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   }
 
   async function submitVenue(){
-    const isBudapest = !form.city_name || form.city_name === "Budapest";
+    const isBudapest = manualMode
+      ? form.city_name === "Budapest"
+      : (!form.city_name || form.city_name === "Budapest");
 
     if(manualMode){
       // Manual mode: name, address, city_name, country required, no city_id needed
@@ -5783,28 +5785,60 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           ) : (
             <>
               <div style={{background:"var(--surface2)",borderRadius:12,padding:"10px 14px",marginBottom:10,border:"1.5px solid var(--border-col)"}}>
-                <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Manual entry</div>
-                {/* Name */}
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                  <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>Manual entry</div>
+                </div>
+                {/* Country first */}
+                <select style={{...selectStyle,marginBottom:8}} value={form.country||""} onChange={e=>{
+                  setF("country",e.target.value);
+                  setF("city_name","");
+                  setF("city_id","");
+                  setF("district","");
+                }}>
+                  <option value="">Select country *</option>
+                  {[...new Set(["Hungary","Austria","Czech Republic","Germany","France","Italy","Spain","United Kingdom","Netherlands","Poland","Romania","Croatia","Slovakia","Slovenia","Serbia","Switzerland","Belgium","Portugal","Greece","Sweden","Norway","Denmark","Finland","Turkey","United States","Japan","South Korea","Thailand","Singapore","Australia","Brazil","Argentina"].sort())].map(c=>(
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                {/* City — filtered by country if possible, else free text */}
+                {form.country&&(()=>{
+                  const countryCities = cities.filter(c=>c.country===form.country);
+                  if(countryCities.length>0) return (
+                    <select style={{...selectStyle,marginBottom:8}} value={form.city_name||""} onChange={e=>{
+                      const match = cities.find(c=>c.name===e.target.value);
+                      setF("city_name",e.target.value);
+                      setF("city_id", match?.id||"");
+                      setF("district","");
+                    }}>
+                      <option value="">Select city *</option>
+                      {countryCities.map(c=><option key={c.id} value={c.name}>{c.name}</option>)}
+                      <option value="__new__">+ Add new city</option>
+                    </select>
+                  );
+                  return (
+                    <div className="input-wrap-light" style={{marginBottom:8}}>
+                      <input placeholder="City *" value={form.city_name||""} onChange={e=>setF("city_name",e.target.value)} style={{flex:1}}/>
+                    </div>
+                  );
+                })()}
+                {form.city_name==="__new__"&&(
+                  <div className="input-wrap-light" style={{marginBottom:8}}>
+                    <input placeholder="New city name *" autoFocus onChange={e=>setF("city_name",e.target.value)} style={{flex:1}}/>
+                  </div>
+                )}
+                {/* Venue name */}
                 <div className="input-wrap-light" style={{marginBottom:8}}>
                   <input placeholder="Venue name *" value={form.name} onChange={e=>setF("name",e.target.value)} style={{flex:1}}/>
                 </div>
                 {/* Address */}
-                <div className="input-wrap-light" style={{marginBottom:8}}>
+                <div className="input-wrap-light" style={{marginBottom:0}}>
                   <input placeholder="Address" value={form.address} onChange={e=>setF("address",e.target.value)} style={{flex:1}}/>
                 </div>
-                {/* City */}
-                <div className="input-wrap-light" style={{marginBottom:8}}>
-                  <input placeholder="City *" value={form.city_name||""} onChange={e=>setF("city_name",e.target.value)} style={{flex:1}}/>
-                </div>
-                {/* Country */}
-                <div className="input-wrap-light" style={{marginBottom:0}}>
-                  <input placeholder="Country *" value={form.country||""} onChange={e=>setF("country",e.target.value)} style={{flex:1}}/>
-                </div>
               </div>
-              {/* District — only if Budapest */}
-              {(form.city_name==="Budapest"||!form.city_name)&&(
+              {/* District — only if Budapest explicitly selected */}
+              {form.city_name==="Budapest"&&(
                 <select style={selectStyle} value={form.district} onChange={e=>setF("district",e.target.value)}>
-                  <option value="">District (Budapest only)</option>
+                  <option value="">Select district *</option>
                   {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
                     <option key={d} value={d}>District {d}.</option>
                   ))}
