@@ -5215,6 +5215,8 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   const [placeSuggestions,setPlaceSuggestions]=useState([]);
   const [placeSearchVal,setPlaceSearchVal]=useState("");
   const [placeSelected,setPlaceSelected]=useState(false);
+  const [manualMode,setManualMode]=useState(false);
+  const [manualMode,setManualMode]=useState(false);
   const [loadingPlace,setLoadingPlace]=useState(false);
   const placeSessionToken=React.useRef(null);
   const placeSvc=React.useRef(null);
@@ -5422,9 +5424,19 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
 
   async function submitVenue(){
     const isBudapest = !form.city_name || form.city_name === "Budapest";
-    if(!form.name||!form.address||!form.category||!form.price_level||!form.why||!form.google_maps_url||!form.city_id){
-      setFormError("Please fill in all required fields (*).");
-      return;
+
+    if(manualMode){
+      // Manual mode: name, address, city_name, country required, no city_id needed
+      if(!form.name||!form.category||!form.price_level||!form.why||!form.city_name||!form.country){
+        setFormError("Please fill in all required fields (*).");
+        return;
+      }
+    } else {
+      // Autocomplete mode: city_id required
+      if(!form.name||!form.address||!form.category||!form.price_level||!form.why||!form.google_maps_url||!form.city_id){
+        setFormError("Please fill in all required fields (*).");
+        return;
+      }
     }
     if(isBudapest && !form.district){
       setFormError("Please select a district (*).");
@@ -5443,22 +5455,36 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
     setSubmitting(true);
     setFormError(null);
     try {
+      // For manual mode: find or create city
+      let cityId = form.city_id || user?.city_id || "62aeda29-9994-4c45-8d41-d1bd68ce1fa1";
+      if(manualMode && form.city_name){
+        const {data: existingCity} = await supabase.from("cities").select("id").eq("name",form.city_name).single();
+        if(existingCity){
+          cityId = existingCity.id;
+        } else {
+          const {data: newCity} = await supabase.from("cities").insert({
+            name: form.city_name,
+            country: form.country||"",
+          }).select("id").single();
+          if(newCity) cityId = newCity.id;
+        }
+      }
+
       const {data, error} = await supabase.from("venues").insert({
-        city_id: form.city_id || user?.city_id || "62aeda29-9994-4c45-8d41-d1bd68ce1fa1",
+        city_id: cityId,
         name: form.name,
-        address: form.address,
-        district: form.district,
+        address: form.address||null,
+        district: form.district||null,
         category: form.category,
         subcategory: form.subcategory||null,
         cuisine: form.cuisine||null,
         price_level: form.price_level,
         capacity: form.capacity||null,
-
-        google_maps_url: form.google_maps_url,
+        google_maps_url: form.google_maps_url||null,
         instagram_url: form.instagram_url||null,
         reservation_url: form.reservation_url||null,
         dietary: form.dietary||[],
-      tags: form.tags||[],
+        tags: form.tags||[],
         why: form.why,
         scout_alias: (()=>{ const fn=(user?.name||"Scout").split(" ")[0]; const b=user?.badge||"The Local"; return `${fn} - ${b}`; })(),
         submitted_by: user?.id||null,
@@ -5503,6 +5529,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       setGeocodeResult(null);
       setPlaceSearchVal("");
       setPlaceSelected(false);
+      setManualMode(false);
       setPlaceSuggestions([]);
       setSelOccasions([]);
       setCustomOccasion("");
@@ -5722,31 +5749,74 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         <div className="scroll" style={{padding:"14px 20px 80px"}}>
           <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",marginBottom:14}}>{t("scout.submit_new")}</div>
 
-          {/* Google Places Autocomplete search */}
-          <div style={{position:"relative",marginBottom:10}}>
-            <div className="input-wrap-light" style={{marginBottom:0}}>
-              <input
-                placeholder="🔍 Search venue name..."
-                value={placeSearchVal}
-                onChange={e=>handlePlaceSearch(e.target.value)}
-                autoComplete="off"
-                style={{flex:1}}
-              />
-              {loadingPlace&&<span style={{fontSize:12,color:"var(--text-muted)"}}>...</span>}
-              {placeSelected&&<span style={{fontSize:16,color:"#16a34a"}}>✓</span>}
-            </div>
-            {placeSuggestions.length>0&&(
-              <div style={{position:"absolute",top:"100%",left:0,right:0,background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:14,zIndex:100,boxShadow:"0 8px 24px rgba(0,0,0,.12)",overflow:"hidden",marginTop:4}}>
-                {placeSuggestions.map(pred=>(
-                  <div key={pred.place_id} onClick={()=>selectPlace(pred)}
-                    style={{padding:"12px 16px",cursor:"pointer",borderBottom:"1px solid var(--border-col)",fontFamily:"var(--body)"}}>
-                    <div style={{fontWeight:700,fontSize:14,color:"var(--black)"}}>{pred.structured_formatting?.main_text||pred.description}</div>
-                    <div style={{fontSize:12,color:"var(--text-muted)",marginTop:2}}>{pred.structured_formatting?.secondary_text||""}</div>
+          {/* Google Places Autocomplete search / Manual mode toggle */}
+          {!manualMode ? (
+            <>
+              <div style={{position:"relative",marginBottom:10}}>
+                <div className="input-wrap-light" style={{marginBottom:0}}>
+                  <input
+                    placeholder="🔍 Search venue name..."
+                    value={placeSearchVal}
+                    onChange={e=>handlePlaceSearch(e.target.value)}
+                    autoComplete="off"
+                    style={{flex:1}}
+                  />
+                  {loadingPlace&&<span style={{fontSize:12,color:"var(--text-muted)"}}>...</span>}
+                  {placeSelected&&<span style={{fontSize:16,color:"#16a34a"}}>✓</span>}
+                </div>
+                {placeSuggestions.length>0&&(
+                  <div style={{position:"absolute",top:"100%",left:0,right:0,background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:14,zIndex:100,boxShadow:"0 8px 24px rgba(0,0,0,.12)",overflow:"hidden",marginTop:4}}>
+                    {placeSuggestions.map(pred=>(
+                      <div key={pred.place_id} onClick={()=>selectPlace(pred)}
+                        style={{padding:"12px 16px",cursor:"pointer",borderBottom:"1px solid var(--border-col)",fontFamily:"var(--body)"}}>
+                        <div style={{fontWeight:700,fontSize:14,color:"var(--black)"}}>{pred.structured_formatting?.main_text||pred.description}</div>
+                        <div style={{fontSize:12,color:"var(--text-muted)",marginTop:2}}>{pred.structured_formatting?.secondary_text||""}</div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </div>
+              <button type="button" onClick={()=>{setManualMode(true);setPlaceSearchVal("");setPlaceSuggestions([]);}}
+                style={{background:"none",border:"none",fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",cursor:"pointer",textDecoration:"underline",marginBottom:10,padding:0}}>
+                Can't find it? Add manually →
+              </button>
+            </>
+          ) : (
+            <>
+              <div style={{background:"var(--surface2)",borderRadius:12,padding:"10px 14px",marginBottom:10,border:"1.5px solid var(--border-col)"}}>
+                <div style={{fontFamily:"var(--body)",fontSize:11,fontWeight:700,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:8}}>Manual entry</div>
+                {/* Name */}
+                <div className="input-wrap-light" style={{marginBottom:8}}>
+                  <input placeholder="Venue name *" value={form.name} onChange={e=>setF("name",e.target.value)} style={{flex:1}}/>
+                </div>
+                {/* Address */}
+                <div className="input-wrap-light" style={{marginBottom:8}}>
+                  <input placeholder="Address" value={form.address} onChange={e=>setF("address",e.target.value)} style={{flex:1}}/>
+                </div>
+                {/* City */}
+                <div className="input-wrap-light" style={{marginBottom:8}}>
+                  <input placeholder="City *" value={form.city_name||""} onChange={e=>setF("city_name",e.target.value)} style={{flex:1}}/>
+                </div>
+                {/* Country */}
+                <div className="input-wrap-light" style={{marginBottom:0}}>
+                  <input placeholder="Country *" value={form.country||""} onChange={e=>setF("country",e.target.value)} style={{flex:1}}/>
+                </div>
+              </div>
+              {/* District — only if Budapest */}
+              {(form.city_name==="Budapest"||!form.city_name)&&(
+                <select style={selectStyle} value={form.district} onChange={e=>setF("district",e.target.value)}>
+                  <option value="">District (Budapest only)</option>
+                  {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
+                    <option key={d} value={d}>District {d}.</option>
+                  ))}
+                </select>
+              )}
+              <button type="button" onClick={()=>{setManualMode(false);setF("name","");setF("address","");setF("city_name","");setF("country","");setF("district","");}}
+                style={{background:"none",border:"none",fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",cursor:"pointer",textDecoration:"underline",marginBottom:10,padding:0}}>
+                ← Search on Google instead
+              </button>
+            </>
+          )}
 
           {/* Auto-filled fields — show after place selected */}
           {placeSelected&&(
@@ -5775,8 +5845,8 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
             </div>
           )}
 
-          {/* District — only for Budapest, only after place selected */}
-          {placeSelected && (!form.city_name || form.city_name === "Budapest") && (
+          {/* District — only for Budapest, only after place selected (autocomplete mode) */}
+          {!manualMode && placeSelected && (!form.city_name || form.city_name === "Budapest") && (
             <select style={selectStyle} value={form.district} onChange={e=>setF("district",e.target.value)}>
               <option value="">{t("opt.select_district")}</option>
               {["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII"].map(d=>(
