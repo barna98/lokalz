@@ -4336,10 +4336,10 @@ function FeedScreen({navigate, user, allVenues}) {
       .order("created_at", {ascending:false})
       .limit(20);
 
-    // Merge, deduplicate, followed scouts first
+    // Merge, deduplicate, sort by created_at desc
     const followed = feedVenues;
     const cityOnly = (cityVenues||[]).filter(v=>!followed.find(f=>f.id===v.id));
-    const all = [...followed, ...cityOnly];
+    const all = [...followed, ...cityOnly].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
 
     // Load like counts
     if(all.length > 0){
