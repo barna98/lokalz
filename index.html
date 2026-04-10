@@ -4935,12 +4935,12 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
 
   return (
     <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
-      <div style={{position:"absolute",top:0,left:0,right:0,zIndex:10,padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",display:"flex",flexDirection:"column",gap:8,alignItems:"center"}}>
+      {viewMode==="map"&&<div style={{position:"absolute",top:0,left:0,right:0,zIndex:10,padding:"12px 16px",paddingTop:"calc(12px + env(safe-area-inset-top))",display:"flex",flexDirection:"column",gap:8,alignItems:"center"}}>
         <div className="av-ctrl" style={{display:"flex",gap:8,width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4}}>
-          <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:viewMode==="map"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="map"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
+          <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:"var(--surface)",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:"var(--black)",transition:"all .2s"}}>
             {t("map.map")}
           </button>
-          <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:viewMode==="list"?"var(--surface)":"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:viewMode==="list"?"var(--black)":"rgba(255,255,255,.75)",transition:"all .2s"}}>
+          <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:"rgba(255,255,255,.75)",transition:"all .2s"}}>
             {t("map.list")}
           </button>
         </div>
@@ -4948,9 +4948,6 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
           <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
           <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} className="search-input" style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}} />
         </div>
-        {viewMode==="list"&&availableCities?.length>0&&(
-          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-        )}
         <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
           {CATEGORIES.map(c=>{
             const sel = category===c;
@@ -4978,7 +4975,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
             })}
           </div>
         )}
-      </div>
+      </div>}
       <div style={{position:"absolute",inset:0,display:viewMode==="map"?"flex":"none",flexDirection:"column"}}>
           <div ref={mapRef} style={{position:"absolute",inset:0}}/>
           {/* Zoom + locate */}
@@ -5029,7 +5026,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
             </div>
           )}
       </div>
-      {viewMode==="list"&&<div className="scroll" style={{position:"absolute",inset:0,padding:"12px 20px 80px",paddingTop:"calc(220px + env(safe-area-inset-top))"}} ref={scrollRef}
+      {viewMode==="list"&&<div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}} ref={scrollRef}
         onScroll={e=>saveScroll("allVenues", e.currentTarget)}
         onTouchStart={e=>{ if(scrollRef.current?.scrollTop===0) window._avPullStart=e.touches[0].clientY; }}
         onTouchEnd={e=>{
@@ -5039,6 +5036,53 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
           }
           window._avPullStart=null;
         }}>
+        {/* Scrollable header */}
+        <div style={{padding:"12px 16px 6px",paddingTop:"calc(12px + env(safe-area-inset-top))",display:"flex",flexDirection:"column",gap:8}}>
+          <div style={{display:"flex",gap:8,width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4}}>
+            <button onClick={()=>setViewModePersist("map")} style={{flex:1,background:"transparent",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:"rgba(255,255,255,.75)",transition:"all .2s"}}>
+              {t("map.map")}
+            </button>
+            <button onClick={()=>setViewModePersist("list")} style={{flex:1,background:"var(--surface)",border:"none",borderRadius:50,padding:"10px 0",fontFamily:"var(--body)",fontSize:14,fontWeight:600,cursor:"pointer",color:"var(--black)",transition:"all .2s"}}>
+              {t("map.list")}
+            </button>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px"}}>
+            <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
+            <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,color:"white",flex:1,colorScheme:"dark"}} />
+          </div>
+          {availableCities?.length>0&&(
+            <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          )}
+          <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
+            {CATEGORIES.map(c=>{
+              const sel = category===c;
+              return (
+                <button key={c} onClick={()=>{setCategory(sel?"":c);setCuisine("");setSubcategory("");}}
+                  style={{background:sel?"var(--surface)":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"1px solid var(--border-col)":"1px solid rgba(255,255,255,.25)",borderRadius:50,padding:"5px 12px",fontFamily:"var(--body)",fontSize:12,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.9)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>
+                  {tCat(c)}
+                </button>
+              );
+            })}
+          </div>
+          {category==="Bar"&&(
+            <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
+              {["Cocktail bar","Wine bar","Pub","Night club","Speakeasy"].map(s=>{
+                const sel=subcategory===s;
+                return <button key={s} onClick={()=>setSubcategory(sel?"":s)} style={{background:sel?"var(--surface)":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"1px solid var(--border-col)":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{tCat(s)}</button>;
+              })}
+            </div>
+          )}
+          {category==="Restaurant"&&(
+            <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
+              {CUISINES_FILTER.map(c=>{
+                const sel=cuisine===c;
+                return <button key={c} onClick={()=>setCuisine(sel?"":c)} style={{background:sel?"var(--surface)":"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",border:sel?"1px solid var(--border-col)":"1px solid rgba(255,255,255,.2)",borderRadius:50,padding:"4px 10px",fontFamily:"var(--body)",fontSize:11,fontWeight:sel?700:400,color:sel?"var(--black)":"rgba(255,255,255,.85)",cursor:"pointer",transition:"all .15s",whiteSpace:"nowrap",flexShrink:0}}>{tCui(c)}</button>;
+              })}
+            </div>
+          )}
+        </div>
+        {/* Venue list */}
+        <div style={{padding:"4px 20px"}}>
         {sorted.length===0
           ?<div className="empty"><div className="empty-icon">🍽</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--text-muted)"}}>no venues found</div></div>
           :sorted.map((v,i)=>(
@@ -5047,6 +5091,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
             </div>
           ))
         }
+        </div>
       </div>}
     </div>
   );
