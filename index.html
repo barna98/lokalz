@@ -4957,18 +4957,22 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
           {selectedVenue&&(
             <div style={{position:"absolute",bottom:90,left:16,right:16,zIndex:20,animation:"slideInUp .2s cubic-bezier(.2,.8,.4,1)"}}>
               <div onClick={()=>navigate("venue",selectedVenue)}
-                style={{background:"var(--surface)",borderRadius:20,overflow:"hidden",border:"1.5px solid var(--border-col)",boxShadow:"0 8px 32px rgba(0,0,0,.18)",cursor:"pointer",display:"flex",gap:0}}>
+                style={{background:"var(--surface)",borderRadius:20,overflow:"hidden",border:"1.5px solid var(--border-col)",boxShadow:"0 8px 32px rgba(0,0,0,.18)",cursor:"pointer",display:"flex"}}>
                 <div style={{width:4,background:"var(--red)",flexShrink:0}}/>
-                <div style={{display:"flex",gap:14,padding:"16px",flex:1,alignItems:"center"}}>
+                <div style={{display:"flex",gap:14,padding:"18px 16px",flex:1,alignItems:"flex-start"}}>
                   <MapVenueThumb venueId={selectedVenue.id} category={selectedVenue.category}/>
                   <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:17,color:"var(--black)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginBottom:3}}>{selectedVenue.name}</div>
-                    <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginBottom:6}}>
+                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:17,color:"var(--black)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginBottom:4}}>{selectedVenue.name}</div>
+                    <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginBottom:8}}>
                       {tCat(selectedVenue.category)}{venueLocation(selectedVenue)&&` · ${venueLocation(selectedVenue)}`}{(selectedVenue.price_level||selectedVenue.price)&&` · ${selectedVenue.price_level||selectedVenue.price}`}
                     </div>
-                    {selectedVenue.why&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)",fontStyle:"italic",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",opacity:.65}}>{selectedVenue.why}</div>}
+                    {selectedVenue.why&&(
+                      <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)",fontStyle:"italic",lineHeight:1.5,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",opacity:.7}}>
+                        {selectedVenue.why}
+                      </div>
+                    )}
                   </div>
-                  <div style={{color:"var(--red)",fontSize:20,flexShrink:0,fontWeight:300}}>→</div>
+                  <div style={{color:"var(--red)",fontSize:20,flexShrink:0,paddingTop:2}}>→</div>
                 </div>
               </div>
             </div>
