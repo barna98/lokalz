@@ -3552,6 +3552,32 @@ function SkeletonCard(){
   );
 }
 
+function FeedSkeletonCard(){
+  return (
+    <div style={{padding:"0 16px",marginBottom:16}}>
+      <div style={{background:"var(--surface)",borderRadius:20,border:"1.5px solid var(--border-col)",overflow:"hidden",display:"flex",gap:0}}>
+        <div style={{width:4,background:"var(--surface2)",flexShrink:0}}/>
+        <div style={{flex:1,padding:"16px 16px 14px"}}>
+          {/* Scout row */}
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+            <div className="skeleton" style={{width:28,height:28,borderRadius:"50%",flexShrink:0}}/>
+            <div className="skeleton" style={{height:12,borderRadius:8,width:"40%"}}/>
+          </div>
+          {/* Venue name */}
+          <div className="skeleton" style={{height:20,borderRadius:8,marginBottom:6,width:"70%"}}/>
+          {/* Meta */}
+          <div className="skeleton" style={{height:12,borderRadius:8,marginBottom:12,width:"45%"}}/>
+          {/* Image */}
+          <div className="skeleton" style={{height:180,borderRadius:12,marginBottom:12}}/>
+          {/* Why */}
+          <div className="skeleton" style={{height:12,borderRadius:8,marginBottom:6,width:"90%"}}/>
+          <div className="skeleton" style={{height:12,borderRadius:8,width:"60%"}}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partner, user, selectedCity}) {
   const BATCH=5;
   const activeAll = allVenues.filter(v=>v.status==="active");
@@ -4564,8 +4590,8 @@ function FeedScreen({navigate, user, allVenues}) {
         </div>
 
         {loading&&(
-          <div style={{padding:"0 20px"}}>
-            {[1,2,3].map(i=><SkeletonCard key={i}/>)}
+          <div style={{padding:"0"}}>
+            {[1,2,3].map(i=><FeedSkeletonCard key={i}/>)}
           </div>
         )}
 
