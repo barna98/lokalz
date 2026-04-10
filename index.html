@@ -2007,6 +2007,57 @@ function NavIcon({id, active}) {
   return null;
 }
 
+function CitySearchBar({availableCities, selectedCity, onSelect}) {
+  const [query, setQuery] = React.useState("");
+  const [open, setOpen] = React.useState(false);
+  const inputRef = React.useRef(null);
+
+  const filtered = (availableCities||[]).filter(c=>
+    !query || c.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  function select(name) {
+    onSelect&&onSelect(name==="all"?null:name);
+    setQuery("");
+    setOpen(false);
+  }
+
+  return (
+    <div style={{width:"100%",position:"relative"}}>
+      <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
+        <span style={{fontSize:13}}>📍</span>
+        <input
+          ref={inputRef}
+          placeholder={selectedCity||"All cities"}
+          value={query}
+          onChange={e=>{setQuery(e.target.value);setOpen(true);}}
+          onFocus={()=>setOpen(true)}
+          style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:selectedCity?700:400,color:"white",flex:1}}
+        />
+        {(selectedCity||query)&&(
+          <button onClick={()=>{select("all");setQuery("");}} style={{background:"none",border:"none",color:"rgba(255,255,255,.6)",cursor:"pointer",fontSize:16,padding:0,lineHeight:1}}>×</button>
+        )}
+      </div>
+      {open&&(
+        <div style={{position:"absolute",top:"calc(100% + 6px)",left:0,right:0,background:"rgba(20,20,20,.95)",backdropFilter:"blur(16px)",borderRadius:16,overflow:"hidden",zIndex:50,boxShadow:"0 8px 32px rgba(0,0,0,.3)",maxHeight:220,overflowY:"auto"}}>
+          <div onClick={()=>select("all")} style={{padding:"12px 16px",fontFamily:"var(--body)",fontSize:14,color:!selectedCity?"white":"rgba(255,255,255,.6)",fontWeight:!selectedCity?700:400,cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,.08)"}}>
+            🌍 All cities
+          </div>
+          {filtered.map(c=>(
+            <div key={c.name} onClick={()=>select(c.name)}
+              style={{padding:"12px 16px",fontFamily:"var(--body)",fontSize:14,color:selectedCity===c.name?"white":"rgba(255,255,255,.6)",fontWeight:selectedCity===c.name?700:400,cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,.06)",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span>📍 {c.name}</span>
+              <span style={{fontSize:12,opacity:.5}}>{c.count||""}</span>
+            </div>
+          ))}
+          {filtered.length===0&&<div style={{padding:"12px 16px",fontFamily:"var(--body)",fontSize:13,color:"rgba(255,255,255,.4)"}}>No cities found</div>}
+        </div>
+      )}
+      {open&&<div style={{position:"fixed",inset:0,zIndex:49}} onClick={()=>{setOpen(false);setQuery("");}}/>}
+    </div>
+  );
+}
+
 function CityPicker({availableCities, selectedCity, onSelect}) {
   const [open, setOpen] = useState(false);
 
@@ -4896,9 +4947,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
           <input placeholder={t("search.placeholder")} value={search} onChange={e=>setSearch(e.target.value)} className="search-input" style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}} />
         </div>
         {viewMode==="list"&&availableCities?.length>0&&(
-          <div style={{display:"flex",width:"100%"}}>
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          </div>
+          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
         <div style={{display:"flex",gap:6,overflowX:"auto",width:"100%",scrollbarWidth:"none",WebkitOverflowScrolling:"touch",paddingBottom:2}}>
           {CATEGORIES.map(c=>{
