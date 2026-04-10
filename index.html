@@ -4721,7 +4721,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
         </div>
       </div>
 
-      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
         {availableCities?.length>0&&(
           <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
@@ -6029,7 +6029,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           </div>
         </div>
       </div>
-      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
         {availableCities?.length>0&&(
           <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
@@ -6819,7 +6819,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
           </div>
         </div>
       </div>
-      <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
+      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
         {availableCities?.length>0&&(
           <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
