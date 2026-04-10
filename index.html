@@ -4782,6 +4782,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
           </div>
         )}
       </div>
+      </div>
     </div>
   );
 }
@@ -6019,8 +6020,9 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   );
 
   return (
-    <div className="screen-scroll" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
+      <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div style={{textAlign:"right"}}>
@@ -6351,6 +6353,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           }
         </div>
       )}
+      </div>
     </div>
   );
 }
@@ -6808,8 +6811,9 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
   );
 
   return (
-    <div className="screen-scroll" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
+      <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div style={{textAlign:"right"}}>
@@ -7123,6 +7127,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       {tab==="partners"&&(
         <PartnerManageTab showToast={showToast} cityId={user?.city_id}/>
       )}
+      </div>
     </div>
   );
 }
@@ -8073,8 +8078,9 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
   const displayEvents = tab==="my" ? myEvents : events;
 
   return (
-    <div className="screen-scroll" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+    <div className="screen" style={{background:"var(--bg)"}}>
+      <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div style={{textAlign:"right"}}>
@@ -8135,6 +8141,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
             </>
           }
         </div>
+      </div>
       {showCreate&&<CreatePlanModal navigate={navigate} user={user} allVenues={allVenues} showToast={showToast}
         onClose={()=>setShowCreate(false)}
         onCreate={plan=>{setMyEvents(p=>[plan,...p]);setShowCreate(false);setTab("my");}}/>}
