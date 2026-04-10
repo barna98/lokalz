@@ -2613,7 +2613,7 @@ function CityPickBox({label, cat, venues, navigate, isPremium}) {
 
   React.useEffect(()=>{
     if(venues.length===0) return;
-    const ids = venues.slice(0,3).map(v=>v.id);
+    const ids = venues.slice(0,4).map(v=>v.id);
     Promise.all(ids.map(id=>
       supabase.from("venue_images").select("url").eq("venue_id",id).eq("is_primary",true).limit(1)
         .then(({data})=>data&&data[0]?data[0].url:null)
@@ -2621,13 +2621,16 @@ function CityPickBox({label, cat, venues, navigate, isPremium}) {
   },[venues.length]);
 
   const hasImgs = imgs.length>0;
+  const count = venues.length;
 
   return (
     <div onClick={()=>isPremium&&venues.length>0&&navigate("results_list",{venues,title:label})}
       onTouchStart={e=>isPremium&&(e.currentTarget.style.transform="scale(.96)")}
       onTouchEnd={e=>e.currentTarget.style.transform=""}
       style={{
-        background:dark?"#1c1c1c":"#000000",border:dark?"1.5px solid #2a2a2a":"none",borderRadius:20,
+        background:dark?"#1c1c1c":"#ffffff",
+        border:dark?"1.5px solid #2a2a2a":"1.5px solid rgba(0,0,0,.08)",
+        borderRadius:20,
         cursor:isPremium&&venues.length>0?"pointer":"default",
         aspectRatio:"1/1",overflow:"hidden",display:"flex",flexDirection:"column",
         opacity:isPremium?(venues.length>0?1:.35):.35,
@@ -2635,21 +2638,26 @@ function CityPickBox({label, cat, venues, navigate, isPremium}) {
         userSelect:"none",
         transition:"transform .12s ease",
         position:"relative",
-        boxShadow:"0 2px 8px rgba(0,0,0,.15)",
+        boxShadow:dark?"none":"0 2px 12px rgba(0,0,0,.08)",
       }}>
-      {/* Top: collage - 2 small left stacked, 1 large right */}
-      <div style={{flex:1,display:"grid",gridTemplateColumns:"1fr 1fr",gridTemplateRows:"1fr 1fr",gap:2,background:"rgba(255,255,255,.05)",overflow:"hidden"}}>
+      {/* Image collage — 1 large top, 3 small bottom */}
+      <div style={{flex:1,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gridTemplateRows:"1.4fr 1fr",gap:2,overflow:"hidden",background:dark?"#111":"#f5f5f5"}}>
         {hasImgs ? <>
-          {imgs[0]&&<div style={{background:`url(${imgs[0]}) center/cover`,backgroundSize:"cover"}}/>}
-          {imgs[1]&&<div style={{background:`url(${imgs[1]}) center/cover`,backgroundSize:"cover",gridRow:"1/3"}}/>}
-          {imgs[2]&&<div style={{background:`url(${imgs[2]}) center/cover`,backgroundSize:"cover"}}/>}
-        </> : <div style={{gridColumn:"1/-1",gridRow:"1/3",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,background:"rgba(255,255,255,.05)"}}>
+          {imgs[0]&&<div style={{gridColumn:"1/4",background:`url(${imgs[0]}) center/cover`}}/>}
+          {imgs[1]&&<div style={{background:`url(${imgs[1]}) center/cover`}}/>}
+          {imgs[2]&&<div style={{background:`url(${imgs[2]}) center/cover`}}/>}
+          {imgs[3]&&<div style={{background:`url(${imgs[3]}) center/cover`,position:"relative"}}>
+            {count>4&&<div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.45)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"white"}}>+{count-3}</div>}
+          </div>}
+          {!imgs[3]&&count>0&&<div style={{background:dark?"#222":"#eee",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:dark?"#888":"#aaa"}}>{count>3?`+${count-2}`:""}</div>}
+        </> : <div style={{gridColumn:"1/-1",gridRow:"1/3",display:"flex",alignItems:"center",justifyContent:"center",fontSize:40}}>
           {cat==="Restaurant"?"🍽":cat==="Bar"?"🍷":cat==="Bakery"?"🥐":cat==="Street food"?"🌮":"☕"}
         </div>}
       </div>
-      {/* Bottom: red label strip */}
-      <div style={{padding:"10px 14px",background:dark?"#2a2a2a":"#000000",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"white",lineHeight:1.1}}>{label}</div>
+      {/* Label */}
+      <div style={{padding:"10px 14px",background:dark?"#1c1c1c":"#ffffff",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:14,color:dark?"white":"var(--black)",lineHeight:1.1}}>{label}</div>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:11,color:dark?"rgba(255,255,255,.4)":"rgba(0,0,0,.35)"}}>{count} spots</div>
       </div>
     </div>
   );
