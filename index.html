@@ -3147,9 +3147,9 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
               </button>
             ))}
           </div>
+          </div>
         </div>
       </div>
-
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>selOcc.length>0&&next()}
           className="q-next-btn" style={{opacity:selOcc.length>0?1:.4,cursor:selOcc.length>0?"pointer":"default"}}>
@@ -3266,6 +3266,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
           <span>{t("q3.surprise")}</span>
         </button>
       </div>
+      </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel.length>0&&next()} className="q-next-btn" style={{opacity:sel.length>0?1:.4,cursor:sel.length>0?"pointer":"default"}}>next</button>
       </div>
@@ -3336,6 +3337,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
           </button>
         ))}
       </div>
+      </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel.length>0&&next()} className="q-next-btn" style={{opacity:sel.length>0?1:.4,cursor:sel.length>0?"pointer":"default"}}>next</button>
       </div>
@@ -3372,6 +3374,7 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
         ))}
         <button style={{...PILL,width:"100%",background:"var(--surface)",color:"var(--text-muted)",borderColor:"var(--border-col)",justifyContent:"center",gridColumn:"1/-1"}} onClick={()=>{setAnswers(a=>({...a,cuisines:[]}));navigate("q6");}}>{t("q4.not_sure")}</button>
       </div>
+      </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel.length>0&&next()} className="q-next-btn" style={{opacity:sel.length>0?1:.4,cursor:sel.length>0?"pointer":"default"}}>{t("q5.next")}</button>
       </div>
@@ -3402,6 +3405,7 @@ function Q6Screen({navigate, onMenu, answers, setAnswers}) {
         {[["2","2"],["3-6","3-6"],["6-8","6-8"],["9+","9+"],["solo","solo mission"]].map(([val,label])=>(
           <button key={val} style={{...PILL,background:answers.group===val?"var(--red)":"var(--surface)",color:answers.group===val?"white":"var(--black)",borderColor:answers.group===val?"var(--red)":"var(--border-col)"}} onClick={()=>select(val)}>{label}</button>
         ))}
+        </div>
       </div>
     </div>
   );
