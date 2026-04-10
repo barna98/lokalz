@@ -3061,19 +3061,19 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-            <div/>
-            <div style={{textAlign:"right"}}>
-              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
-            </div>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+          <div/>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
           </div>
         </div>
-        <QProgress step="q1"/>
-        <div style={{padding:"8px 20px 12px"}}>
-          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q1.title")}</div>
-        </div>
-        <div style={{padding:"0 20px"}}>
+      </div>
+      <QProgress step="q1"/>
+      <div style={{padding:"8px 20px 12px",flexShrink:0}}>
+        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q1.title")}</div>
+      </div>
+      <div className="scroll" style={{padding:"0 20px 100px"}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           {CATS.map(c=>(
             <div key={c.id} onClick={()=>{haptic("light");setSel(c.id);}}
@@ -3100,8 +3100,6 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
               </div>
             </div>
           ))}
-
-        </div>
         </div>
       </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
