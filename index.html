@@ -148,7 +148,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
   0%{background-position:200% center;}
   100%{background-position:-200% center;}
 }
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideInLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 @keyframes slideInUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -156,7 +156,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 @keyframes staggerUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes imgFadeIn{from{opacity:0}to{opacity:1}}
 
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:fadeUp .2s cubic-bezier(.25,.46,.45,.94) both;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:fadeUp .15s cubic-bezier(.25,.46,.45,.94) both;}
 .screen-scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);animation:fadeUp .2s cubic-bezier(.25,.46,.45,.94) both;display:flex;flex-direction:column;}
 .screen-no-anim{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);}
 .screen-detail{position:absolute;inset:0;display:flex;flex-direction:column;background:transparent;}
@@ -2970,7 +2970,11 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
             {!isPremium&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20}}>{t("home.pro_only")}</span>}
           </div>
           <div style={{position:"relative",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-            {[
+            {venuesLoading
+              ? [1,2,3,4,5].map(i=>(
+                  <div key={i} className="skeleton" style={{borderRadius:16,aspectRatio:"1/1"}}/>
+                ))
+              : [
               {label:tCat("Restaurant").toUpperCase(),  cat:"Restaurant"},
               {label:tCat("Street food").toUpperCase(), cat:"Street food"},
               {label:tCat("Bakery").toUpperCase(),      cat:"Bakery"},
