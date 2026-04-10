@@ -4711,7 +4711,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button className="back-btn" onClick={()=>{onMenu&&onMenu();}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -4723,9 +4723,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
 
       <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
-          <div style={{marginBottom:8}}>
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          </div>
+          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["places",t("saved.places")],["scouts",t("saved.scouts")]].map(([k,l])=>(
@@ -4735,7 +4733,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
       </div>
 
       {tab==="places"&&(
-        <div className="scroll" style={{padding:"36px 20px 80px"}}>
+        <div className="scroll" style={{padding:"20px 20px 80px"}}>
           {saved.length===0
             ?<div className="empty">
                 <div className="empty-icon">🤍</div>
@@ -4753,7 +4751,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
       )}
 
       {tab==="scouts"&&(
-        <div className="scroll" style={{padding:"36px 20px 80px"}}>
+        <div className="scroll" style={{padding:"20px 20px 80px"}}>
           {!isPremium
             ?<div style={{textAlign:"center",padding:"48px 20px"}}>
                 <div style={{fontSize:44,marginBottom:12}}>👤</div>
@@ -5178,7 +5176,7 @@ function ScoutEventsTab({user, allVenues, showToast}) {
   const inputStyle = {width:"100%",border:"1.5px solid var(--border-col)",borderRadius:10,padding:"11px 14px",fontFamily:"var(--body)",fontSize:14,fontWeight:600,outline:"none",background:"var(--surface)",color:"var(--black)",marginBottom:10};
 
   return (
-    <div className="scroll" style={{padding:"36px 20px 80px"}}>
+    <div className="scroll" style={{padding:"20px 20px 80px"}}>
       <button className="btn-black" style={{marginBottom:16}} onClick={()=>setShowCreate(v=>!v)}>
         {showCreate?t("btn.cancel"):t("btn.add_event")}
       </button>
@@ -5862,7 +5860,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       <div style={{padding:"8px 20px 12px",background:"#FFF3CD",borderRadius:0}}>
         <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#664D03"}}>✏ {editingVenue.edit_comment||"Edit requested by city lead"}</div>
       </div>
-      <div className="scroll" style={{padding:"36px 20px 80px"}}>
+      <div className="scroll" style={{padding:"20px 20px 80px"}}>
         {[["name","Name *"],["address","Address *"],["google_maps_url","Google Maps URL"],["instagram_url","Instagram URL"],["reservation_url","Reservation URL"]].map(([k,p])=>(
           <input key={k} style={inputStyle} placeholder={p} value={editForm[k]} onChange={e=>setEditForm(f=>({...f,[k]:e.target.value}))}/>
         ))}
@@ -6022,7 +6020,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -6033,9 +6031,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       </div>
       <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
-          <div style={{marginBottom:8}}>
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          </div>
+          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["add","add venue"],["events","events"],[t("scout.activity"),"my activity"]].map(([k,l])=>(
@@ -6045,7 +6041,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       </div>
 
       {tab==="add"&&(
-        <div className="scroll" style={{padding:"36px 20px 80px"}}>
+        <div className="scroll" style={{padding:"20px 20px 80px"}}>
           <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",marginBottom:14}}>{t("scout.submit_new")}</div>
 
           {/* Google Places Autocomplete search / Manual mode toggle */}
@@ -6325,7 +6321,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         <ScoutEventsTab user={user} allVenues={allVenues} showToast={showToast}/>
       )}
       {tab==="activity"&&(
-        <div className="scroll" style={{padding:"36px 20px 80px"}} ref={scoutScrollRef}
+        <div className="scroll" style={{padding:"20px 20px 80px"}} ref={scoutScrollRef}
           onScroll={e=>saveScroll("scout",e.currentTarget)}>
           <div style={{display:"flex",gap:12,marginBottom:20}}>
             {[["✅",t("scout.approved"),myVenues.filter(v=>v.status==="active").length],["⏳",t("status.pending"),myVenues.filter(v=>v.status==="pending").length]].map(([ico,label,count])=>(
@@ -6654,7 +6650,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--red)"}}>EDIT VENUE</div>
         <div style={{width:26}}/>
       </div>
-      <div className="scroll" style={{padding:"36px 20px 80px"}}>
+      <div className="scroll" style={{padding:"20px 20px 80px"}}>
         {[["name","Name *"],["address","Address *"],["scout_alias","Scout alias"],
           ["google_maps_url","Google Maps URL"],["instagram_url","Instagram URL"],
           ["reservation_url","Reservation URL"],["website_url","Website URL"]].map(([k,p])=>(
@@ -6814,7 +6810,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -6825,9 +6821,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       </div>
       <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
-          <div style={{marginBottom:8}}>
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          </div>
+          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["pending","pending",pending.length],["all","all",active.length],["events","events",pendingEvents.length],["reports","reports",reports.length],["partners","partners",""]].map(([k,l,c])=>(
@@ -6838,7 +6832,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       </div>
       {tab==="pending"&&(
-        <div className="scroll" style={{padding:"36px 20px 80px"}}>
+        <div className="scroll" style={{padding:"20px 20px 80px"}}>
           {pending.length===0
             ?<div className="empty"><div className="empty-icon">✅</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("cl.no_pending")}</div></div>
             :pending.map(v=>{
@@ -6972,7 +6966,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       )}
       {tab==="all"&&(
-        <div className="scroll" style={{padding:"36px 20px 80px"}} ref={clScrollRef}
+        <div className="scroll" style={{padding:"20px 20px 80px"}} ref={clScrollRef}
           onScroll={e=>saveScroll("cityLead",e.currentTarget)}>
           <div style={{marginBottom:12,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"var(--text-muted)"}}>
@@ -7060,7 +7054,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       )}
       {tab==="reports"&&(
-        <div className="scroll" style={{padding:"36px 20px 80px"}}>
+        <div className="scroll" style={{padding:"20px 20px 80px"}}>
           {reports.length===0
             ?<div className="empty"><div className="empty-icon">🚩</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>No reports yet.</div></div>
             :Object.entries(
@@ -7100,7 +7094,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       )}
       {tab==="events"&&(
-        <div className="scroll" style={{padding:"36px 20px 80px"}}>
+        <div className="scroll" style={{padding:"20px 20px 80px"}}>
           {pendingEvents.length===0
             ?<div className="empty"><div className="empty-icon">🗓</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("cl.no_pending_events")}</div></div>
             :pendingEvents.map(ev=>(
@@ -7164,7 +7158,7 @@ function PartnerManageTab({showToast, cityId}) {
   }
 
   return (
-    <div className="scroll" style={{padding:"36px 20px 80px"}}>
+    <div className="scroll" style={{padding:"20px 20px 80px"}}>
       {partners.length===0
         ?<div className="empty"><div className="empty-icon">🏨</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>No partners yet.</div></div>
         :partners.map(p=>(
@@ -7298,7 +7292,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
           </div>
         </div>
       </div>
-      <div className="scroll" style={{padding:"36px 20px 80px",background:"var(--bg)",flex:1}}>
+      <div className="scroll" style={{padding:"20px 20px 80px",background:"var(--bg)",flex:1}}>
 
         {/* Profile card */}
         <div style={{background:"var(--surface)",borderRadius:20,padding:"20px",marginBottom:16,border:"1.5px solid var(--border-col)"}}>
@@ -7582,7 +7576,7 @@ function ScoutsScreen({navigate, onMenu, user, selectedCity, availableCities, on
         </div>
       </div>
 
-      <div className="scroll" style={{padding:"36px 20px 80px"}}>
+      <div className="scroll" style={{padding:"20px 20px 80px"}}>
         {loading&&<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>}
         {!loading&&filtered.length===0&&<div style={{textAlign:"center",padding:32,fontFamily:"var(--body)",fontSize:14,color:"var(--text-muted)"}}>{t("sc.no_scouts")}</div>}
         {filtered.map(s=>(
@@ -7732,7 +7726,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <button className="back-btn" onClick={()=>navigate(-1)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -7847,7 +7841,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
 function AboutScreen({navigate}) {
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -8080,7 +8074,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
           <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div style={{textAlign:"right"}}>
@@ -8104,7 +8098,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
         ? <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
             <div style={{width:28,height:28,border:"2.5px solid var(--surface3)",borderTop:"2.5px solid black",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
           </div>
-        : <div className="scroll" style={{padding:"36px 20px 80px"}}>
+        : <div className="scroll" style={{padding:"20px 20px 80px"}}>
             {tab==="my"&&!isPremium&&(
               <div style={{textAlign:"center",padding:"40px 20px"}}>
                 <div style={{fontFamily:"var(--body)",fontSize:14,color:"#888",marginBottom:16}}>{t("ev.upgrade_rsvp")}</div>
@@ -8258,7 +8252,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   if(!isPremium) return (
     <div className="screen">
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
       <div style={{padding:"60px 28px",textAlign:"center"}}>
         <div style={{fontSize:56,marginBottom:20}}>🎉</div>
         <div style={{fontFamily:"var(--display)",fontWeight:900,fontSize:22,color:"var(--black)",marginBottom:10}}>{t("sc.premium_feature")}</div>
@@ -8270,7 +8264,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   return (
     <div className="screen">
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
+      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}><div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div></div>
       <div style={{padding:"12px 24px 16px",flexShrink:0}}>
         <div className="logo-md">Lokal&#39;z</div>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",marginTop:6}}>{t("ev.my_events")}</div>
@@ -9182,7 +9176,7 @@ function App() {
       const listTitle = listData.title||"spots";
       return (
         <div className="screen" style={{background:"var(--bg)"}}>
-          <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+          <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
             <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
               <button onClick={()=>navigate("home",null,{replace:true})} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
               <div style={{textAlign:"right"}}>
@@ -9192,7 +9186,7 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="scroll" style={{padding:"36px 20px 80px"}}>
+          <div className="scroll" style={{padding:"20px 20px 80px"}}>
             {listVenues.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)}
           </div>
         </div>
