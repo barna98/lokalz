@@ -7279,17 +7279,18 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
 
   return (
     <div className="screen">
-      {/* Pink header */}
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.profile")}</div>
+      <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
+        {/* Header */}
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.profile")}</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="scroll" style={{padding:"20px 20px 80px",background:"var(--bg)",flex:1}}>
+        <div style={{padding:"20px 20px 0",background:"var(--bg)"}}
 
         {/* Profile card */}
         <div style={{background:"var(--surface)",borderRadius:20,padding:"20px",marginBottom:16,border:"1.5px solid var(--border-col)"}}>
@@ -7501,6 +7502,7 @@ function ProfileScreen({navigate, user, setUser, onMenu, onSignOut, cities, lang
           </div>
         }
         <div style={{height:32}}/>
+      </div>
       </div>
     </div>
   );
