@@ -1700,6 +1700,11 @@ const BUDGETS = ["$","$$","$$$","$$$$"];
 const DIETARY_OPTIONS = ["Gluten-free","Vegan","Vegetarian","Halal","Kosher","Dairy-free","Nut-free","Pescatarian"];
 const TAGS = ["Specialty coffee","Matcha","Hidden gem","Cozy","Chill","Quiet","Grab & go","Cocktails","Wine bar","Speakeasy","Live music","Good music","Good for groups","Romantic","Lively","Upscale","Scenic","Underrated","Aesthetic","Outdoor seating","Indoor seating"];
 const CUISINES = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","Italian","French","Spanish","Greek","Mexican","American","Hungarian","Middle Eastern","Mediterranean"];
+const CUISINE_FLAGS = {
+  "Japanese":"🇯🇵","Chinese":"🇨🇳","Korean":"🇰🇷","Thai":"🇹🇭","Vietnamese":"🇻🇳",
+  "Indian":"🇮🇳","Italian":"🇮🇹","French":"🇫🇷","Spanish":"🇪🇸","Greek":"🇬🇷",
+  "Mexican":"🇲🇽","American":"🇺🇸","Hungarian":"🇭🇺","Middle Eastern":"🌙","Mediterranean":"🫒"
+};
 const CUISINES_FILTER = ["Japanese","Chinese","Korean","Thai","Vietnamese","Indian","Italian","French","Spanish","Greek","Mexican","American","Hungarian","Middle Eastern","Mediterranean","Other"];
 const GROUP_SIZES = ["2","3-6","6-8","9+"];
 const CITIES = ["Budapest","Vienna","Prague"];
@@ -3241,7 +3246,7 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q3.where_city")}</div>
       </div>
-        <div style={{padding:"0 20px"}}>
+        <div style={{padding:"0 20px",display:"flex",flexDirection:"column",gap:9}}>
         <button onClick={detectLocation}
           style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--red)":"var(--surface)",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid "+(sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--red)":"var(--border-col)")}}>
           <span>{locLoading?t("q.locating"):t("q.detect_location")}</span>
@@ -3368,8 +3373,8 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
         </div>
         <div style={{padding:"0 20px 100px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
         {CUISINES.map(x=>(
-          <button key={x} style={{...PILL,width:"100%",background:sel.includes(x)?"var(--red)":"var(--surface)",color:sel.includes(x)?"white":"var(--black)",borderColor:sel.includes(x)?"var(--red)":"var(--border-col)",justifyContent:"center"}} onClick={()=>toggle(x)}>
-            <span>{tCui(x)}</span>
+          <button key={x} style={{...PILL,width:"100%",background:sel.includes(x)?"var(--red)":"var(--surface)",color:sel.includes(x)?"white":"var(--black)",borderColor:sel.includes(x)?"var(--red)":"var(--border-col)",justifyContent:"center",gap:8}} onClick={()=>toggle(x)}>
+            <span>{CUISINE_FLAGS[x]}</span><span>{tCui(x)}</span>
           </button>
         ))}
         <button style={{...PILL,width:"100%",background:"var(--surface)",color:"var(--text-muted)",borderColor:"var(--border-col)",justifyContent:"center",gridColumn:"1/-1"}} onClick={()=>{setAnswers(a=>({...a,cuisines:[]}));navigate("q6");}}>{t("q4.not_sure")}</button>
