@@ -4711,17 +4711,18 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
   },[user?.id]);
 
   return (
-    <div className="screen-scroll" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button className="back-btn" onClick={()=>{onMenu&&onMenu();}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div className="screen" style={{background:"var(--bg)"}}>
+      <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button className="back-btn" onClick={()=>{onMenu&&onMenu();}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div style={{textAlign:"right"}}>
               <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("saved.title2")}</div>
             </div>
           </div>
         </div>
-      <div style={{background:"var(--bg)",padding:"10px 16px 10px",position:"sticky",top:0,zIndex:10,display:"flex",flexDirection:"column",gap:8}}>
+        <div style={{background:"var(--bg)",padding:"10px 16px 10px",position:"sticky",top:0,zIndex:10,display:"flex",flexDirection:"column",gap:8}}>
           {availableCities?.length>0&&(
             <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
           )}
@@ -4732,55 +4733,55 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
           </div>
         </div>
         {tab==="places"&&(
-        <div style={{padding:"20px 20px 0"}}>
-          {saved.length===0
-            ?<div className="empty">
-                <div className="empty-icon">🤍</div>
-                <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:700,color:"var(--black)",marginBottom:8}}>{t("saved.nothing")}</div>
-                <div style={{fontFamily:"var(--body)",fontSize:13,color:"#888",marginBottom:20}}>{t("saved.explore")}</div>
-                <button className="btn-black" style={{width:"auto",padding:"14px 28px"}} onClick={()=>navigate("q1")}>start discover →</button>
-              </div>
-            :saved.map((v,i)=>(
-              <div key={v.id} style={{animation:`staggerUp .3s ${Math.min(i,8)*0.05}s cubic-bezier(.2,.8,.4,1) both`,opacity:0,animationFillMode:"forwards"}}>
-                <VenueCard venue={v} onClick={()=>navigate("venue",v)}/>
-              </div>
-            ))
-          }
-        </div>
-      )}
-
-      {tab==="scouts"&&(
-        <div style={{padding:"20px 20px 0"}}>
-          {!isPremium
-            ?<div style={{textAlign:"center",padding:"48px 20px"}}>
-                <div style={{fontSize:44,marginBottom:12}}>👤</div>
-                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:8}}>{t("saved.pro_feature")}</div>
-                <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--text-muted)",marginBottom:24,lineHeight:1.6}}>{t("venue.follow_pro")}</div>
-                <button className="btn-black" onClick={()=>navigate("upgrade")}>{t("saved.upgrade")}</button>
-              </div>
-            :scoutsLoading
-              ?<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>
-              :scouts.length===0
-                ?<div className="empty"><div className="empty-icon">👤</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("empty.no_scouts").split("\n")[0]}<br/>{t("empty.no_scouts").split("\n")[1]}</div></div>
-                :scouts.map(s=>(
-                  <div key={s.id} onClick={()=>navigate("scout_profile", s.id)}
-                    style={{background:"var(--surface)",borderRadius:16,padding:"16px",marginBottom:12,cursor:"pointer",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
-                    <div style={{width:48,height:48,borderRadius:"50%",background:"var(--red)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
-                      {s.profile_image
-                        ?<ShimmerImg src={s.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                        :<span style={{fontFamily:"var(--display)",fontWeight:900,fontSize:20,color:"white"}}>{(s.name||"S")[0].toUpperCase()}</span>
-                      }
+          <div style={{padding:"20px 20px 0"}}>
+            {saved.length===0
+              ?<div className="empty">
+                  <div className="empty-icon">🤍</div>
+                  <div style={{fontFamily:"var(--body)",fontSize:15,fontWeight:700,color:"var(--black)",marginBottom:8}}>{t("saved.nothing")}</div>
+                  <div style={{fontFamily:"var(--body)",fontSize:13,color:"#888",marginBottom:20}}>{t("saved.explore")}</div>
+                  <button className="btn-black" style={{width:"auto",padding:"14px 28px"}} onClick={()=>navigate("q1")}>start discover →</button>
+                </div>
+              :saved.map((v,i)=>(
+                <div key={v.id} style={{animation:`staggerUp .3s ${Math.min(i,8)*0.05}s cubic-bezier(.2,.8,.4,1) both`,opacity:0,animationFillMode:"forwards"}}>
+                  <VenueCard venue={v} onClick={()=>navigate("venue",v)}/>
+                </div>
+              ))
+            }
+          </div>
+        )}
+        {tab==="scouts"&&(
+          <div style={{padding:"20px 20px 0"}}>
+            {!isPremium
+              ?<div style={{textAlign:"center",padding:"48px 20px"}}>
+                  <div style={{fontSize:44,marginBottom:12}}>👤</div>
+                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",marginBottom:8}}>{t("saved.pro_feature")}</div>
+                  <div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:400,color:"var(--text-muted)",marginBottom:24,lineHeight:1.6}}>{t("venue.follow_pro")}</div>
+                  <button className="btn-black" onClick={()=>navigate("upgrade")}>{t("saved.upgrade")}</button>
+                </div>
+              :scoutsLoading
+                ?<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>
+                :scouts.length===0
+                  ?<div className="empty"><div className="empty-icon">👤</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("empty.no_scouts").split("\n")[0]}<br/>{t("empty.no_scouts").split("\n")[1]}</div></div>
+                  :scouts.map(s=>(
+                    <div key={s.id} onClick={()=>navigate("scout_profile", s.id)}
+                      style={{background:"var(--surface)",borderRadius:16,padding:"16px",marginBottom:12,cursor:"pointer",display:"flex",alignItems:"center",gap:14,boxShadow:"0 1px 4px rgba(0,0,0,.08)"}}>
+                      <div style={{width:48,height:48,borderRadius:"50%",background:"var(--red)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
+                        {s.profile_image
+                          ?<ShimmerImg src={s.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                          :<span style={{fontFamily:"var(--display)",fontWeight:900,fontSize:20,color:"white"}}>{(s.name||"S")[0].toUpperCase()}</span>
+                        }
+                      </div>
+                      <div style={{flex:1}}>
+                        <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)"}}>{s.name}</div>
+                        <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:600,color:"#888",marginTop:2}}>{s.badge||(s.role==="city_lead"?t("menu.city_lead"):t("venue.local_scout"))}</div>
+                      </div>
+                      <span style={{color:"var(--red)",fontSize:20}}>›</span>
                     </div>
-                    <div style={{flex:1}}>
-                      <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)"}}>{s.name}</div>
-                      <div style={{fontFamily:"var(--body)",fontSize:12,fontWeight:600,color:"#888",marginTop:2}}>{s.badge||(s.role==="city_lead"?t("menu.city_lead"):t("venue.local_scout"))}</div>
-                    </div>
-                    <span style={{color:"var(--red)",fontSize:20}}>›</span>
-                  </div>
-                ))
-          }
-        </div>
-      )}
+                  ))
+            }
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -7556,26 +7557,25 @@ function ScoutsScreen({navigate, onMenu, user, selectedCity, availableCities, on
   );
 
   return (
-    <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 8px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("menu.scouts2")}</div>
+    <div className="screen" style={{background:"var(--bg)"}}>
+      <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 8px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("menu.scouts2")}</div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div style={{padding:"0 16px 10px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px"}}>
-          <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search scouts..."
-            className="search-input" style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}}/>
+        <div style={{padding:"0 16px 10px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px"}}>
+            <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>🔍</span>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="search scouts..."
+              className="search-input" style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:400,color:"white",flex:1,colorScheme:"dark"}}/>
+          </div>
         </div>
-      </div>
-
-      <div className="scroll" style={{padding:"20px 20px 80px"}}>
+        <div style={{padding:"0 20px"}}>
         {loading&&<div style={{textAlign:"center",padding:32}}><div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite",display:"inline-block"}}/></div>}
         {!loading&&filtered.length===0&&<div style={{textAlign:"center",padding:32,fontFamily:"var(--body)",fontSize:14,color:"var(--text-muted)"}}>{t("sc.no_scouts")}</div>}
         {filtered.map(s=>(
@@ -7596,6 +7596,7 @@ function ScoutsScreen({navigate, onMenu, user, selectedCity, availableCities, on
             <span style={{color:"var(--text-muted)",fontSize:20}}>›</span>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
