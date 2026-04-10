@@ -126,6 +126,8 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 [data-dark="true"] textarea, 
 [data-dark="true"] select { background: #1c1c1c !important; color: #ffffff !important; border-color: #2a2a2a !important; color-scheme: dark; }
 [data-dark="true"] .search-input { background: transparent !important; border: none !important; }
+.av-ctrl input::placeholder { color: rgba(255,255,255,.5) !important; }
+.av-ctrl input { color: white !important; }
 [data-dark="true"] [style*="#FFD966"] { border-color: #5a4400 !important; }
 /* Hardcoded white screen overrides */
 [data-dark="true"] [style*="background:\"var(--surface)\""][class="screen"] { background: #0d0d0d !important; }
@@ -2025,17 +2027,17 @@ function CitySearchBar({availableCities, selectedCity, onSelect}) {
   return (
     <div style={{width:"100%",position:"relative"}}>
       <div className="av-ctrl" style={{display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:"8px 14px",width:"100%"}}>
-        <span style={{fontSize:13}}>📍</span>
+        <span style={{color:"rgba(255,255,255,.75)",fontSize:13}}>📍</span>
         <input
           ref={inputRef}
           placeholder={selectedCity||"All cities"}
           value={query}
           onChange={e=>{setQuery(e.target.value);setOpen(true);}}
           onFocus={()=>setOpen(true)}
-          style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:selectedCity?700:400,color:"white",flex:1}}
+          style={{background:"none",border:"none",outline:"none",fontFamily:"var(--body)",fontSize:13,fontWeight:selectedCity?700:400,color:"white",flex:1,colorScheme:"dark"}}
         />
         {(selectedCity||query)&&(
-          <button onClick={()=>{select("all");setQuery("");}} style={{background:"none",border:"none",color:"rgba(255,255,255,.6)",cursor:"pointer",fontSize:16,padding:0,lineHeight:1}}>×</button>
+          <button onClick={()=>{select("all");setQuery("");}} style={{background:"none",border:"none",color:"rgba(255,255,255,.75)",cursor:"pointer",fontSize:16,padding:0,lineHeight:1}}>×</button>
         )}
       </div>
       {open&&(
