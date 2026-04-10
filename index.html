@@ -4711,7 +4711,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-            <div className="scroll" style={{padding:"0 0 6px"}}
+            <div className="scroll" style={{padding:"0 0 6px"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
 
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
@@ -4726,9 +4726,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
 
       <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
-          <div style={{marginBottom:8}}>
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          </div>
+          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["places",t("saved.places")],["scouts",t("saved.scouts")]].map(([k,l])=>(
@@ -6025,7 +6023,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-            <div className="scroll" style={{padding:"0 0 6px"}}
+            <div className="scroll" style={{padding:"0 0 6px"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
 
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
@@ -6039,9 +6037,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
 
       <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
-          <div style={{marginBottom:8}}>
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          </div>
+          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["add","add venue"],["events","events"],[t("scout.activity"),"my activity"]].map(([k,l])=>(
@@ -6820,7 +6816,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-            <div className="scroll" style={{padding:"0 0 6px"}}
+            <div className="scroll" style={{padding:"0 0 6px"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
 
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
@@ -6834,9 +6830,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
 
       <div style={{background:"transparent",padding:"10px 16px 6px",flexShrink:0}}>
         {availableCities?.length>0&&(
-          <div style={{marginBottom:8}}>
-            <CityPicker availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-          </div>
+          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
         {[["pending","pending",pending.length],["all","all",active.length],["events","events",pendingEvents.length],["reports","reports",reports.length],["partners","partners",""]].map(([k,l,c])=>(
@@ -7741,7 +7735,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-            <div className="scroll" style={{padding:"0 0 80px"}}
+            <div className="scroll" style={{padding:"0 0 80px"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
 
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -7859,7 +7853,7 @@ function ScoutProfileScreen({navigate, scoutId, allVenues, user, selectedCity, a
 function AboutScreen({navigate}) {
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-            <div className="scroll" style={{padding:"0 0 80px"}}
+            <div className="scroll" style={{padding:"0 0 80px"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
 
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
@@ -8095,7 +8089,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-            <div className="scroll" style={{padding:"0 0 10px"}}
+            <div className="scroll" style={{padding:"0 0 10px"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
 
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
@@ -8276,7 +8270,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   if(!isPremium) return (
     <div className="screen">
-            <div className="scroll" style={{padding:"0 0 28px"}}
+            <div className="scroll" style={{padding:"0 0 28px"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
 <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div>      </div>
 
@@ -8291,7 +8285,7 @@ function EventPlanningScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   return (
     <div className="screen">
-            <div className="scroll" style={{padding:"0 0 16px"}}
+            <div className="scroll" style={{padding:"0 0 16px"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
 <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}><div style={{textAlign:"right"}}><div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div></div></div>      </div>
 
@@ -9206,7 +9200,7 @@ function App() {
       const listTitle = listData.title||"spots";
       return (
         <div className="screen" style={{background:"var(--bg)"}}>
-                <div className="scroll" style={{padding:"0 0 80px"}}
+                <div className="scroll" style={{padding:"0 0 80px"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
 
             <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
