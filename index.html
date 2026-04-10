@@ -4596,6 +4596,25 @@ function FeedScreen({navigate, user, allVenues}) {
   );
 }
 
+function MapVenueThumb({venueId, category}){
+  const [imgUrl, setImgUrl] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(()=>{
+    supabase.from("venue_images").select("url").eq("venue_id",venueId).eq("is_primary",true).limit(1).then(({data})=>{
+      if(data&&data[0]) setImgUrl(data[0].url);
+    });
+  },[venueId]);
+  const catEmoji = {Restaurant:"🍽️","Street food":"🌮",Bakery:"🥐",Café:"☕",Patisserie:"🍰",Bar:"🍸"};
+  return (
+    <div style={{width:56,height:56,borderRadius:12,background:"var(--surface2)",flexShrink:0,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>
+      {imgUrl
+        ?<img src={imgUrl} onLoad={()=>setLoaded(true)} style={{width:"100%",height:"100%",objectFit:"cover",opacity:loaded?1:0,transition:"opacity .2s"}}/>
+        :<span>{catEmoji[category]||"🍽️"}</span>
+      }
+    </div>
+  );
+}
+
 function FeedVenueImage({venueId, category}){
   const [imgUrl, setImgUrl] = useState(null);
   const [loaded, setLoaded] = useState(false);
@@ -4725,6 +4744,8 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
   const [subcategory,setSubcategory]=useState("");
   const [viewMode,setViewMode]=useState(window._avViewMode||"map");
   const setViewModePersist = (m)=>{ window._avViewMode=m; setViewMode(m); };
+  const [selectedVenue, setSelectedVenue] = useState(null);
+  const markerMapRef = React.useRef({});
   const scrollRef = React.useRef(null);
   const mapRef = React.useRef(null);
   const mapInstanceRef = React.useRef(null);
@@ -4794,34 +4815,41 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
         position:{lat:v.latitude,lng:v.longitude},
         map:mapInstanceRef.current,
         title:v.name,
-        icon:{
-          path:"M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
-          fillColor:"#DC2626",
-          fillOpacity:1,
-          strokeColor:"white",
-          strokeWeight:1.5,
-          scale:1.8,
-          anchor: new window.google.maps.Point(12,22),
-        }
       });
+      const defaultIcon = {
+        path:"M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
+        fillColor:"#DC2626",fillOpacity:1,strokeColor:"white",strokeWeight:1.5,scale:1.8,
+        anchor:new window.google.maps.Point(12,22),
+      };
+      const activeIcon = {
+        path:"M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
+        fillColor:"#F5B8EC",fillOpacity:1,strokeColor:"white",strokeWeight:2,scale:2.2,
+        anchor:new window.google.maps.Point(12,22),
+      };
+      marker.setIcon(defaultIcon);
       const infoDiv = document.createElement("div");
-      infoDiv.innerHTML = `<div style="font-family:sans-serif;padding:8px 6px;min-width:150px;max-width:200px"><div style="font-weight:700;font-size:14px;margin-bottom:3px">${v.name}</div><div style="color:#666;font-size:12px;margin-bottom:8px">${v.category||v.cuisine||""} · ${venueLocation(v)}</div><button id="info-btn-${v.id}" style="background:#DC2626;color:white;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:sans-serif;width:100%">megnyitás →</button></div>`;
-      const info = new window.google.maps.InfoWindow({ content: infoDiv });
       marker.addListener("click",()=>{
-        if(activeInfoRef.current) activeInfoRef.current.close();
-        info.open(mapInstanceRef.current, marker);
-        activeInfoRef.current = info;
-        setTimeout(()=>{
-          const btn = document.getElementById(`info-btn-${v.id}`);
-          if(btn) btn.addEventListener("click",()=>{ info.close(); navigate("venue",v); });
-        }, 100);
+        if(activeInfoRef.current){
+          activeInfoRef.current.setIcon(defaultIcon);
+        }
+        marker.setIcon(activeIcon);
+        activeInfoRef.current = marker;
+        setSelectedVenue(v);
       });
       markersRef.current.push(marker);
     });
 
-    // Close info on map click
+    // Close card on map click
     mapInstanceRef.current.addListener("click",()=>{
-      if(activeInfoRef.current) activeInfoRef.current.close();
+      if(activeInfoRef.current){
+        activeInfoRef.current.setIcon({
+          path:"M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
+          fillColor:"#DC2626",fillOpacity:1,strokeColor:"white",strokeWeight:1.5,scale:1.8,
+          anchor:new window.google.maps.Point(12,22),
+        });
+        activeInfoRef.current = null;
+      }
+      setSelectedVenue(null);
     });
   },[viewMode, allVenues, search, category, subcategory, cuisine, navigate]);
 
@@ -4923,6 +4951,26 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
             <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:8,background:"var(--bg)"}}>
               <div style={{fontSize:40}}>🗺️</div>
               <div style={{fontFamily:"var(--body)",fontSize:14,color:"#888",textAlign:"center",padding:"0 32px"}}>{t("empty.no_coords")}</div>
+            </div>
+          )}
+          {/* Bottom venue card */}
+          {selectedVenue&&(
+            <div style={{position:"absolute",bottom:90,left:16,right:16,zIndex:20,animation:"slideInUp .2s cubic-bezier(.2,.8,.4,1)"}}>
+              <div onClick={()=>navigate("venue",selectedVenue)}
+                style={{background:"var(--surface)",borderRadius:20,overflow:"hidden",border:"1.5px solid var(--border-col)",boxShadow:"0 8px 32px rgba(0,0,0,.18)",cursor:"pointer",display:"flex",gap:0}}>
+                <div style={{width:4,background:"var(--red)",flexShrink:0}}/>
+                <div style={{display:"flex",gap:12,padding:"12px 14px",flex:1,alignItems:"center"}}>
+                  <MapVenueThumb venueId={selectedVenue.id} category={selectedVenue.category}/>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{selectedVenue.name}</div>
+                    <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginTop:2}}>
+                      {tCat(selectedVenue.category)}{venueLocation(selectedVenue)&&` · ${venueLocation(selectedVenue)}`}
+                    </div>
+                    {selectedVenue.why&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--black)",marginTop:4,fontStyle:"italic",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",opacity:.7}}>{selectedVenue.why}</div>}
+                  </div>
+                  <div style={{color:"var(--red)",fontSize:18,flexShrink:0}}>→</div>
+                </div>
+              </div>
             </div>
           )}
       </div>
