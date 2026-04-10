@@ -148,7 +148,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
   0%{background-position:200% center;}
   100%{background-position:-200% center;}
 }
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideInLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 @keyframes slideInUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -156,7 +156,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 @keyframes staggerUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes imgFadeIn{from{opacity:0}to{opacity:1}}
 
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:fadeUp .2s cubic-bezier(.25,.46,.45,.94) both;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:fadeUp .15s cubic-bezier(.25,.46,.45,.94) both;}
 .screen-no-anim{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);}
 .screen-detail{position:absolute;inset:0;display:flex;flex-direction:column;background:transparent;}
 
@@ -4588,7 +4588,7 @@ function FeedScreen({navigate, user, allVenues}) {
                   {scout&&(
                     <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}
                       onClick={e=>{e.stopPropagation();navigate("scout_profile",scout.id);}}>
-                      <div style={{width:28,height:28,borderRadius:"50%",background:"var(--surface2)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",border:"1.5px solid var(--border-col)"}}>
+                      <div style={{width:36,height:36,borderRadius:"50%",background:"var(--surface2)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",border:"1.5px solid var(--border-col)"}}>
                         {scout.profile_image
                           ?<img src={scout.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                           :<span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:11,color:"var(--black)"}}>{(scout.name||"S")[0].toUpperCase()}</span>
@@ -4603,7 +4603,7 @@ function FeedScreen({navigate, user, allVenues}) {
                   )}
 
                   {/* Venue name + meta */}
-                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",lineHeight:1.1,marginBottom:4}}>{venue.name}</div>
+                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",lineHeight:1.1,marginBottom:4}}>{venue.name}</div>
                   <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginBottom:10}}>
                     {tCat(venue.category)}
                     {venueLocation(venue)&&<span> · {venueLocation(venue)}</span>}
@@ -4711,29 +4711,28 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button className="back-btn" onClick={()=>{onMenu&&onMenu();}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("saved.title2")}</div>
+      <div className="scroll" style={{padding:"0 0 80px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button className="back-btn" onClick={()=>{onMenu&&onMenu();}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("saved.title2")}</div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
-        {availableCities?.length>0&&(
-          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-        )}
-        <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
-        {[["places",t("saved.places")],["scouts",t("saved.scouts")]].map(([k,l])=>(
-          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
-        ))}
+        <div style={{background:"var(--bg)",padding:"10px 16px 10px",display:"flex",flexDirection:"column",gap:8,position:"sticky",top:0,zIndex:10}}>
+          {availableCities?.length>0&&(
+            <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          )}
+          <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
+          {[["places",t("saved.places")],["scouts",t("saved.scouts")]].map(([k,l])=>(
+            <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
+          ))}
+          </div>
         </div>
-      </div>
-
-      {tab==="places"&&(
-        <div className="scroll" style={{padding:"20px 20px 80px"}}>
+        {tab==="places"&&(
+        <div style={{padding:"20px 20px 0"}}>
           {saved.length===0
             ?<div className="empty">
                 <div className="empty-icon">🤍</div>
@@ -4751,7 +4750,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
       )}
 
       {tab==="scouts"&&(
-        <div className="scroll" style={{padding:"20px 20px 80px"}}>
+        <div style={{padding:"20px 20px 80px"}}>
           {!isPremium
             ?<div style={{textAlign:"center",padding:"48px 20px"}}>
                 <div style={{fontSize:44,marginBottom:12}}>👤</div>
@@ -4782,6 +4781,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
           }
         </div>
       )}
+      </div>
     </div>
   );
 }
@@ -6020,17 +6020,18 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.scout_mode")}</div>
+      <div className="scroll" style={{padding:"0 0 80px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.scout_mode")}</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
-        {availableCities?.length>0&&(
+        <div style={{background:"var(--bg)",padding:"10px 16px 10px",display:"flex",flexDirection:"column",gap:8,position:"sticky",top:0,zIndex:10}}>
+          {availableCities?.length>0&&(
           <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
         )}
         <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
@@ -6041,7 +6042,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
       </div>
 
       {tab==="add"&&(
-        <div className="scroll" style={{padding:"20px 20px 80px"}}>
+        <div style={{padding:"20px 20px 80px"}}>
           <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"#888",marginBottom:14}}>{t("scout.submit_new")}</div>
 
           {/* Google Places Autocomplete search / Manual mode toggle */}
@@ -6321,8 +6322,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
         <ScoutEventsTab user={user} allVenues={allVenues} showToast={showToast}/>
       )}
       {tab==="activity"&&(
-        <div className="scroll" style={{padding:"20px 20px 80px"}} ref={scoutScrollRef}
-          onScroll={e=>saveScroll("scout",e.currentTarget)}>
+        <div style={{padding:"20px 20px 80px"}}>
           <div style={{display:"flex",gap:12,marginBottom:20}}>
             {[["✅",t("scout.approved"),myVenues.filter(v=>v.status==="active").length],["⏳",t("status.pending"),myVenues.filter(v=>v.status==="pending").length]].map(([ico,label,count])=>(
               <div key={label} style={{flex:1,background:"var(--surface)",borderRadius:16,padding:"16px",textAlign:"center"}}>
@@ -6352,6 +6352,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
           }
         </div>
       )}
+      </div>
     </div>
   );
 }
@@ -6810,29 +6811,30 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.city_lead2")}</div>
+      <div className="scroll" style={{padding:"0 0 80px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.city_lead2")}</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0,display:"flex",flexDirection:"column",gap:8}}>
-        {availableCities?.length>0&&(
-          <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
-        )}
-        <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
-        {[["pending","pending",pending.length],["all","all",active.length],["events","events",pendingEvents.length],["reports","reports",reports.length],["partners","partners",""]].map(([k,l,c])=>(
-          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>
-            {l}
-          </button>
-        ))}
+        <div style={{background:"var(--bg)",padding:"10px 16px 10px",display:"flex",flexDirection:"column",gap:8,position:"sticky",top:0,zIndex:10}}>
+          {availableCities?.length>0&&(
+            <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
+          )}
+          <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
+          {[["pending","pending",pending.length],["all","all",active.length],["events","events",pendingEvents.length],["reports","reports",reports.length],["partners","partners",""]].map(([k,l,c])=>(
+            <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>
+              {l}
+            </button>
+          ))}
+          </div>
         </div>
-      </div>
       {tab==="pending"&&(
-        <div className="scroll" style={{padding:"20px 20px 80px"}}>
+        <div style={{padding:"20px 20px 80px"}}>
           {pending.length===0
             ?<div className="empty"><div className="empty-icon">✅</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("cl.no_pending")}</div></div>
             :pending.map(v=>{
@@ -6966,8 +6968,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       )}
       {tab==="all"&&(
-        <div className="scroll" style={{padding:"20px 20px 80px"}} ref={clScrollRef}
-          onScroll={e=>saveScroll("cityLead",e.currentTarget)}>
+        <div style={{padding:"20px 20px 80px"}}>
           <div style={{marginBottom:12,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div style={{fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"var(--text-muted)"}}>
               {active.length} <span style={{fontWeight:400}}>venues</span>
@@ -7054,7 +7055,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       )}
       {tab==="reports"&&(
-        <div className="scroll" style={{padding:"20px 20px 80px"}}>
+        <div style={{padding:"20px 20px 80px"}}>
           {reports.length===0
             ?<div className="empty"><div className="empty-icon">🚩</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>No reports yet.</div></div>
             :Object.entries(
@@ -7125,6 +7126,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
       {tab==="partners"&&(
         <PartnerManageTab showToast={showToast} cityId={user?.city_id}/>
       )}
+      </div>
     </div>
   );
 }
@@ -8074,31 +8076,32 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.events")}</div>
+      <div className="scroll" style={{padding:"0 0 80px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>{onMenu&&onMenu();}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>{t("menu.events")}</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div style={{background:"transparent",padding:"10px 16px 10px",flexShrink:0}}>
-        <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
-        {[["public","public events"],["my","my events"]].map(([k,l])=>(
-          <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
-        ))}
-        {isPremium&&(
-          <button onClick={()=>setShowCreate(true)} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"rgba(255,255,255,.75)",background:"transparent",border:"none",cursor:"pointer",borderRadius:50}}>+ add</button>
-        )}
+        <div style={{background:"var(--bg)",padding:"10px 16px 10px",position:"sticky",top:0,zIndex:10}}>
+          <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
+          {[["public","public events"],["my","my events"]].map(([k,l])=>(
+            <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
+          ))}
+          {isPremium&&(
+            <button onClick={()=>setShowCreate(true)} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:700,color:"rgba(255,255,255,.75)",background:"transparent",border:"none",cursor:"pointer",borderRadius:50}}>+ add</button>
+          )}
+          </div>
         </div>
-      </div>
-
-      {loading
-        ? <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <div style={{padding:"20px 20px 0"}}>
+        {loading
+        ? <div style={{padding:"60px 0",display:"flex",alignItems:"center",justifyContent:"center"}}>
             <div style={{width:28,height:28,border:"2.5px solid var(--surface3)",borderTop:"2.5px solid black",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
           </div>
-        : <div className="scroll" style={{padding:"20px 20px 80px"}}>
+        : <div>
             {tab==="my"&&!isPremium&&(
               <div style={{textAlign:"center",padding:"40px 20px"}}>
                 <div style={{fontFamily:"var(--body)",fontSize:14,color:"#888",marginBottom:16}}>{t("ev.upgrade_rsvp")}</div>
@@ -8220,6 +8223,7 @@ function EventDetailScreen({navigate, event, user, showToast}) {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
