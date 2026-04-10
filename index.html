@@ -2927,7 +2927,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
             ))
             .sort((a,b)=>new Date(b.approved_at||b.created_at)-new Date(a.approved_at||a.created_at))
             .slice(0,8);
-          if(recent.length===0) return null;
+          if(!venuesLoading && recent.length===0) return null;
           return (
             <div style={{marginTop:0,marginBottom:32}}>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
@@ -2935,7 +2935,11 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
                 <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:11,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20,letterSpacing:".04em"}}>{t("home.new")}</span>
               </div>
               <div style={{display:"flex",gap:12,overflowX:"auto",paddingBottom:8,scrollbarWidth:"none",WebkitOverflowScrolling:"touch"}}>
-                {recent.map((v,i)=>(
+                {venuesLoading
+                  ? [1,2,3,4].map(i=>(
+                      <div key={i} className="skeleton" style={{flexShrink:0,width:150,height:180,borderRadius:16}}/>
+                    ))
+                  : recent.map((v,i)=>(
                   <div key={v.id}
                     onClick={()=>navigate("venue",v)}
                     style={{
@@ -2963,8 +2967,6 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
         })()}
 
         <div style={{height:1,background:"rgba(0,0,0,.08)",margin:"0 4px 32px"}}/>
-
-        <div style={{marginTop:0,marginBottom:100}}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
             <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,letterSpacing:0,color:"var(--black)"}}>⭐ city picks of {cityName}</span>
             {!isPremium&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20}}>{t("home.pro_only")}</span>}
@@ -4560,8 +4562,8 @@ function FeedScreen({navigate, user, allVenues}) {
         </div>
 
         {loading&&(
-          <div style={{display:"flex",justifyContent:"center",padding:40}}>
-            <div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
+          <div style={{padding:"0 20px"}}>
+            {[1,2,3].map(i=><SkeletonCard key={i}/>)}
           </div>
         )}
 
