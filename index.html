@@ -4931,7 +4931,7 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
       <div style={{position:"absolute",inset:0,display:viewMode==="map"?"flex":"none",flexDirection:"column"}}>
           <div ref={mapRef} style={{position:"absolute",inset:0}}/>
           {/* Zoom + locate */}
-          <div style={{position:"absolute",bottom:100,right:16,display:"flex",flexDirection:"column",gap:8}}>
+          <div style={{position:"absolute",bottom:selectedVenue?200:100,right:16,display:"flex",flexDirection:"column",gap:8,transition:"bottom .2s"}}>
             <div style={{background:"var(--surface)",border:"1.5px solid var(--border-col)",borderRadius:20,boxShadow:"0 2px 8px rgba(0,0,0,.2)",display:"flex",flexDirection:"column",overflow:"hidden"}}>
               <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)+1)} style={{background:"var(--surface)",border:"none",borderBottom:"1px solid var(--border-col)",cursor:"pointer",width:40,height:40,fontSize:20,color:"var(--black)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:300}}>+</button>
               <button onClick={()=>mapInstanceRef.current?.setZoom((mapInstanceRef.current.getZoom()||13)-1)} style={{background:"var(--surface)",border:"none",cursor:"pointer",width:40,height:40,fontSize:20,color:"var(--black)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:300}}>−</button>
@@ -4959,16 +4959,16 @@ function AllVenuesScreen({navigate, allVenues, onMenu, user, selectedCity, avail
               <div onClick={()=>navigate("venue",selectedVenue)}
                 style={{background:"var(--surface)",borderRadius:20,overflow:"hidden",border:"1.5px solid var(--border-col)",boxShadow:"0 8px 32px rgba(0,0,0,.18)",cursor:"pointer",display:"flex",gap:0}}>
                 <div style={{width:4,background:"var(--red)",flexShrink:0}}/>
-                <div style={{display:"flex",gap:12,padding:"12px 14px",flex:1,alignItems:"center"}}>
+                <div style={{display:"flex",gap:14,padding:"16px",flex:1,alignItems:"center"}}>
                   <MapVenueThumb venueId={selectedVenue.id} category={selectedVenue.category}/>
                   <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:16,color:"var(--black)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{selectedVenue.name}</div>
-                    <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginTop:2}}>
-                      {tCat(selectedVenue.category)}{venueLocation(selectedVenue)&&` · ${venueLocation(selectedVenue)}`}
+                    <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:17,color:"var(--black)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginBottom:3}}>{selectedVenue.name}</div>
+                    <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginBottom:6}}>
+                      {tCat(selectedVenue.category)}{venueLocation(selectedVenue)&&` · ${venueLocation(selectedVenue)}`}{(selectedVenue.price_level||selectedVenue.price)&&` · ${selectedVenue.price_level||selectedVenue.price}`}
                     </div>
-                    {selectedVenue.why&&<div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--black)",marginTop:4,fontStyle:"italic",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",opacity:.7}}>{selectedVenue.why}</div>}
+                    {selectedVenue.why&&<div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)",fontStyle:"italic",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",opacity:.65}}>{selectedVenue.why}</div>}
                   </div>
-                  <div style={{color:"var(--red)",fontSize:18,flexShrink:0}}>→</div>
+                  <div style={{color:"var(--red)",fontSize:20,flexShrink:0,fontWeight:300}}>→</div>
                 </div>
               </div>
             </div>
