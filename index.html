@@ -2967,6 +2967,8 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
         })()}
 
         <div style={{height:1,background:"rgba(0,0,0,.08)",margin:"0 4px 32px"}}/>
+
+        <div style={{marginTop:0,marginBottom:100}}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
             <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,letterSpacing:0,color:"var(--black)"}}>⭐ city picks of {cityName}</span>
             {!isPremium&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20}}>{t("home.pro_only")}</span>}
