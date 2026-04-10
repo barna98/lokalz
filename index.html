@@ -8140,6 +8140,8 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
       {showCreate&&<CreatePlanModal navigate={navigate} user={user} allVenues={allVenues} showToast={showToast}
         onClose={()=>setShowCreate(false)}
         onCreate={plan=>{setMyEvents(p=>[plan,...p]);setShowCreate(false);setTab("my");}}/>}
+        </div>
+      </div>
     </div>
   );
 }
