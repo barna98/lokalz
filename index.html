@@ -4736,7 +4736,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
       </div>
 
       {tab==="places"&&(
-        
+        <div style={{padding:"20px 20px 80px"}}>
           {saved.length===0
             ?<div className="empty">
                 <div className="empty-icon">🤍</div>
@@ -6841,7 +6841,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
         </div>
       </div>
       {tab==="pending"&&(
-        
+        <div style={{padding:"20px 20px 80px"}}>
           {pending.length===0
             ?<div className="empty"><div className="empty-icon">✅</div><div style={{fontFamily:"var(--body)",fontSize:14,fontWeight:600,color:"var(--text-muted)"}}>{t("cl.no_pending")}</div></div>
             :pending.map(v=>{
