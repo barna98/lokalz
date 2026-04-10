@@ -3650,44 +3650,45 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{isAI?"AI results":"discover"}</div>
-          </div>
-        </div>
-      </div>
-      {!isAI&&(
-        <div style={{padding:"8px 20px 12px",flexShrink:0}}>
-          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>{t("results.our_picks")}</div>
-          {(()=>{
-            const pills = [];
-            if(answers.category) pills.push(answers.category);
-            if(answers.locations?.length>0&&!answers.locations.includes(t("q.anywhere"))) pills.push(...answers.locations.map(l=>`${t("venue.dist")} ${l}`));
-            if(answers.budgets?.length>0) pills.push(...answers.budgets);
-            if(answers.occasions?.length>0) pills.push(answers.occasions[0]);
-            if(pills.length===0) return null;
-            return <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:8}}>
-              {pills.map((p,i)=>(
-                <span key={i} style={{fontFamily:"var(--body)",fontSize:12,fontWeight:600,background:"#111",color:"white",padding:"3px 10px",borderRadius:20}}>
-                  {p}
-                </span>
-              ))}
-            </div>;
-          })()}
-        </div>
-      )}
-      {isAI&&answers.aiQuery&&(
-        <div style={{padding:"4px 20px 12px",flexShrink:0}}>
-          <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",fontWeight:400}}>
-            ✨ <span style={{fontStyle:"italic"}}>"{answers.aiQuery}"</span>
-          </div>
-        </div>
-      )}
-      <div className="scroll" style={{padding:"36px 20px 80px"}} ref={pullRef}
+      <div className="scroll" style={{padding:"0 0 80px"}} ref={pullRef}
         onTouchStart={onPullStart} onTouchMove={onPullMove} onTouchEnd={onPullEnd}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{isAI?"AI results":"discover"}</div>
+            </div>
+          </div>
+        </div>
+        {!isAI&&(
+          <div style={{padding:"8px 20px 12px"}}>
+            <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)"}}>{t("results.our_picks")}</div>
+            {(()=>{
+              const pills = [];
+              if(answers.category) pills.push(answers.category);
+              if(answers.locations?.length>0&&!answers.locations.includes(t("q.anywhere"))) pills.push(...answers.locations.map(l=>`${t("venue.dist")} ${l}`));
+              if(answers.budgets?.length>0) pills.push(...answers.budgets);
+              if(answers.occasions?.length>0) pills.push(answers.occasions[0]);
+              if(pills.length===0) return null;
+              return <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:8}}>
+                {pills.map((p,i)=>(
+                  <span key={i} style={{fontFamily:"var(--body)",fontSize:12,fontWeight:600,background:"#111",color:"white",padding:"3px 10px",borderRadius:20}}>
+                    {p}
+                  </span>
+                ))}
+              </div>;
+            })()}
+          </div>
+        )}
+        {isAI&&answers.aiQuery&&(
+          <div style={{padding:"4px 20px 12px"}}>
+            <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",fontWeight:400}}>
+              ✨ <span style={{fontStyle:"italic"}}>"{answers.aiQuery}"</span>
+            </div>
+          </div>
+        )}
+        <div style={{padding:"20px 20px 0"}}>
         {(pullDist>0||refreshing)&&(
           <div style={{textAlign:"center",padding:"8px",fontFamily:"var(--body)",fontSize:13,color:"#888",transform:`translateY(${pullDist}px)`,transition:pullDist===0?"all .3s":"none"}}>
             {refreshing?t("results.refreshing"):t("results.release")}
@@ -3737,6 +3738,7 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
             {t("results.thats_all")} <span className="text-link text-link-blue" onClick={()=>navigate("q1")}>{t("results.start_over2")}</span>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
