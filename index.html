@@ -9234,7 +9234,7 @@ function App() {
               );
             })()}
             {showMenu&&<Menu onClose={()=>setShowMenu(false)} navigate={navigate} role={user?.role||"explorer"} onSignOut={signOut}/>}
-      {user&&!appLoading&&screen!=="onboarding"&&(["home","feed","all_venues","q1","q2","q3","q3_city","q4","q5","q6","scouts"].includes(screen)||showMenu)&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)} menuOpen={showMenu} answers={answers}/>}
+      {user&&!appLoading&&screen!=="onboarding"&&(["home","feed","all_venues","q1","q2","q3","q3_city","q4","q5","q6"].includes(screen)||showMenu)&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)} menuOpen={showMenu} answers={answers}/>}
                 </>
       }
       {toast&&<div className="toast">{toast}</div>}
