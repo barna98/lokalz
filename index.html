@@ -2736,10 +2736,10 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
   const isPremium = user?.role==="explorer_pro"||user?.role==="scout"||user?.role==="city_lead"||!!partner;
 
 
+  const cityName = selectedCity || (allVenues.find(v=>v.city_id===user?.city_id)?.city_name) || "Budapest";
+
   return (
     <div className="screen">
-      <div style={{padding:"36px 28px 0",display:"flex",alignItems:"center"}}>
-      </div>
       <div className="scroll" style={{padding:"36px 28px 0"}}>
         <div style={{fontFamily:"var(--display)",fontSize:"56px",color:"var(--red)",lineHeight:.88,letterSpacing:0,userSelect:"none"}}>LOKAL&#39;Z</div>
         <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:10,marginBottom:0}}>{t("onboard.beyond")}</div>
@@ -2891,7 +2891,7 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
 
         <div style={{marginTop:0,marginBottom:100}}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
-            <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,letterSpacing:0,color:"var(--black)"}}>{t("home.city_picks")}</span>
+            <span style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,letterSpacing:0,color:"var(--black)"}}>⭐ city picks of {cityName}</span>
             {!isPremium&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:400,background:"var(--red)",color:"white",padding:"2px 8px",borderRadius:20}}>{t("home.pro_only")}</span>}
           </div>
           <div style={{position:"relative",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
@@ -2902,7 +2902,10 @@ function HomeScreen({navigate, onMenu, setAnswers, user, partner, venuesLoading,
               {label:tCat("Café").toUpperCase(),        cat:"Café"},
               {label:tCat("Bar").toUpperCase(),         cat:"Bar"},
             ].map(({label,cat})=>{
-              const venues=getWeeklyPicks(allVenues||[], cat, 5);
+              const cityVenues = (allVenues||[]).filter(v=>
+                v.status==="active" && (selectedCity ? v.city_name===selectedCity : (!v.city_name||v.city_id===user?.city_id))
+              );
+              const venues=getWeeklyPicks(cityVenues, cat, 5);
               return <CityPickBox key={cat} label={label} cat={cat} venues={venues} navigate={navigate} isPremium={isPremium}/>;
             })}
             {!isPremium&&(
