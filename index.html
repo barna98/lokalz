@@ -3173,16 +3173,16 @@ function Q2Screen({navigate, onMenu, answers, setAnswers, selectedCity}) {
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-            <button onClick={()=>navigate("q1")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-            <div style={{textAlign:"right"}}>
-              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
-            </div>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+          <button onClick={()=>navigate("q1")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
           </div>
         </div>
-        <QProgress step="q2"/>
-        <div style={{padding:"0 20px"}}>
+      </div>
+      <QProgress step="q2"/>
+      <div className="scroll" style={{padding:"0 20px 100px"}}>
         {/* Occasions */}
         <div style={{marginBottom:24}}>
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8,marginBottom:12}}>{t("q2.mood")}</div>
@@ -3194,7 +3194,6 @@ function Q2Screen({navigate, onMenu, answers, setAnswers, selectedCity}) {
             ))}
           </div>
         </div>
-
         {/* Tags */}
         <div style={{marginBottom:16}}>
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:4}}>{t("q2.vibe")}</div>
@@ -3205,7 +3204,6 @@ function Q2Screen({navigate, onMenu, answers, setAnswers, selectedCity}) {
                 {tTag(tag)}
               </button>
             ))}
-          </div>
           </div>
         </div>
       </div>
@@ -3418,15 +3416,15 @@ function Q4Screen({navigate, onMenu, answers, setAnswers, selectedCity}) {
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-            <button onClick={()=>navigate((!selectedCity||selectedCity==="Budapest")?"q3":"q3_city")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-            <div style={{textAlign:"right"}}>
-              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
-            </div>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+          <button onClick={()=>navigate((!selectedCity||selectedCity==="Budapest")?"q3":"q3_city")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
           </div>
         </div>
-        <QProgress step="q4"/>
+      </div>
+      <QProgress step="q4"/>
         <div style={{padding:"8px 20px 16px"}}>
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q4.damage")}</div>
         </div>
@@ -3453,15 +3451,15 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-            <button onClick={()=>navigate("q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-            <div style={{textAlign:"right"}}>
-              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
-            </div>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+          <button onClick={()=>navigate("q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
           </div>
         </div>
-        <QProgress step="q5"/>
+      </div>
+      <QProgress step="q5"/>
         <div style={{padding:"8px 20px 16px"}}>
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q5.craving")}</div>
         </div>
@@ -3487,15 +3485,15 @@ function Q6Screen({navigate, onMenu, answers, setAnswers}) {
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
       <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-            <button onClick={()=>navigate(answers.category==="Restaurant"?"q5":"q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-            <div style={{textAlign:"right"}}>
-              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
-            </div>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+          <button onClick={()=>navigate(answers.category==="Restaurant"?"q5":"q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
           </div>
         </div>
-        <QProgress step="q6"/>
+      </div>
+      <QProgress step="q6"/>
         <div style={{padding:"8px 20px 16px"}}>
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q4.how_many")}</div>
         </div>
