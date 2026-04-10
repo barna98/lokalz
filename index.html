@@ -2998,21 +2998,21 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
-        <div style={{position:"absolute",bottom:0,left:0,right:0,height:16,background:"linear-gradient(to bottom,transparent,var(--bg))",pointerEvents:"none",zIndex:2}}/>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <div/>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
+      <div className="scroll" style={{padding:"0 0 100px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <div/>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
+            </div>
           </div>
         </div>
-      </div>
-      <QProgress step="q1"/>
-      <div style={{padding:"8px 20px 12px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q1.title")}</div>
-      </div>
-      <div className="scroll" style={{padding:"20px 20px 100px"}}>
+        <QProgress step="q1"/>
+        <div style={{padding:"8px 20px 12px"}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q1.title")}</div>
+        </div>
+        <div style={{padding:"0 20px"}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           {CATS.map(c=>(
             <div key={c.id} onClick={()=>{haptic("light");setSel(c.id);}}
@@ -3093,22 +3093,36 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
     transition:"all .15s",
   });
 
+  const vibeStyle = (sel) => ({
+    padding:"8px 16px",
+    borderRadius:50,
+    border:"1.5px solid",
+    fontFamily:"var(--body)",
+    fontWeight:600,
+    fontSize:13,
+    cursor:"pointer",
+    background:"var(--surface)",
+    color:sel?"var(--red)":"var(--black)",
+    borderColor:sel?"var(--red)":"var(--border-col)",
+    transition:"all .15s",
+  });
+
   const occList = OCCASIONS.filter(o=>availableOccs.includes(o.id));
 
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
-        <div style={{position:"absolute",bottom:0,left:0,right:0,height:16,background:"linear-gradient(to bottom,transparent,var(--bg))",pointerEvents:"none",zIndex:2}}/>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("q1")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
+      <div className="scroll" style={{padding:"0 0 100px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>navigate("q1")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
+            </div>
           </div>
         </div>
-      </div>
-      <QProgress step="q2"/>
-      <div className="scroll" style={{padding:"20px 20px 100px"}}>
+        <QProgress step="q2"/>
+        <div style={{padding:"0 20px"}}>
         {/* Occasions */}
         <div style={{marginBottom:24}}>
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8,marginBottom:12}}>{t("q2.mood")}</div>
@@ -3127,7 +3141,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
           <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:13,color:"rgba(0,0,0,.4)",marginBottom:12}}>{t("q2.optional")}</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
             {availableTags.map(tag=>(
-              <button key={tag} type="button" onClick={()=>toggleTag(tag)} style={pillStyle(selTags.includes(tag))}>
+              <button key={tag} type="button" onClick={()=>toggleTag(tag)} style={vibeStyle(selTags.includes(tag))}>
                 {tTag(tag)}
               </button>
             ))}
@@ -3212,21 +3226,21 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
-        <div style={{position:"absolute",bottom:0,left:0,right:0,height:16,background:"linear-gradient(to bottom,transparent,var(--bg))",pointerEvents:"none",zIndex:2}}/>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("q2")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
+      <div className="scroll" style={{padding:"0 0 100px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>navigate("q2")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
+            </div>
           </div>
         </div>
-      </div>
-      <QProgress step="q3"/>
+        <QProgress step="q3"/>
       <div style={{padding:"8px 20px 16px",flexShrink:0}}>
         <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q3.where_city")}</div>
       </div>
-      <div className="scroll" style={{padding:"20px 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
+        <div style={{padding:"0 20px"}}>
         <button onClick={detectLocation}
           style={{...PILL,background:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--red)":"var(--surface)",color:sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"white":"var(--black)",border:"1.5px solid "+(sel.length>0&&!["V","VI","VII"].includes(sel[0])&&![t("q.anywhere")].includes(sel[0])&&sel.length===1?"var(--red)":"var(--border-col)")}}>
           <span>{locLoading?t("q.locating"):t("q.detect_location")}</span>
@@ -3234,19 +3248,21 @@ function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVe
         </button>
         {DISTRICTS_MAIN.filter(d=>d!=="near me").map(d=>(
           <button key={d} style={{...PILL,background:sel.includes(d)?"var(--red)":"var(--surface)",color:sel.includes(d)?"white":"var(--black)",borderColor:sel.includes(d)?"var(--red)":"var(--border-col)"}} onClick={()=>toggle(d)}>
-            <span>{districtLabel(d)}</span>{sel.includes(d)&&<span>✓</span>}
+            <span>{districtLabel(d)}</span>
           </button>
         ))}
         <button style={{...PILL,background:showMore?"var(--red)":"var(--surface)",color:showMore?"white":"var(--black)",borderColor:showMore?"var(--red)":"var(--border-col)"}} onClick={()=>setShowMore(v=>!v)}>
           <span>{t("misc.more_toggle")}</span><span>{showMore?"▲":"▼"}</span>
         </button>
-        {showMore&&ALL_DISTRICTS.filter(d=>!DISTRICTS_MAIN.includes(d)).map(d=>(
-          <button key={d} style={{...PILL,background:sel.includes(d)?"var(--red)":"var(--surface)",color:sel.includes(d)?"white":"var(--black)",borderColor:sel.includes(d)?"var(--red)":"var(--border-col)"}} onClick={()=>toggle(d)}>
-            <span>{districtLabel(d)}</span>{sel.includes(d)&&<span>✓</span>}
-          </button>
-        ))}
+        {showMore&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9,marginBottom:9}}>
+          {ALL_DISTRICTS.filter(d=>!DISTRICTS_MAIN.includes(d)).map(d=>(
+            <button key={d} style={{...PILL,width:"100%",background:sel.includes(d)?"var(--red)":"var(--surface)",color:sel.includes(d)?"white":"var(--black)",borderColor:sel.includes(d)?"var(--red)":"var(--border-col)",justifyContent:"center"}} onClick={()=>toggle(d)}>
+              <span>{districtLabel(d)}</span>
+            </button>
+          ))}
+        </div>}
         <button style={{...PILL,background:sel.includes(t("q.anywhere"))?"var(--red)":"var(--surface)",color:sel.includes(t("q.anywhere"))?"white":"var(--black)",fontWeight:700,borderColor:sel.includes(t("q.anywhere"))?"var(--red)":"var(--border-col)"}} onClick={()=>toggle(t("q.anywhere"))}>
-          <span>{t("q3.surprise")}</span>{sel.includes(t("q.anywhere"))&&<span>✓</span>}
+          <span>{t("q3.surprise")}</span>
         </button>
       </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
@@ -3298,24 +3314,24 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
-        <div style={{position:"absolute",bottom:0,left:0,right:0,height:16,background:"linear-gradient(to bottom,transparent,var(--bg))",pointerEvents:"none",zIndex:2}}/>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("q3")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
+      <div className="scroll" style={{padding:"0 0 100px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>navigate("q3")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
               <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
             </div>
+          </div>
         </div>
-      </div>
-      <QProgress step="q4"/>
-      <div style={{padding:"8px 20px 16px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q4.damage")}</div>
-      </div>
-      <div style={{padding:"36px 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
+        <QProgress step="q4"/>
+        <div style={{padding:"8px 20px 16px"}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q4.damage")}</div>
+        </div>
+        <div style={{padding:"0 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
         {BUDGETS.map(b=>(
           <button key={b} style={{...PILL,background:sel.includes(b)?"var(--red)":"var(--surface)",color:sel.includes(b)?"white":"var(--black)",borderColor:sel.includes(b)?"var(--red)":"var(--border-col)"}} onClick={()=>toggle(b)}>
-            <span>{b}</span>{sel.includes(b)&&<span>✓</span>}
+            <span>{b}</span>
           </button>
         ))}
       </div>
@@ -3333,27 +3349,27 @@ function Q5Screen({navigate, onMenu, answers, setAnswers}) {
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
-        <div style={{position:"absolute",bottom:0,left:0,right:0,height:16,background:"linear-gradient(to bottom,transparent,var(--bg))",pointerEvents:"none",zIndex:2}}/>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate("q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
+      <div className="scroll" style={{padding:"0 0 100px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>navigate("q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
               <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
             </div>
+          </div>
         </div>
-      </div>
-      <QProgress step="q5"/>
-      <div style={{padding:"8px 20px 16px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q5.craving")}</div>
-      </div>
-      <div className="scroll" style={{padding:"20px 20px 100px",display:"flex",flexDirection:"column",gap:9}}>
+        <QProgress step="q5"/>
+        <div style={{padding:"8px 20px 16px"}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q5.craving")}</div>
+        </div>
+        <div style={{padding:"0 20px 100px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
         {CUISINES.map(x=>(
-          <button key={x} style={{...PILL,background:sel.includes(x)?"var(--red)":"var(--surface)",color:sel.includes(x)?"white":"var(--black)",borderColor:sel.includes(x)?"var(--red)":"var(--border-col)"}} onClick={()=>toggle(x)}>
-            <span>{tCui(x)}</span>{sel.includes(x)&&<span>✓</span>}
+          <button key={x} style={{...PILL,width:"100%",background:sel.includes(x)?"var(--red)":"var(--surface)",color:sel.includes(x)?"white":"var(--black)",borderColor:sel.includes(x)?"var(--red)":"var(--border-col)",justifyContent:"center"}} onClick={()=>toggle(x)}>
+            <span>{tCui(x)}</span>
           </button>
         ))}
-        <button style={{...PILL,background:"var(--surface)",color:"var(--text-muted)",borderColor:"var(--border-col)",justifyContent:"center"}} onClick={()=>{setAnswers(a=>({...a,cuisines:[]}));navigate("q6");}}>{t("q4.not_sure")}</button>
+        <button style={{...PILL,width:"100%",background:"var(--surface)",color:"var(--text-muted)",borderColor:"var(--border-col)",justifyContent:"center",gridColumn:"1/-1"}} onClick={()=>{setAnswers(a=>({...a,cuisines:[]}));navigate("q6");}}>{t("q4.not_sure")}</button>
       </div>
       <div style={{position:"absolute",bottom:76,left:"50%",transform:"translateX(-50%)",zIndex:10}}>
         <button onClick={()=>sel.length>0&&next()} className="q-next-btn" style={{opacity:sel.length>0?1:.4,cursor:sel.length>0?"pointer":"default"}}>{t("q5.next")}</button>
@@ -3367,21 +3383,21 @@ function Q6Screen({navigate, onMenu, answers, setAnswers}) {
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",width:"100%",transition:"transform .1s ease"};
   return (
     <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0,position:"relative"}}>
-        <div style={{position:"absolute",bottom:0,left:0,right:0,height:16,background:"linear-gradient(to bottom,transparent,var(--bg))",pointerEvents:"none",zIndex:2}}/>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <button onClick={()=>navigate(answers.category==="Restaurant"?"q5":"q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div style={{textAlign:"right"}}>
+      <div className="scroll" style={{padding:"0 0 100px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>navigate(answers.category==="Restaurant"?"q5":"q4")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
               <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
             </div>
+          </div>
         </div>
-      </div>
-      <QProgress step="q6"/>
-      <div style={{padding:"8px 20px 16px",flexShrink:0}}>
-        <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q4.how_many")}</div>
-      </div>
-      <div style={{padding:"36px 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
+        <QProgress step="q6"/>
+        <div style={{padding:"8px 20px 16px"}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:8}}>{t("q4.how_many")}</div>
+        </div>
+        <div style={{padding:"0 20px 80px",display:"flex",flexDirection:"column",gap:9}}>
         {[["2","2"],["3-6","3-6"],["6-8","6-8"],["9+","9+"],["solo","solo mission"]].map(([val,label])=>(
           <button key={val} style={{...PILL,background:answers.group===val?"var(--red)":"var(--surface)",color:answers.group===val?"white":"var(--black)",borderColor:answers.group===val?"var(--red)":"var(--border-col)"}} onClick={()=>select(val)}>{label}</button>
         ))}
