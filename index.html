@@ -2982,7 +2982,7 @@ function QProgress({step}) {
 }
 
 function Q1Screen({navigate, onMenu, answers, setAnswers}) {
-  const [sel, setSel] = useState(answers.category||"");
+  const [sel, setSel] = useState("");
   const dark = useDark();
 
   function next(){
@@ -3058,9 +3058,9 @@ function Q1Screen({navigate, onMenu, answers, setAnswers}) {
   );
 }
 
-function Q2Screen({navigate, onMenu, answers, setAnswers}) {
-  const [selOcc, setSelOcc] = useState(answers.occasions||[]);
-  const [selTags, setSelTags] = useState(answers.tags||[]);
+function Q2Screen({navigate, onMenu, answers, setAnswers, selectedCity}) {
+  const [selOcc, setSelOcc] = useState([]);
+  const [selTags, setSelTags] = useState([]);
 
   const category = answers.category||"";
   const availableOccs = getOccasionsForCategory(category);
@@ -3082,7 +3082,8 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
   function next(){
     const occasions = selOcc.includes("___not_sure___") ? [] : selOcc;
     setAnswers(a=>({...a,occasions,tags:selTags}));
-    navigate("q3");
+    const isBudapest = !selectedCity || selectedCity === "Budapest";
+    navigate(isBudapest ? "q3" : "q3_city");
   }
 
   const pillStyle = (sel) => ({
@@ -3166,7 +3167,7 @@ function Q2Screen({navigate, onMenu, answers, setAnswers}) {
 }
 
 function Q3Screen({navigate, onMenu, answers, setAnswers, partnerDistrict, allVenues}) {
-  const [sel, setSel] = useState(answers.locations||(partnerDistrict?[partnerDistrict]:[]));
+  const [sel, setSel] = useState(partnerDistrict?[partnerDistrict]:[]);
   const [showMore, setShowMore] = useState(false);
   const [locLoading, setLocLoading] = useState(false);
 
@@ -3314,8 +3315,52 @@ function getTagsForCategory(category, extraTags=[]) {
   return merged;
 }
 
-function Q4Screen({navigate, onMenu, answers, setAnswers}) {
-  const [sel, setSel] = useState(answers.budgets||[]);
+function Q3CityScreen({navigate, selectedCity, onCitySelect, availableCities}) {
+  const dark = useDark();
+  const city = selectedCity || "Budapest";
+  return (
+    <div className="screen" style={{background:"var(--bg)",display:"flex",flexDirection:"column"}}>
+      <div className="scroll" style={{padding:"0 0 100px"}}>
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <button onClick={()=>navigate("q2")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
+            </div>
+          </div>
+        </div>
+        <QProgress step="q3"/>
+        <div style={{padding:"20px 20px 0"}}>
+          <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginBottom:24}}>Where are you exploring?</div>
+          {/* Current city - confirm */}
+          <div style={{background:"var(--red)",borderRadius:16,padding:"18px 20px",marginBottom:12,display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}
+            onClick={()=>navigate("q4")}>
+            <div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"white"}}>📍 {city}</div>
+              <div style={{fontFamily:"var(--body)",fontSize:13,color:"rgba(255,255,255,.75)",marginTop:2}}>tap to confirm</div>
+            </div>
+            <span style={{fontSize:22}}>→</span>
+          </div>
+          {/* Other cities */}
+          <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",marginBottom:12,marginTop:20}}>or choose a different city</div>
+          <div style={{display:"flex",flexDirection:"column",gap:9}}>
+            {(availableCities||[]).filter(c=>c.name!==city).map(c=>(
+              <button key={c.name}
+                onClick={()=>{ onCitySelect&&onCitySelect(c.name); navigate("q4"); }}
+                style={{border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",background:"var(--surface)",color:"var(--black)",width:"100%",transition:"transform .1s ease"}}>
+                {c.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Q4Screen({navigate, onMenu, answers, setAnswers, selectedCity}) {
+  const [sel, setSel] = useState([]);
   function toggle(b){setSel(prev=>prev.includes(b)?prev.filter(x=>x!==b):[...prev,b]);}
   function next(){setAnswers(a=>({...a,budgets:sel}));navigate(answers.category==="Restaurant"?"q5":"q6");}
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
@@ -3324,7 +3369,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
       <div className="scroll" style={{padding:"0 0 100px"}}>
         <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
           <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-            <button onClick={()=>navigate("q3")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button onClick={()=>navigate((!selectedCity||selectedCity==="Budapest")?"q3":"q3_city")} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div style={{textAlign:"right"}}>
               <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>discover</div>
@@ -3351,7 +3396,7 @@ function Q4Screen({navigate, onMenu, answers, setAnswers}) {
 }
 
 function Q5Screen({navigate, onMenu, answers, setAnswers}) {
-  const [sel,setSel]=useState(answers.cuisines||[]);
+  const [sel,setSel]=useState([]);
   function toggle(x){setSel(prev=>prev.includes(x)?prev.filter(v=>v!==x):[...prev,x]);}
   function next(){setAnswers(a=>({...a,cuisines:sel}));navigate("q6");}
   const PILL = {border:"1.5px solid var(--border-col)",borderRadius:50,height:44,fontFamily:"var(--body)",fontWeight:400,fontSize:15,cursor:"pointer",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",transition:"transform .1s ease"};
@@ -8945,9 +8990,10 @@ function App() {
     onboarding: <OnboardingScreen navigate={navigate} user={user} setUser={setUser}/>,
     home: <HomeScreen navigate={navigate} onMenu={()=>setShowMenu(true)} setAnswers={setAnswers} user={user} partner={isPartnerActive ? partner : null} venuesLoading={venuesLoading} allVenues={allVenues} selectedCity={selectedCity}/>,
     q1: <Q1Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
-    q2: <Q2Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
+    q2: <Q2Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} selectedCity={selectedCity}/>,
     q3: <Q3Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} partnerDistrict={isPartnerActive ? partner?.district : null} allVenues={allVenues}/>,
-    q4: <Q4Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
+    q3_city: <Q3CityScreen navigate={navigate} selectedCity={selectedCity} onCitySelect={selectCity} availableCities={availableCities}/>,
+    q4: <Q4Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} selectedCity={selectedCity}/>,
     q5: <Q5Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     q6: <Q6Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
     results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user} selectedCity={selectedCity}/>,
