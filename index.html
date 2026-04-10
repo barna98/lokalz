@@ -4711,7 +4711,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
   },[user?.id]);
 
   return (
-    <div className="screen" style={{background:"var(--bg)"}}>
+    <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
       <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
         <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
           <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
@@ -4722,7 +4722,7 @@ function SavedScreen({navigate, savedIds, allVenues, onMenu, user, selectedCity,
             </div>
           </div>
         </div>
-        <div style={{background:"var(--bg)",padding:"10px 16px 10px",display:"flex",flexDirection:"column",gap:8}}>
+        <div style={{padding:"10px 16px 10px",display:"flex",flexDirection:"column",gap:8}}>
           {availableCities?.length>0&&(
             <CitySearchBar availableCities={availableCities} selectedCity={selectedCity} onSelect={onCitySelect}/>
           )}
@@ -6019,7 +6019,7 @@ function ScoutScreen({navigate, allVenues, onMenu, showToast, setAllVenues, user
   );
 
   return (
-    <div className="screen" style={{background:"var(--bg)"}}>
+    <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
       <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
         <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
@@ -6810,7 +6810,7 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
   );
 
   return (
-    <div className="screen" style={{background:"var(--bg)"}}>
+    <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
       <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
         <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
@@ -8077,7 +8077,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
   const displayEvents = tab==="my" ? myEvents : events;
 
   return (
-    <div className="screen" style={{background:"var(--bg)"}}>
+    <div className="screen" style={{background:"var(--bg)",overflow:"hidden"}}>
       <div className="scroll" style={{position:"absolute",inset:0,padding:"0 0 80px"}}>
         <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
         <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
@@ -8088,7 +8088,7 @@ function EventCalendarScreen({navigate, onMenu, user, allVenues, showToast}) {
             </div>
           </div>
         </div>
-      <div style={{background:"var(--bg)",padding:"10px 16px 10px",}}}>
+      <div style={{background:"var(--bg)",padding:"10px 16px 10px"}}>
           <div style={{display:"flex",width:"100%",background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",borderRadius:50,padding:4,gap:2}}>
           {[["public","public events"],["my","my events"]].map(([k,l])=>(
             <button key={k} style={{flex:1,padding:"8px 4px",fontFamily:"var(--body)",fontSize:13,fontWeight:tab===k?700:400,color:tab===k?"white":"rgba(255,255,255,.65)",background:tab===k?"var(--red)":"transparent",border:"none",cursor:"pointer",borderRadius:50,transition:"all .2s cubic-bezier(.25,.46,.45,.94)"}} onClick={()=>setTab(k)}>{l}</button>
