@@ -3654,7 +3654,7 @@ function ResultsScreen({navigate, onMenu, answers, setAnswers, allVenues, partne
         onTouchStart={onPullStart} onTouchMove={onPullMove} onTouchEnd={onPullEnd}>
         <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
           <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-            <button onClick={()=>navigate(-1)} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button onClick={()=>{setAnswers(a=>({...a,aiQuery:null,semanticVenueIds:null,similarities:{},aiRequired:[]}));navigate(isAI?"home":"q6");}} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div style={{textAlign:"right"}}>
               <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
               <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{isAI?"AI results":"discover"}</div>
@@ -4484,18 +4484,18 @@ function FeedScreen({navigate, user, allVenues}) {
 
   return (
     <div className="screen" style={{background:"var(--bg)"}}>
-      {/* Header */}
-      <div className="screen-hdr" style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
-          <div/>
-          <div style={{textAlign:"right"}}>
-            <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>feed</div>
+      <div className="scroll" style={{padding:"0 0 80px"}}>
+        {/* Scrollable header */}
+        <div style={{background:"var(--bg)",padding:"20px 24px 16px"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+            <div/>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+              <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:18,color:"var(--black)",marginTop:4}}>feed</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="scroll" style={{padding:"36px 16px 80px"}}>
         {loading&&(
           <div style={{display:"flex",justifyContent:"center",padding:40}}>
             <div style={{width:28,height:28,border:"3px solid var(--surface3)",borderTop:"3px solid var(--red)",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
@@ -4520,60 +4520,65 @@ function FeedScreen({navigate, user, allVenues}) {
 
           return (
             <div key={venue.id} style={{animation:`staggerUp .3s ${Math.min(i,6)*0.06}s cubic-bezier(.2,.8,.4,1) both`,opacity:0,animationFillMode:"forwards"}}>
-              {/* Divider between posts */}
-              {i>0&&<div style={{height:1,background:"var(--border-col)",margin:"24px 0"}}/>}
+              {i>0&&<div style={{height:1,background:"var(--border-col)",margin:"4px 0"}}/>}
 
-              {/* Scout header */}
-              {scout&&(
-                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12,paddingLeft:2}}>
-                  <div onClick={()=>navigate("scout_profile",scout.id)} style={{width:40,height:40,borderRadius:"50%",background:"var(--surface2)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",border:"2px solid var(--border-col)"}}>
-                    {scout.profile_image
-                      ?<img src={scout.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                      :<span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)"}}>{(scout.name||"S")[0].toUpperCase()}</span>
-                    }
-                  </div>
-                  <div style={{flex:1}}>
-                    <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
-                      <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:15,color:"var(--black)",cursor:"pointer"}} onClick={()=>navigate("scout_profile",scout.id)}>{scout.name}</span>
-                      {scout.badge&&<span style={{fontFamily:"var(--body)",fontSize:11,fontWeight:600,color:"var(--text-muted)",background:"var(--surface2)",padding:"2px 8px",borderRadius:20}}>· {scout.badge}</span>}
+              {/* Editorial card */}
+              <div onClick={()=>navigate("venue",venue)} style={{cursor:"pointer",display:"flex",gap:0,overflow:"hidden",background:"var(--surface)",borderRadius:0,padding:"20px 16px 16px",position:"relative"}}>
+                {/* Left red accent bar */}
+                <div style={{width:3,background:"var(--red)",borderRadius:2,flexShrink:0,marginRight:14,minHeight:"100%",alignSelf:"stretch"}}/>
+
+                {/* Content */}
+                <div style={{flex:1,minWidth:0}}>
+                  {/* Scout line */}
+                  {scout&&(
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}
+                      onClick={e=>{e.stopPropagation();navigate("scout_profile",scout.id);}}>
+                      <div style={{width:28,height:28,borderRadius:"50%",background:"var(--surface2)",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",border:"1.5px solid var(--border-col)"}}>
+                        {scout.profile_image
+                          ?<img src={scout.profile_image} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                          :<span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:11,color:"var(--black)"}}>{(scout.name||"S")[0].toUpperCase()}</span>
+                        }
+                      </div>
+                      <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                        <span style={{fontFamily:"var(--body)",fontWeight:700,fontSize:13,color:"var(--red)"}}>{scout.name}</span>
+                        {scout.badge&&<span style={{fontFamily:"var(--body)",fontSize:11,color:"var(--text-muted)"}}>· {scout.badge}</span>}
+                        <span style={{fontFamily:"var(--body)",fontSize:11,color:"var(--text-muted)"}}>· {timeAgo(venue.created_at)}</span>
+                      </div>
                     </div>
-                    <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginTop:2}}>
-                      added a new place · {timeAgo(venue.created_at)}
-                    </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {/* Venue card */}
-              <div onClick={()=>navigate("venue",venue)} style={{background:"var(--surface)",borderRadius:20,overflow:"hidden",border:"1.5px solid var(--border-col)",cursor:"pointer"}}>
-                {/* Image */}
-                <FeedVenueImage venueId={venue.id} category={venue.category}/>
-
-                {/* Body */}
-                <div style={{padding:"16px 16px 14px"}}>
-                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:19,color:"var(--black)",marginBottom:4}}>{venue.name}</div>
-                  <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--text-muted)",marginBottom:10}}>
+                  {/* Venue name + meta */}
+                  <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",lineHeight:1.1,marginBottom:4}}>{venue.name}</div>
+                  <div style={{fontFamily:"var(--body)",fontSize:12,color:"var(--text-muted)",marginBottom:10}}>
                     {tCat(venue.category)}
                     {venueLocation(venue)&&<span> · {venueLocation(venue)}</span>}
                     {(venue.price_level||venue.price)&&<span> · {venue.price_level||venue.price}</span>}
                   </div>
+
+                  {/* Image */}
+                  <div style={{borderRadius:12,overflow:"hidden",marginBottom:10}}>
+                    <FeedVenueImage venueId={venue.id} category={venue.category}/>
+                  </div>
+
+                  {/* Why quote */}
                   {venue.why&&(
-                    <div style={{fontFamily:"var(--body)",fontSize:14,color:"var(--black)",lineHeight:1.6,marginBottom:14,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",fontStyle:"italic",borderLeft:"3px solid var(--red)",paddingLeft:12}}>
-                      {venue.why}
+                    <div style={{fontFamily:"var(--body)",fontSize:13,color:"var(--black)",lineHeight:1.6,marginBottom:12,fontStyle:"italic",overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>
+                      "{venue.why}"
                     </div>
                   )}
+
                   {/* Like button */}
-                  <div style={{display:"flex",alignItems:"center",justifyContent:"flex-end"}}>
+                  <div style={{display:"flex",justifyContent:"flex-end"}}>
                     <button onClick={e=>{e.stopPropagation();toggleLike(venue.id);}} style={{
-                      display:"flex",alignItems:"center",gap:6,
+                      display:"flex",alignItems:"center",gap:5,
                       background:liked?"rgba(220,38,38,.08)":"transparent",
                       border:"1.5px solid",borderColor:liked?"var(--red)":"var(--border-col)",
-                      borderRadius:50,padding:"7px 16px",cursor:"pointer",
-                      fontFamily:"var(--body)",fontWeight:700,fontSize:13,
+                      borderRadius:50,padding:"6px 14px",cursor:"pointer",
+                      fontFamily:"var(--body)",fontWeight:700,fontSize:12,
                       color:liked?"var(--red)":"var(--text-muted)",
                       transition:"all .15s"
                     }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill={liked?"var(--red)":"none"} stroke={liked?"var(--red)":"currentColor"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill={liked?"var(--red)":"none"} stroke={liked?"var(--red)":"currentColor"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
                       </svg>
                       {count>0?<span>{count}</span>:<span>like</span>}
