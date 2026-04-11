@@ -2165,7 +2165,7 @@ function BottomNav({screen, navigate, onMenu, menuOpen, answers}) {
   );
 }
 
-function Menu({onClose, navigate, role, onSignOut}) {
+function Menu({onClose, navigate, role, onSignOut, pendingCount, newApprovedCount, onClearApproved}) {
   const itemStyle = {fontFamily:"var(--body)",fontWeight:400,fontSize:22,color:"var(--black)",padding:"10px 0",cursor:"pointer",lineHeight:1.2};
   const boldStyle = {fontFamily:"var(--body)",fontWeight:700,fontSize:22,color:"var(--black)",padding:"10px 0",cursor:"pointer",lineHeight:1.2};
   return (
@@ -2186,9 +2186,15 @@ function Menu({onClose, navigate, role, onSignOut}) {
 
       {(role==="scout"||role==="city_lead")&&(
         <div style={{marginTop:24,display:"flex",flexDirection:"column",gap:0,paddingLeft:8}}>
-          {(role==="scout"||role==="city_lead")&&<div style={boldStyle} onClick={()=>{navigate("scout",null,{replace:true});onClose();}}>{t("menu.scout_mode")}</div>}
+          {(role==="scout"||role==="city_lead")&&<div style={boldStyle} onClick={()=>{navigate("scout",null,{replace:true});onClearApproved&&onClearApproved();onClose();}}>
+            {t("menu.scout_mode")}
+            {newApprovedCount>0&&<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",background:"var(--red)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,borderRadius:"50%",minWidth:16,height:16,padding:"0 4px",marginLeft:6,verticalAlign:"middle"}}>{newApprovedCount}</span>}
+          </div>}
           {role==="city_lead"&&(
-            <div style={boldStyle} onClick={()=>{navigate("city_lead",null,{replace:true});onClose();}}>{t("menu.city_lead2")}</div>
+            <div style={boldStyle} onClick={()=>{navigate("city_lead",null,{replace:true});onClose();}}>
+              {t("menu.city_lead2")}
+              {pendingCount>0&&<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",background:"var(--red)",color:"white",fontFamily:"var(--body)",fontWeight:700,fontSize:10,borderRadius:"50%",minWidth:16,height:16,padding:"0 4px",marginLeft:6,verticalAlign:"middle"}}>{pendingCount}</span>}
+            </div>
           )}
         </div>
       )}
@@ -6440,13 +6446,14 @@ function CityLeadScreen({navigate, allVenues, setAllVenues, onMenu, showToast, u
   const CAPACITIES = ["2","3-6","6-8","9+"];
 
   // City Lead: filter by selectedCity if set, otherwise own city
-  const cityVenues = selectedCity
-    ? allVenues.filter(v=>v.city_name===selectedCity)
-    : (user?.city_id ? allVenues.filter(v=>v.city_id===user.city_id) : allVenues);
+  const isAllCities = !selectedCity || selectedCity === "All";
+  const cityVenues = isAllCities
+    ? allVenues
+    : allVenues.filter(v=>v.city_name===selectedCity);
 
-  const pending = selectedCity
-    ? allVenues.filter(v=>(v.status==="pending"||v.status==="needs_edit")&&v.city_name===selectedCity)
-    : allVenues.filter(v=>v.status==="pending"||v.status==="needs_edit");
+  const pending = isAllCities
+    ? allVenues.filter(v=>v.status==="pending"||v.status==="needs_edit")
+    : allVenues.filter(v=>(v.status==="pending"||v.status==="needs_edit")&&v.city_name===selectedCity);
   const rejected = cityVenues.filter(v=>v.status==="rejected");
   const active = [...cityVenues.filter(v=>v.status==="active")].reverse();
 
@@ -8832,6 +8839,29 @@ function App() {
   const changeLang = (l) => { setLang(l); setLangState(l); };
   const changeDark = (v) => { setDarkMode(v); setDarkState(v); };
   React.useEffect(()=>{ applyDarkMode(_dark); }, []);
+
+  // Swipe right from left edge → go back
+  React.useEffect(()=>{
+    let startX=0, startY=0;
+    function onTouchStart(e){
+      startX=e.touches[0].clientX;
+      startY=e.touches[0].clientY;
+    }
+    function onTouchEnd(e){
+      const dx=e.changedTouches[0].clientX-startX;
+      const dy=Math.abs(e.changedTouches[0].clientY-startY);
+      // Swipe right from left edge (first 30px), horizontal enough
+      if(startX<30 && dx>60 && dy<80){
+        navigate(-1);
+      }
+    }
+    document.addEventListener('touchstart', onTouchStart, {passive:true});
+    document.addEventListener('touchend', onTouchEnd, {passive:true});
+    return ()=>{
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchend', onTouchEnd);
+    };
+  }, []);
   const [history, setHistory] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [selectedScout, setSelectedScout] = useState(null);
@@ -8847,6 +8877,7 @@ function App() {
   const [answers, setAnswers] = useState({});
   const [selectedCity, setSelectedCity] = useState(getStoredCity());
   const [availableCities, setAvailableCities] = useState([]);
+  const [newApprovedCount, setNewApprovedCount] = useState(0);
 
   function selectCity(city) {
     setSelectedCity(city);
@@ -8902,6 +8933,16 @@ function App() {
         occasions: v.occasions || []
       }));
       setAllVenues(mapped);
+      // Track newly approved venues for scout badge
+      if (user?.id) {
+        const lastSeen = parseInt(localStorage.getItem('lastSeenApproved_'+user.id)||'0');
+        const newlyApproved = mapped.filter(v=>
+          v.status==='active' &&
+          v.submitted_by===user.id &&
+          new Date(v.approved_at||v.updated_at||0).getTime() > lastSeen
+        );
+        setNewApprovedCount(newlyApproved.length);
+      }
       // Build available cities from all venues (including pending)
       const cityMap = {};
       mapped.filter(v=>v.city_name).forEach(v=>{
@@ -9274,7 +9315,14 @@ function App() {
                 </>
               );
             })()}
-            {showMenu&&<Menu onClose={()=>setShowMenu(false)} navigate={navigate} role={user?.role||"explorer"} onSignOut={signOut}/>}
+            {showMenu&&<Menu onClose={()=>setShowMenu(false)} navigate={navigate} role={user?.role||"explorer"} onSignOut={signOut}
+              pendingCount={allVenues.filter(v=>v.status==="pending"||v.status==="needs_edit").length}
+              newApprovedCount={newApprovedCount}
+              onClearApproved={()=>{
+                localStorage.setItem('lastSeenApproved_'+(user?.id||''), Date.now().toString());
+                setNewApprovedCount(0);
+              }}
+            />}
       {user&&!appLoading&&screen!=="onboarding"&&(["home","feed","all_venues","q1","q2","q3","q3_city","q4","q5","q6"].includes(screen)||showMenu)&&<BottomNav screen={screen} navigate={navigate} onMenu={()=>setShowMenu(true)} menuOpen={showMenu} answers={answers}/>}
                 </>
       }
