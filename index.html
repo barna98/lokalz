@@ -9149,8 +9149,8 @@ function App() {
     setScreen(target);
     setShowMenu(false);
   }
-  // Keep navigateRef always pointing to latest navigate
-  React.useEffect(()=>{ navigateRef.current = navigate; });
+  // Set ref synchronously every render so swipe handler always has latest navigate
+  navigateRef.current = navigate;
   function showToastMsg(msg){setToast(msg);setTimeout(()=>setToast(null),3000);}
 
   async function loadSavedIds(userId){
