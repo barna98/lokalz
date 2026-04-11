@@ -8851,22 +8851,20 @@ function App() {
     function onTouchStart(e){
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
-      active = startX < 30; // only from left edge
+      active = startX < 30;
       if(active){
-        // Find the topmost screen element
-        screenEl = document.querySelector('#app-root > div[style*="absolute"] .screen');
-        if(!screenEl) screenEl = document.querySelector('.screen');
+        screenEl = document.getElementById('swipe-screen');
       }
     }
     function onTouchMove(e){
       if(!active || !screenEl) return;
       const dx = e.touches[0].clientX - startX;
       const dy = Math.abs(e.touches[0].clientY - startY);
-      if(dy > 40 && dx < dy){ active=false; screenEl.style.transform=''; return; }
+      if(dy > 40 && dy > dx){ active=false; screenEl.style.transform=''; return; }
       if(dx > 0){
         screenEl.style.transition = 'none';
         screenEl.style.transform = `translateX(${dx}px)`;
-        screenEl.style.boxShadow = `-${dx*0.1}px 0 20px rgba(0,0,0,${0.15 - dx/W*0.1})`;
+        screenEl.style.boxShadow = `-4px 0 24px rgba(0,0,0,0.15)`;
       }
     }
     function onTouchEnd(e){
@@ -8874,23 +8872,26 @@ function App() {
       active = false;
       const dx = e.changedTouches[0].clientX - startX;
       const dy = Math.abs(e.changedTouches[0].clientY - startY);
+      const el = screenEl;
+      screenEl = null;
 
       if(dx > W * 0.35 && dy < 100){
-        // Complete the swipe — slide out then navigate
-        screenEl.style.transition = 'transform .25s cubic-bezier(.4,0,.2,1)';
-        screenEl.style.transform = `translateX(${W}px)`;
+        // Complete — slide out then navigate back
+        el.style.transition = 'transform .25s cubic-bezier(.4,0,.2,1)';
+        el.style.transform = `translateX(${W}px)`;
         setTimeout(()=>{
-          if(screenEl){ screenEl.style.transform=''; screenEl.style.boxShadow=''; screenEl.style.transition=''; }
+          el.style.transform = '';
+          el.style.boxShadow = '';
+          el.style.transition = '';
           if(navigateRef.current) navigateRef.current(-1);
         }, 250);
       } else {
         // Cancel — snap back
-        screenEl.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
-        screenEl.style.transform = 'translateX(0)';
-        screenEl.style.boxShadow = '';
-        setTimeout(()=>{ if(screenEl){ screenEl.style.transform=''; screenEl.style.transition=''; } }, 200);
+        el.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
+        el.style.transform = 'translateX(0)';
+        el.style.boxShadow = '';
+        setTimeout(()=>{ el.style.transform=''; el.style.transition=''; }, 200);
       }
-      screenEl = null;
     }
     document.addEventListener('touchstart', onTouchStart, {passive:true});
     document.addEventListener('touchmove', onTouchMove, {passive:true});
@@ -9339,7 +9340,7 @@ function App() {
                 : screen;
               return (
                 <>
-                  <div key={bgKey} id="bg-screen-wrapper" style={{
+                  <div key={bgKey} id="swipe-screen" style={{
                     position:"absolute",inset:0,
                     pointerEvents:isDetail?"none":"auto",
                     userSelect:isDetail?"none":"auto",
@@ -9352,7 +9353,7 @@ function App() {
                   }}>
                     {screens[bgKey]||screens.signin}
                   </div>
-                  {isDetail && screens[screen]}
+                  {isDetail && <div id="swipe-screen" style={{position:"absolute",inset:0}}>{screens[screen]}</div>}
                 </>
               );
             })()}
