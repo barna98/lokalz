@@ -137,7 +137,6 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 @keyframes skeleton{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:skeleton 1.5s infinite;}
 /* Google Maps UI cleanup */
-.gm-style-cc{opacity:0.4;transform:scale(0.8);transform-origin:bottom right;}
 .gmnoprint a,.gmnoprint span{display:none!important;}
 .gm-style .gm-style-cc>div>a{font-size:9px!important;opacity:0.5;}
 @keyframes glow-pulse{
@@ -157,40 +156,23 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 @keyframes imgFadeIn{from{opacity:0}to{opacity:1}}
 
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);animation:fadeUp .15s cubic-bezier(.25,.46,.45,.94) both;}
-.screen-scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);animation:fadeUp .2s cubic-bezier(.25,.46,.45,.94) both;display:flex;flex-direction:column;}
-.screen-no-anim{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);}
 .screen-detail{position:absolute;inset:0;display:flex;flex-direction:column;background:transparent;}
 
 /* Tap feedback */
-.tap{transition:transform .12s ease,opacity .12s ease;}
-.tap:active{transform:scale(.96);opacity:.85;}
 
 /* Staggered cards */
-.stagger-1{animation:staggerUp .3s .04s ease both;}
-.stagger-2{animation:staggerUp .3s .08s ease both;}
-.stagger-3{animation:staggerUp .3s .12s ease both;}
-.stagger-4{animation:staggerUp .3s .16s ease both;}
-.stagger-5{animation:staggerUp .3s .20s ease both;}
 
 /* Smooth image load */
-.img-fade{animation:imgFadeIn .4s ease both;}
 
 /* Bottom nav tap */
-.nav-btn{transition:transform .1s ease;}
-.nav-btn:active{transform:scale(.88);}
 
 /* LOGO — large on auth screens, medium on inner screens */
 .logo{font-family:var(--display);font-size:52px;color:var(--red);line-height:.88;letter-spacing:0;user-select:none;}
 .logo-md{font-family:var(--display);font-size:40px;color:var(--red);line-height:.9;letter-spacing:0;user-select:none;}
-.logo-white{color:var(--white);}
 
 /* TAGLINE */
-.tagline{font-family:var(--body);font-weight:400;font-size:17px;color:var(--black);margin-top:8px;line-height:1.3;}
 
 /* SCRIPT TEXT */
-.script{font-family:var(--body);font-size:26px;font-weight:600;color:var(--black);}
-.script-white{color:var(--white);}
-.script-sm{font-size:20px;}
 
 /* INPUTS — blue background, white bold uppercase, pill shape */
 .input-field{
@@ -227,21 +209,6 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 }
 .btn-black:active{transform:scale(.97);}
 
-.btn-black-half{
-  background:var(--white);
-  color:var(--black);
-  border:1.5px solid var(--black);
-  border-radius:50px;
-  padding:18px 20px;
-  font-family:var(--body);
-  font-weight:600;
-  font-size:16px;
-  cursor:pointer;
-  flex:1;
-  text-align:center;
-  transition:transform .12s;
-}
-.btn-black-half:active{transform:scale(.97);}
 
 .btn-blue{
   background:var(--red);
@@ -261,85 +228,13 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .btn-blue:active{transform:scale(.97);}
 
 /* OCCASION CARDS — horizontal scroll */
-.cards-row{
-  display:flex;
-  gap:14px;
-  padding:0 24px;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  scroll-snap-type:x mandatory;
-  padding-bottom:8px;
-  flex-shrink:0;
-}
-.cards-row::-webkit-scrollbar{display:none;}
 
-.occ-card{
-  flex-shrink:0;
-  width:210px;
-  height:260px;
-  background:var(--black);
-  border-radius:24px;
-  padding:20px 18px;
-  cursor:pointer;
-  scroll-snap-align:center;
-  transition:transform .15s,opacity .15s,outline .1s;
-  position:relative;
-  overflow:hidden;
-}
-.occ-card:active{transform:scale(.97);}
 .occ-card.sel{outline:3px solid var(--red);background:#111;}
-[data-dark="true"] .occ-card:not(.sel){outline:1px solid #2a2a2a;}
-.occ-card-label{font-family:var(--body);font-size:22px;font-weight:600;color:var(--white);line-height:1.25;position:relative;z-index:1;}
+[data-dark="true"] 
 
 /* SOMETHING ELSE EXPANDED */
-.else-card{
-  width:210px;
-  min-height:260px;
-  background:var(--black);
-  border-radius:24px;
-  padding:20px 18px;
-  cursor:pointer;
-  flex-shrink:0;
-  scroll-snap-align:center;
-}
-.else-item{
-  font-family:var(--body);
-  font-size:18px;
-  font-weight:500;
-  color:var(--white);
-  padding:10px 6px;
-  border-bottom:1px solid rgba(255,255,255,.15);
-  cursor:pointer;
-  transition:opacity .15s;
-  border-radius:8px;
-}
-.else-item:last-child{border-bottom:none;}
-.else-item:active{opacity:.7;}
 
 /* MENU */
-.menu-panel{
-  position:absolute;inset:0;
-  background:var(--black);
-  z-index:101;
-  animation:fadeIn .22s ease;
-  display:flex;flex-direction:column;
-  padding:56px 36px 44px;
-}
-.menu-close{position:absolute;top:24px;right:28px;background:none;border:none;color:rgba(255,255,255,.7);font-size:32px;cursor:pointer;font-weight:200;line-height:1;}
-.menu-item{
-  font-family:var(--body);
-  font-weight:700;
-  font-size:40px;
-  color:var(--white);
-  padding:10px 0;
-  cursor:pointer;
-  transition:opacity .15s;
-  line-height:1.1;
-}
-.menu-item:active{opacity:.6;}
-.menu-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
-.menu-bottom-item{font-family:var(--body);font-weight:700;font-size:14px;color:rgba(255,255,255,.55);cursor:pointer;transition:color .15s;}
-.menu-bottom-item:active{color:var(--white);}
 
 /* HAMBURGER */
 .hamburger{background:none;border:none;cursor:pointer;padding:4px;display:flex;flex-direction:column;gap:7px;}
@@ -398,21 +293,16 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .scroll-top-btn{position:fixed;bottom:100px;right:12px;width:32px;height:32px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border-col);box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s;}
 .scroll-top-btn.visible{opacity:1;pointer-events:auto;}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
-.screen-hdr{flex-shrink:0;position:relative;z-index:3;}
-.screen-hdr::after{content:"";position:absolute;bottom:-16px;left:0;right:0;height:16px;background:linear-gradient(to bottom,#F5B8EC,rgba(245,184,236,0));pointer-events:none;z-index:3;}
-[data-dark="true"] .screen-hdr::after{background:linear-gradient(to bottom,#0d0d0d,rgba(13,13,13,0));}
+[data-dark="true"] 
 .back-btn{background:var(--black);border:none;cursor:pointer;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;line-height:1;flex-shrink:0;}
-.back-btn-fixed{position:absolute;top:20px;left:24px;z-index:20;background:var(--black);border:none;cursor:pointer;padding:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;line-height:1;}
 .back-btn:active{opacity:.7;}
 .q-next-btn{background:#000;color:#fff;border:none;border-radius:50px;padding:14px 48px;font-family:var(--body);font-weight:400;font-size:16px;cursor:pointer;white-space:nowrap;transition:opacity .12s;}
 .q-next-btn:active{opacity:.7;}
 .text-link{font-family:var(--body);font-size:14px;font-weight:700;color:var(--black);text-decoration:underline;cursor:pointer;}
 .text-link-blue{color:var(--red);}
-.divider{height:1px;background:rgba(0,0,0,.1);margin:4px 0;}
 .empty{text-align:center;padding:48px 20px;color:#888;display:flex;flex-direction:column;align-items:center;}
 .empty-icon{font-size:44px;margin-bottom:12px;}
 .toast{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--white);padding:13px 26px;border-radius:50px;font-family:var(--body);font-size:14px;font-weight:600;letter-spacing:.02em;animation:popIn .25s ease both;white-space:nowrap;z-index:9999;max-width:320px;text-overflow:ellipsis;overflow:hidden;}
-.status-pill{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.04em;font-family:var(--body);}
 .pill-pending{background:#FFF3CD;color:#856404;}
 .pill-active{background:#D1E7DD;color:#0A3622;}
 .pill-rejected{background:#F8D7DA;color:#58151C;}
@@ -425,8 +315,6 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 .input-wrap-light{background:var(--white);border:1.5px solid rgba(0,0,0,.15);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:10px;width:100%;}
 .input-wrap-light input{border:none;outline:none;background:transparent;font-family:var(--body);font-size:15px;font-weight:400;color:var(--black);flex:1;}
 .input-wrap-light input::placeholder{color:rgba(0,0,0,.3);}
-.prog-dots{display:flex;gap:7px;justify-content:center;padding:10px 0 4px;}
-.prog-dot{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.13);transition:all .2s;}
 .prog-dot.on{background:var(--black);width:24px;border-radius:5px;}
 
 /* DARK MODE — disabled in new design */
@@ -1841,19 +1729,8 @@ const IllusElse = () => (
   </svg>
 );
 
-function Illus({type}) {
-  const map = {date:<IllusDate/>,coffee:<IllusCoffee/>,drinks:<IllusDrinks/>,dinner:<IllusDinner/>,brunch:<IllusBrunch/>,else:<IllusElse/>,late:<IllusDrinks/>,birthday:<IllusDinner/>};
-  return map[type]||<IllusElse/>;
-}
 
 // ── COMPONENTS ───────────────────────────────
-function Hamburger({onClick}) {
-  return (
-    <button className="hamburger" onClick={onClick}>
-      <span/><span/>
-    </button>
-  );
-}
 
 function StatusPill({status}) {
   const map={pending:"pill-pending",active:"pill-active",rejected:"pill-rejected",needs_edit:"pill-needs_edit"};
@@ -2067,74 +1944,6 @@ function CitySearchBar({availableCities, selectedCity, onSelect}) {
   );
 }
 
-function CityPicker({availableCities, selectedCity, onSelect}) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <button onClick={()=>setOpen(true)} style={{
-        display:"inline-flex",alignItems:"center",gap:5,flexShrink:0,
-        background:"rgba(0,0,0,.45)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
-        border:"none",borderRadius:50,padding:"6px 12px",
-        fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"white",cursor:"pointer",
-        whiteSpace:"nowrap"
-      }}>
-        📍 {selectedCity||"all"} <span style={{opacity:.6,fontSize:10}}>▼</span>
-      </button>
-
-      {open&&(
-        <>
-          {/* Backdrop */}
-          <div style={{position:"fixed",inset:0,zIndex:498,background:"rgba(0,0,0,.5)"}} onClick={()=>setOpen(false)}/>
-          {/* Sheet */}
-          <div style={{
-            position:"fixed",left:0,right:0,bottom:0,zIndex:499,
-            background:"var(--surface)",
-            borderRadius:"20px 20px 0 0",
-            padding:"16px 20px",
-            paddingBottom:"calc(80px + env(safe-area-inset-bottom))",
-            maxHeight:"55vh",overflowY:"auto",
-            boxShadow:"0 -8px 32px rgba(0,0,0,.25)",
-            animation:"slideInUp .25s cubic-bezier(.25,.46,.45,.94)"
-          }}>
-            <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:12,color:"var(--text-muted)",textTransform:"uppercase",letterSpacing:".06em",marginBottom:12}}>Select city</div>
-
-            <button onClick={()=>{onSelect(null);setOpen(false);}} style={{
-              width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
-              background:!selectedCity?"var(--red)":"transparent",
-              color:!selectedCity?"white":"var(--black)",
-              border:"1.5px solid",borderColor:!selectedCity?"var(--red)":"var(--border-col)",
-              borderRadius:12,padding:"11px 16px",
-              fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",marginBottom:8,
-              transition:"all .15s"
-            }}>
-              <span>🌍 All cities</span>
-              {!selectedCity&&<span>✓</span>}
-            </button>
-
-            {availableCities.map(c=>(
-              <button key={c.name} onClick={()=>{onSelect(c.name);setOpen(false);}} style={{
-                width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",
-                background:selectedCity===c.name?"var(--red)":"transparent",
-                color:selectedCity===c.name?"white":"var(--black)",
-                border:"1.5px solid",borderColor:selectedCity===c.name?"var(--red)":"var(--border-col)",
-                borderRadius:12,padding:"11px 16px",
-                fontFamily:"var(--body)",fontWeight:700,fontSize:14,cursor:"pointer",marginBottom:8,
-                transition:"all .15s"
-              }}>
-                <div style={{textAlign:"left"}}>
-                  <div>{c.name}</div>
-                  <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:12,opacity:.6,marginTop:1}}>{c.country}{c.count>0?` · ${c.count} venues`:""}</div>
-                </div>
-                {selectedCity===c.name&&<span>✓</span>}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </>
-  );
-}
 
 function BottomNav({screen, navigate, onMenu, menuOpen, answers}) {
   const dark = useDark();
