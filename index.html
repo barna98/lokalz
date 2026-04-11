@@ -9125,11 +9125,11 @@ function App() {
 
   // Swipe back — same pattern as venue card dismiss but horizontal
   const swipeBack = React.useRef({startX:0, startY:0, active:false, dx:0});
+  const SWIPEABLE = ["venue","scout_profile","event_detail","event_plan_detail","about","upgrade","event_plan_detail"];
   function onSwipeTouchStart(e){
     swipeBack.current.startX = e.touches[0].clientX;
     swipeBack.current.startY = e.touches[0].clientY;
-    // Only activate if we have history to go back to AND starting from left edge
-    swipeBack.current.active = e.touches[0].clientX < 40 && history.length > 0;
+    swipeBack.current.active = e.touches[0].clientX < 40 && SWIPEABLE.includes(screen);
     swipeBack.current.dx = 0;
   }
   function onSwipeTouchMove(e){
@@ -9307,7 +9307,7 @@ function App() {
         : <>
             {/* Background screen — always mounted, covered by detail screens */}
             {(()=>{
-              const DETAIL_SCREENS = ["venue","scout_profile","event_detail","event_plan_detail","saved","scout","city_lead","event_calendar","event_planning","profile","scouts","about","upgrade","results","results_list"];
+              const DETAIL_SCREENS = ["venue","scout_profile","event_detail","event_plan_detail"];
               const isDetail = DETAIL_SCREENS.includes(screen);
               const bgKey = isDetail && history.length > 0
                 ? history[history.length-1].screen
