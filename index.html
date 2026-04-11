@@ -391,7 +391,12 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 
 /* MISC */
 .scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;}
-.scroll::-webkit-scrollbar{display:none;}
+.scroll::-webkit-scrollbar{width:3px;}
+.scroll::-webkit-scrollbar-track{background:transparent;}
+.scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:3px;}
+[data-dark="true"] .scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);}
+.scroll-top-btn{position:fixed;bottom:96px;right:16px;width:34px;height:34px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border-col);box-shadow:0 2px 8px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.scroll-top-btn.visible{opacity:1;pointer-events:auto;}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
 .screen-hdr{flex-shrink:0;position:relative;z-index:3;}
 .screen-hdr::after{content:"";position:absolute;bottom:-16px;left:0;right:0;height:16px;background:linear-gradient(to bottom,#F5B8EC,rgba(245,184,236,0));pointer-events:none;z-index:3;}
@@ -3555,6 +3560,31 @@ function SkeletonCard(){
         <div className="skeleton" style={{height:12,borderRadius:8,width:"40%"}}/>
       </div>
     </div>
+  );
+}
+
+function ScrollTopBtn() {
+  const [visible, setVisible] = React.useState(false);
+  React.useEffect(()=>{
+    function onScroll(e){
+      setVisible(e.target.scrollTop > 200);
+    }
+    // Listen on all scroll containers
+    document.addEventListener('scroll', onScroll, true);
+    return ()=>document.removeEventListener('scroll', onScroll, true);
+  },[]);
+
+  function scrollTop(){
+    const el = document.querySelector('.scroll');
+    if(el) el.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  return (
+    <button className={`scroll-top-btn${visible?' visible':''}`} onClick={scrollTop} aria-label="Scroll to top">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="18 15 12 9 6 15"/>
+      </svg>
+    </button>
   );
 }
 
@@ -9167,6 +9197,7 @@ function App() {
                 </>
       }
       {toast&&<div className="toast">{toast}</div>}
+      <ScrollTopBtn/>
     </div>
     </>
     </DarkContext.Provider>
