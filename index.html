@@ -8843,62 +8843,27 @@ function App() {
   // Keep navigate in a ref so swipe always has latest version
   const navigateRef = React.useRef(null);
 
-  // iOS Safari-style swipe back: slide current screen right, reveal previous
+  // Swipe right from left edge → same as back button
   React.useEffect(()=>{
-    let startX=0, startY=0, active=false, screenEl=null;
-    const W = window.innerWidth;
-
+    let startX=0, startY=0, tracking=false;
     function onTouchStart(e){
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
-      active = startX < 30;
-      if(active){
-        screenEl = document.getElementById('swipe-screen');
-      }
-    }
-    function onTouchMove(e){
-      if(!active || !screenEl) return;
-      const dx = e.touches[0].clientX - startX;
-      const dy = Math.abs(e.touches[0].clientY - startY);
-      if(dy > 40 && dy > dx){ active=false; screenEl.style.transform=''; return; }
-      if(dx > 0){
-        screenEl.style.transition = 'none';
-        screenEl.style.transform = `translateX(${dx}px)`;
-        screenEl.style.boxShadow = `-4px 0 24px rgba(0,0,0,0.15)`;
-      }
+      tracking = startX < 40;
     }
     function onTouchEnd(e){
-      if(!active || !screenEl) return;
-      active = false;
+      if(!tracking) return;
+      tracking = false;
       const dx = e.changedTouches[0].clientX - startX;
       const dy = Math.abs(e.changedTouches[0].clientY - startY);
-      const el = screenEl;
-      screenEl = null;
-
-      if(dx > W * 0.35 && dy < 100){
-        // Complete — slide out then navigate back
-        el.style.transition = 'transform .25s cubic-bezier(.4,0,.2,1)';
-        el.style.transform = `translateX(${W}px)`;
-        setTimeout(()=>{
-          el.style.transform = '';
-          el.style.boxShadow = '';
-          el.style.transition = '';
-          if(navigateRef.current) navigateRef.current(-1);
-        }, 250);
-      } else {
-        // Cancel — snap back
-        el.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
-        el.style.transform = 'translateX(0)';
-        el.style.boxShadow = '';
-        setTimeout(()=>{ el.style.transform=''; el.style.transition=''; }, 200);
+      if(dx > 80 && dy < dx && navigateRef.current){
+        navigateRef.current(-1);
       }
     }
     document.addEventListener('touchstart', onTouchStart, {passive:true});
-    document.addEventListener('touchmove', onTouchMove, {passive:true});
     document.addEventListener('touchend', onTouchEnd, {passive:true});
     return ()=>{
       document.removeEventListener('touchstart', onTouchStart);
-      document.removeEventListener('touchmove', onTouchMove);
       document.removeEventListener('touchend', onTouchEnd);
     };
   }, []);
@@ -9340,7 +9305,7 @@ function App() {
                 : screen;
               return (
                 <>
-                  <div key={bgKey} id="swipe-screen" style={{
+                  <div key={bgKey} id="bg-screen-wrapper" style={{
                     position:"absolute",inset:0,
                     pointerEvents:isDetail?"none":"auto",
                     userSelect:isDetail?"none":"auto",
@@ -9353,7 +9318,7 @@ function App() {
                   }}>
                     {screens[bgKey]||screens.signin}
                   </div>
-                  {isDetail && <div id="swipe-screen" style={{position:"absolute",inset:0}}>{screens[screen]}</div>}
+                  {isDetail && screens[screen]}
                 </>
               );
             })()}
