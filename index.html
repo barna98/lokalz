@@ -8840,28 +8840,6 @@ function App() {
   const changeDark = (v) => { setDarkMode(v); setDarkState(v); };
   React.useEffect(()=>{ applyDarkMode(_dark); }, []);
 
-  // Swipe right from left edge → go back
-  React.useEffect(()=>{
-    let startX=0, startY=0;
-    function onTouchStart(e){
-      startX=e.touches[0].clientX;
-      startY=e.touches[0].clientY;
-    }
-    function onTouchEnd(e){
-      const dx=e.changedTouches[0].clientX-startX;
-      const dy=Math.abs(e.changedTouches[0].clientY-startY);
-      // Swipe right from left edge (first 30px), horizontal enough
-      if(startX<30 && dx>60 && dy<80){
-        navigate(-1);
-      }
-    }
-    document.addEventListener('touchstart', onTouchStart, {passive:true});
-    document.addEventListener('touchend', onTouchEnd, {passive:true});
-    return ()=>{
-      document.removeEventListener('touchstart', onTouchStart);
-      document.removeEventListener('touchend', onTouchEnd);
-    };
-  }, []);
   const [history, setHistory] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [selectedScout, setSelectedScout] = useState(null);
