@@ -8839,34 +8839,6 @@ function App() {
   const changeLang = (l) => { setLang(l); setLangState(l); };
   const changeDark = (v) => { setDarkMode(v); setDarkState(v); };
   React.useEffect(()=>{ applyDarkMode(_dark); }, []);
-
-  // Keep navigate in a ref so swipe always has latest version
-  const navigateRef = React.useRef(null);
-
-  // Swipe right from left edge → same as back button
-  React.useEffect(()=>{
-    let startX=0, startY=0, tracking=false;
-    function onTouchStart(e){
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      tracking = startX < 40;
-    }
-    function onTouchEnd(e){
-      if(!tracking) return;
-      tracking = false;
-      const dx = e.changedTouches[0].clientX - startX;
-      const dy = Math.abs(e.changedTouches[0].clientY - startY);
-      if(dx > 80 && dy < dx && navigateRef.current){
-        navigateRef.current(-1);
-      }
-    }
-    document.addEventListener('touchstart', onTouchStart, {passive:true});
-    document.addEventListener('touchend', onTouchEnd, {passive:true});
-    return ()=>{
-      document.removeEventListener('touchstart', onTouchStart);
-      document.removeEventListener('touchend', onTouchEnd);
-    };
-  }, []);
   const [history, setHistory] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [selectedScout, setSelectedScout] = useState(null);
@@ -9149,9 +9121,45 @@ function App() {
     setScreen(target);
     setShowMenu(false);
   }
-  // Set ref synchronously every render so swipe handler always has latest navigate
-  navigateRef.current = navigate;
   function showToastMsg(msg){setToast(msg);setTimeout(()=>setToast(null),3000);}
+
+  // Swipe back — same pattern as venue card dismiss but horizontal
+  const swipeBack = React.useRef({startX:0, startY:0, active:false, dx:0});
+  function onSwipeTouchStart(e){
+    swipeBack.current.startX = e.touches[0].clientX;
+    swipeBack.current.startY = e.touches[0].clientY;
+    swipeBack.current.active = e.touches[0].clientX < 40;
+    swipeBack.current.dx = 0;
+  }
+  function onSwipeTouchMove(e){
+    if(!swipeBack.current.active) return;
+    const dx = e.touches[0].clientX - swipeBack.current.startX;
+    const dy = Math.abs(e.touches[0].clientY - swipeBack.current.startY);
+    if(dy > 40 && dy > dx){ swipeBack.current.active=false; return; }
+    if(dx < 0) return;
+    swipeBack.current.dx = dx;
+    const progress = Math.min(dx / window.innerWidth, 1);
+    // Slide current screen
+    const cur = document.getElementById("bg-screen-wrapper");
+    if(cur){
+      cur.style.transition="none";
+      cur.style.transform=`translateX(${dx}px)`;
+    }
+  }
+  function onSwipeTouchEnd(e){
+    if(!swipeBack.current.active) return;
+    swipeBack.current.active = false;
+    const dx = swipeBack.current.dx;
+    const cur = document.getElementById("bg-screen-wrapper");
+    if(dx > window.innerWidth * 0.35){
+      // Complete — slide out then navigate
+      if(cur){ cur.style.transition="transform .25s cubic-bezier(.4,0,.2,1)"; cur.style.transform=`translateX(${window.innerWidth}px)`; }
+      setTimeout(()=>{ if(cur){ cur.style.transform=""; cur.style.transition=""; } navigate(-1); }, 250);
+    } else {
+      // Cancel — snap back
+      if(cur){ cur.style.transition="transform .25s cubic-bezier(.2,.8,.4,1)"; cur.style.transform=""; setTimeout(()=>{ if(cur) cur.style.transition=""; },250); }
+    }
+  }
 
   async function loadSavedIds(userId){
     const {data, error} = await supabase
@@ -9289,7 +9297,7 @@ function App() {
   return (
     <DarkContext.Provider value={dark}>
     <>
-    <div id="app-root" style={{width:"100%",height:"100%",position:"relative"}}>
+    <div id="app-root" style={{width:"100%",height:"100%",position:"relative"}} onTouchStart={onSwipeTouchStart} onTouchMove={onSwipeTouchMove} onTouchEnd={onSwipeTouchEnd}>
       {appLoading
         ? <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:20,background:"var(--bg)"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"40px",color:"var(--red)",lineHeight:.88,letterSpacing:0}}>LOKAL&#39;Z</div>
