@@ -391,12 +391,7 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:#111;display:flex;j
 
 /* MISC */
 .scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;}
-.scroll::-webkit-scrollbar{width:3px;}
-.scroll::-webkit-scrollbar-track{background:transparent;}
-.scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:3px;}
-[data-dark="true"] .scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);}
-.scroll-top-btn{position:fixed;bottom:96px;right:16px;width:34px;height:34px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border-col);box-shadow:0 2px 8px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s ease;}
-.scroll-top-btn.visible{opacity:1;pointer-events:auto;}
+.scroll::-webkit-scrollbar{display:none;}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 24px 0;flex-shrink:0;}
 .screen-hdr{flex-shrink:0;position:relative;z-index:3;}
 .screen-hdr::after{content:"";position:absolute;bottom:-16px;left:0;right:0;height:16px;background:linear-gradient(to bottom,#F5B8EC,rgba(245,184,236,0));pointer-events:none;z-index:3;}
@@ -3560,31 +3555,6 @@ function SkeletonCard(){
         <div className="skeleton" style={{height:12,borderRadius:8,width:"40%"}}/>
       </div>
     </div>
-  );
-}
-
-function ScrollTopBtn() {
-  const [visible, setVisible] = React.useState(false);
-  React.useEffect(()=>{
-    function onScroll(e){
-      setVisible(e.target.scrollTop > 200);
-    }
-    // Listen on all scroll containers
-    document.addEventListener('scroll', onScroll, true);
-    return ()=>document.removeEventListener('scroll', onScroll, true);
-  },[]);
-
-  function scrollTop(){
-    const el = document.querySelector('.scroll');
-    if(el) el.scrollTo({top:0, behavior:'smooth'});
-  }
-
-  return (
-    <button className={`scroll-top-btn${visible?' visible':''}`} onClick={scrollTop} aria-label="Scroll to top">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="18 15 12 9 6 15"/>
-      </svg>
-    </button>
   );
 }
 
@@ -8869,6 +8839,29 @@ function App() {
   const changeLang = (l) => { setLang(l); setLangState(l); };
   const changeDark = (v) => { setDarkMode(v); setDarkState(v); };
   React.useEffect(()=>{ applyDarkMode(_dark); }, []);
+
+  // Swipe right from left edge → go back
+  React.useEffect(()=>{
+    let startX=0, startY=0;
+    function onTouchStart(e){
+      startX=e.touches[0].clientX;
+      startY=e.touches[0].clientY;
+    }
+    function onTouchEnd(e){
+      const dx=e.changedTouches[0].clientX-startX;
+      const dy=Math.abs(e.changedTouches[0].clientY-startY);
+      // Swipe right from left edge (first 30px), horizontal enough
+      if(startX<30 && dx>60 && dy<80){
+        navigate(-1);
+      }
+    }
+    document.addEventListener('touchstart', onTouchStart, {passive:true});
+    document.addEventListener('touchend', onTouchEnd, {passive:true});
+    return ()=>{
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchend', onTouchEnd);
+    };
+  }, []);
   const [history, setHistory] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [selectedScout, setSelectedScout] = useState(null);
@@ -9153,10 +9146,143 @@ function App() {
   }
   function showToastMsg(msg){setToast(msg);setTimeout(()=>setToast(null),3000);}
 
+  async function loadSavedIds(userId){
+    const {data, error} = await supabase
+      .from("saved_venues")
+      .select("venue_id")
+      .eq("user_id", userId);
+    if(data) setSavedIds(new Set(data.map(r=>r.venue_id)));
+  }
+
+  async function toggleSave(id){
+    if(!user) return;
+    const isSaved = savedIds.has(id);
+    if(isSaved){
+      setSavedIds(prev=>{const n=new Set(prev);n.delete(id);return n;});
+      await supabase.from("saved_venues").delete().eq("user_id",user.id).eq("venue_id",id);
+    } else {
+      setSavedIds(prev=>new Set(prev).add(id));
+      await supabase.from("saved_venues").insert({user_id:user.id, venue_id:id});
+    }
+  }
+
+  function onLogin(u){
+    setUser(u);
+    if(u?.id) loadSavedIds(u.id);
+    if(u?.id) detectUserCity(u);
+    // If pending invite → go to event directly
+    if(pendingInvite){
+      setSelectedPlan(pendingInvite);
+      setPendingInvite(null);
+      setScreen(u.city_id ? "event_plan_detail" : "onboarding");
+      return;
+    }
+    // If partner context → go to activate screen (or home if already has active access)
+    if(partner){
+      const hasActiveAccess = u?.partner_id===partner.id && u?.partner_access_expires_at && new Date(u.partner_access_expires_at) > new Date();
+      if(hasActiveAccess) setScreen("home");
+      else setScreen("partner_activate");
+      return;
+    }
+    // Normal login → home or onboarding
+    if(!u.city_id) setScreen("onboarding");
+    else setScreen("home");
+  }
+  async function signOut(){
+    await supabase.auth.signOut();
+    setUser(null);
+    setSavedIds(new Set());
+    setAnswers({});
+    setHistory([]);
+    setSelectedVenue(null);
+    setSelectedScout(null);
+    setSelectedEvent(null);
+    setSelectedPlan(null);
+    setScreen("signin");
+  }
+
+  const isScout = user?.role==="scout"||user?.role==="city_lead";
+  const isPartnerActive = user?.partner_id && user?.partner_access_expires_at && new Date(user.partner_access_expires_at) > new Date();
+
+  // If partner detected in URL and user not logged in → show partner landing
+  useEffect(()=>{
+    if(partner && screen==="signin"){
+      setScreen("partner_landing");
+    }
+  },[partner]);
+
+  // Pending invite flow
+  useEffect(()=>{
+    if(!pendingInvite || appLoading) return;
+    setSelectedPlan(pendingInvite);
+    if(!user){
+      // Not logged in → go to signup, plan waiting
+      setScreen("signup");
+    } else {
+      // Logged in → open event directly (free users can also RSVP)
+      setScreen("event_plan_detail");
+      setPendingInvite(null);
+    }
+  },[pendingInvite, appLoading, user]);
+
+  const screens = {
+    signin: <SignInScreen navigate={navigate} onLogin={onLogin}/>,
+    signup: <SignUpScreen navigate={navigate} onLogin={onLogin}/>,
+    onboarding: <OnboardingScreen navigate={navigate} user={user} setUser={setUser}/>,
+    home: <HomeScreen navigate={navigate} onMenu={()=>setShowMenu(true)} setAnswers={setAnswers} user={user} partner={isPartnerActive ? partner : null} venuesLoading={venuesLoading} allVenues={allVenues} selectedCity={selectedCity}/>,
+    q1: <Q1Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
+    q2: <Q2Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} selectedCity={selectedCity}/>,
+    q3: <Q3Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} partnerDistrict={isPartnerActive ? partner?.district : null} allVenues={allVenues}/>,
+    q3_city: <Q3CityScreen navigate={navigate} selectedCity={selectedCity} onCitySelect={selectCity} availableCities={availableCities}/>,
+    q4: <Q4Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} selectedCity={selectedCity}/>,
+    q5: <Q5Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
+    q6: <Q6Screen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers}/>,
+    results: <ResultsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} answers={answers} setAnswers={setAnswers} allVenues={allVenues} partner={isPartnerActive ? partner : null} user={user} selectedCity={selectedCity}/>,
+    venue: selectedVenue&&<VenueDetailScreen venue={selectedVenue} navigate={navigate} savedIds={savedIds} toggleSave={toggleSave} showToast={showToastMsg} isScout={isScout} user={user} allVenues={allVenues}/>,
+    feed: <FeedScreen navigate={navigate} user={user} allVenues={allVenues}/>,
+    saved: <SavedScreen navigate={navigate} savedIds={savedIds} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    scouts: <ScoutsScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    all_venues: <AllVenuesScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    scout: <ScoutScreen navigate={navigate} allVenues={allVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} setAllVenues={setAllVenues} user={user} cities={cities} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    city_lead: <CityLeadScreen navigate={navigate} allVenues={allVenues} setAllVenues={setAllVenues} onMenu={()=>setShowMenu(true)} showToast={showToastMsg} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    profile: <ProfileScreen navigate={navigate} user={user} setUser={setUser} onMenu={()=>setShowMenu(true)} onSignOut={signOut} cities={cities} lang={lang} changeLang={changeLang} dark={dark} changeDark={changeDark}/>,
+    about: <AboutScreen navigate={navigate}/>,
+    upgrade: <UpgradeScreen navigate={navigate} user={user}/>,
+    event_calendar: <EventCalendarScreen navigate={navigate} onMenu={()=>setShowMenu(true)} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
+    event_detail: selectedEvent&&<EventDetailScreen navigate={navigate} event={selectedEvent} user={user} showToast={showToastMsg}/>,
+    event_plan_detail: selectedPlan&&<EventPlanDetailScreen navigate={navigate} plan={selectedPlan} user={user} allVenues={allVenues} showToast={showToastMsg}/>,
+    scout_profile: selectedScout&&<ScoutProfileScreen navigate={navigate} scoutId={selectedScout} allVenues={allVenues} savedIds={savedIds} user={user} selectedCity={selectedCity} availableCities={availableCities} onCitySelect={selectCity}/>,
+    results_list: (()=>{
+      const listData = selectedVenue||{};
+      const listVenues = listData.venues||[];
+      const listTitle = listData.title||"spots";
+      return (
+        <div className="screen" style={{background:"var(--bg)"}}>
+          <div style={{background:"var(--bg)",padding:"20px 24px 16px",flexShrink:0}}>
+            <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
+              <button onClick={()=>navigate("home",null,{replace:true})} className="back-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <div style={{textAlign:"right"}}>
+                <div style={{fontFamily:"var(--display)",fontSize:"44px",color:"var(--red)",lineHeight:.9,letterSpacing:0}}>LOKAL&#39;Z</div>
+                <div style={{fontFamily:"var(--body)",fontWeight:700,fontSize:20,color:"var(--black)",marginTop:4}}>{t("home.city_picks")}</div>
+                <div style={{fontFamily:"var(--body)",fontWeight:400,fontSize:20,color:"var(--black)",marginTop:2}}>{listTitle}</div>
+              </div>
+            </div>
+          </div>
+          <div className="scroll" style={{padding:"20px 20px 80px"}}>
+            {listVenues.map(v=><VenueCard key={v.id} venue={v} onClick={()=>navigate("venue",v)}/>)}
+          </div>
+        </div>
+      );
+    })(),
+    partner_activate: partner&&user&&<PartnerActivateScreen partner={partner} navigate={navigate} user={user} onActivate={u=>{setUser(u);}} showToast={showToastMsg}/>,
+    partner_signup: <SignUpScreen navigate={navigate} onLogin={onLogin} partner={partner}/>,
+    partner_signin: <SignInScreen navigate={navigate} onLogin={onLogin} partner={partner}/>,
+  };
+
   return (
     <DarkContext.Provider value={dark}>
     <>
-    <div id="app-root" style={{width:"100%",height:"100%",position:"relative"}}>
+    <div style={{width:"100%",height:"100%",position:"relative"}}>
       {appLoading
         ? <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:20,background:"var(--bg)"}}>
             <div style={{fontFamily:"var(--display)",fontSize:"40px",color:"var(--red)",lineHeight:.88,letterSpacing:0}}>LOKAL&#39;Z</div>
@@ -9167,9 +9293,8 @@ function App() {
             {(()=>{
               const DETAIL_SCREENS = ["venue","scout_profile","event_detail","event_plan_detail"];
               const isDetail = DETAIL_SCREENS.includes(screen);
-              const bgKey = isDetail && history.length > 0
-                ? history[history.length-1].screen
-                : isDetail ? "home"
+              const bgKey = isDetail
+                ? (history.length>0 ? history[history.length-1].screen : "home")
                 : screen;
               return (
                 <>
@@ -9202,7 +9327,6 @@ function App() {
                 </>
       }
       {toast&&<div className="toast">{toast}</div>}
-      <ScrollTopBtn/>
     </div>
     </>
     </DarkContext.Provider>
